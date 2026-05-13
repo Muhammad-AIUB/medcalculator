@@ -1,6 +1,5 @@
 'use client';
-import { useState, useMemo, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useMemo } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
 import { CalculatorCard } from '@/components/layout/calculator-card';
 import { CALCULATORS } from '@/lib/calculators/calculator-registry';
@@ -23,26 +22,7 @@ export default function DashboardPage() {
   const [search, setSearch] = useState('');
   const [activeCategory, setActiveCategory] = useState('all');
   const [showSearch, setShowSearch] = useState(false);
-  const router = useRouter();
   const { recentCalculators } = useUIStore();
-  const [checked, setChecked] = useState(false);
-
-  useEffect(() => {
-    if (checked) return;
-    // Only redirect on fresh app open, not when navigating back within the session
-    if (!sessionStorage.getItem('medcalc-session')) {
-      sessionStorage.setItem('medcalc-session', '1');
-      const raw = localStorage.getItem('medcalc-ui-store');
-      if (raw) {
-        try {
-          const parsed = JSON.parse(raw);
-          const lp = parsed?.state?.lastPage;
-          if (lp && lp !== '/') { router.replace(lp); return; }
-        } catch {}
-      }
-    }
-    setChecked(true);
-  }, [checked, router]);
 
   const filtered = useMemo(() => {
     let list = CALCULATORS;

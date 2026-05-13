@@ -1,6 +1,6 @@
 'use client';
 import { useParams, useRouter } from 'next/navigation';
-import { useMemo, useState, useCallback, useEffect } from 'react';
+import { useMemo, useState, useCallback } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
 import { ResultCard } from '@/components/ui/result-card';
 import { Button } from '@/components/ui/button';
@@ -33,13 +33,11 @@ export default function CalculatorPage() {
   const { id } = useParams<{ id: string }>();
   const router = useRouter();
   const calculator = useMemo(() => getCalculator(id), [id]);
-  const { addToRecent, addHistoryEntry, setLastPage } = useUIStore();
+  const { addToRecent, addHistoryEntry } = useUIStore();
   const [result, setResult] = useState<any>(null);
   const [resetKey, setResetKey] = useState(0);
 
   const FormComponent = FORM_MAP[id];
-
-  useEffect(() => { setLastPage(`/calculators/${id}`); }, [id, setLastPage]);
 
   if (!calculator || !FormComponent) {
     return (
