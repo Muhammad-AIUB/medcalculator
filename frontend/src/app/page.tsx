@@ -29,13 +29,17 @@ export default function DashboardPage() {
 
   useEffect(() => {
     if (checked) return;
-    const raw = localStorage.getItem('medcalc-ui-store');
-    if (raw) {
-      try {
-        const parsed = JSON.parse(raw);
-        const lp = parsed?.state?.lastPage;
-        if (lp && lp !== '/') { router.replace(lp); return; }
-      } catch {}
+    // Only redirect on fresh app open, not when navigating back within the session
+    if (!sessionStorage.getItem('medcalc-session')) {
+      sessionStorage.setItem('medcalc-session', '1');
+      const raw = localStorage.getItem('medcalc-ui-store');
+      if (raw) {
+        try {
+          const parsed = JSON.parse(raw);
+          const lp = parsed?.state?.lastPage;
+          if (lp && lp !== '/') { router.replace(lp); return; }
+        } catch {}
+      }
     }
     setChecked(true);
   }, [checked, router]);
