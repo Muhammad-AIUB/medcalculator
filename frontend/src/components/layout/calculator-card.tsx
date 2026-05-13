@@ -53,8 +53,7 @@ export function CalculatorCard({ calculator }: CalculatorCardProps) {
             <IconComp className="h-5 w-5 text-white" />
           </div>
           <div className="flex-1 min-w-0 pr-6">
-            <h3 className="text-sm font-semibold text-foreground leading-tight mb-1">{calculator.title}</h3>
-            <p className="text-xs text-muted-foreground leading-relaxed line-clamp-2">{calculator.description}</p>
+            <h3 className="text-sm font-semibold text-foreground leading-tight">{calculator.title}</h3>
           </div>
         </div>
         <div className="flex items-center justify-between mt-3">
