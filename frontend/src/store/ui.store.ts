@@ -23,7 +23,7 @@ interface UIState {
   addHistoryEntry: (entry: Omit<HistoryEntry, 'id'>) => void;
   removeHistoryEntry: (id: string) => void;
   clearHistory: () => void;
-  setLastPage: (path: string) => void;
+  setLastPage: (path: string | null) => void;
   setFormData: (calcId: string, data: Record<string, unknown>) => void;
   getFormData: (calcId: string) => Record<string, unknown> | undefined;
 }
