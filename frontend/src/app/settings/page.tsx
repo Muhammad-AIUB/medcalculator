@@ -15,7 +15,7 @@ const themes = [
 
 export default function SettingsPage() {
   const { theme, setTheme } = useTheme();
-  const { clearHistory, history, favorites } = useUIStore();
+  const { clearHistory, history } = useUIStore();
   const [cleared, setCleared] = useState(false);
 
   const handleClear = () => {
@@ -67,12 +67,6 @@ export default function SettingsPage() {
                 <Trash2 className="h-3.5 w-3.5" />
                 {cleared ? 'Cleared!' : 'Clear'}
               </Button>
-            </div>
-            <div className="flex items-center justify-between px-4 py-3.5">
-              <div>
-                <p className="text-sm font-medium">Favorites</p>
-                <p className="text-xs text-muted-foreground">{favorites.length} pinned calculators</p>
-              </div>
             </div>
           </div>
         </section>
