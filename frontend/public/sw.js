@@ -6,7 +6,7 @@
  *   - Static assets: Stale While Revalidate
  */
 
-const CACHE_VERSION = 'v1.0.0';
+const CACHE_VERSION = 'v1.0.2';
 const SHELL_CACHE = `medcalc-shell-${CACHE_VERSION}`;
 const DYNAMIC_CACHE = `medcalc-dynamic-${CACHE_VERSION}`;
 const API_CACHE = `medcalc-api-${CACHE_VERSION}`;
@@ -75,9 +75,9 @@ self.addEventListener('fetch', (event) => {
   if (CACHE_STRATEGIES.isAPICall(url)) {
     // Network First — cache API responses as fallback
     event.respondWith(networkFirstWithCache(event.request, API_CACHE, 5000));
-  } else if (CACHE_STRATEGIES.isAppShell(url)) {
-    // Cache First — serve from cache, fallback to network
-    event.respondWith(cacheFirstWithFallback(event.request, SHELL_CACHE));
+  } else if (event.request.mode === 'navigate' || CACHE_STRATEGIES.isAppShell(url)) {
+    // Network First for HTML pages — always get latest, fallback to cache offline
+    event.respondWith(networkFirstWithCache(event.request, SHELL_CACHE, 3000));
   } else if (CACHE_STRATEGIES.isStaticAsset(url)) {
     // Stale While Revalidate
     event.respondWith(staleWhileRevalidate(event.request, DYNAMIC_CACHE));
