@@ -1,0 +1,93 @@
+import type { Metadata, Viewport } from 'next'
+import { Inter } from 'next/font/google'
+import { ThemeProvider } from 'next-themes'
+import { Toaster } from 'sonner'
+import { PWARegister } from '@/components/pwa-register'
+import './globals.css'
+
+const inter = Inter({
+  subsets: ['latin'],
+  variable: '--font-inter',
+  display: 'swap',
+})
+
+export const metadata: Metadata = {
+  title: {
+    default: 'MedCalc Pro — Clinical Calculator Platform',
+    template: '%s | MedCalc Pro',
+  },
+  description:
+    'Professional clinical calculators for healthcare providers. eGFR, Child-Pugh, MELD-Na, SOFA, BMI, EDD, Vasopressor Score, TSAT and more.',
+  keywords: [
+    'medical calculator', 'clinical calculator', 'eGFR', 'SOFA score',
+    'Child-Pugh', 'MELD', 'BMI', 'TSAT', 'vasopressor score',
+    'hospital tool', 'ICU calculator',
+  ],
+  authors: [{ name: 'MedCalc Pro' }],
+  manifest: '/manifest.json',
+  appleWebApp: {
+    capable: true,
+    statusBarStyle: 'default',
+    title: 'MedCalc Pro',
+  },
+  icons: {
+    icon: '/icon-192.png',
+    apple: '/icon-192.png',
+  },
+  openGraph: {
+    type: 'website',
+    locale: 'en_US',
+    title: 'MedCalc Pro — Clinical Calculator Platform',
+    description: 'Professional clinical calculators for healthcare providers',
+    siteName: 'MedCalc Pro',
+  },
+}
+
+export const viewport: Viewport = {
+  width: 'device-width',
+  initialScale: 1,
+  maximumScale: 5,
+  userScalable: true,
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#0891b2' },
+    { media: '(prefers-color-scheme: dark)', color: '#0e7490' },
+  ],
+}
+
+export default function RootLayout({ children }: { children: React.ReactNode }) {
+  return (
+    <html lang="en" suppressHydrationWarning className={inter.variable}>
+      <head>
+        <link rel="manifest" href="/manifest.json" />
+        <meta name="apple-mobile-web-app-capable" content="yes" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-title" content="MedCalc Pro" />
+        <meta name="format-detection" content="telephone=no" />
+        <meta name="mobile-web-app-capable" content="yes" />
+        <meta name="msapplication-TileColor" content="#0891b2" />
+      </head>
+      <body className="antialiased min-h-screen bg-background">
+        <ThemeProvider
+          attribute="class"
+          defaultTheme="light"
+          enableSystem
+          disableTransitionOnChange={false}
+        >
+          {children}
+          <Toaster
+            position="top-center"
+            toastOptions={{
+              style: {
+                background: 'hsl(var(--card))',
+                color: 'hsl(var(--card-foreground))',
+                border: '1px solid hsl(var(--border))',
+                borderRadius: '0.75rem',
+              },
+            }}
+          />
+        </ThemeProvider>
+        <PWARegister />
+      </body>
+    </html>
+  )
+}
