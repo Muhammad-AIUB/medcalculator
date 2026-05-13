@@ -4,7 +4,7 @@
   "description": "Enterprise Medical Calculator Platform - NestJS Backend",
   "scripts": {
     "clean:build": "node -e \"const fs=require('fs'); fs.rmSync('dist',{recursive:true,force:true}); fs.rmSync('tsconfig.tsbuildinfo',{force:true});\"",
-    "build": "npm run clean:build && npx nest build",
+    "build": "npm run clean:build && npx prisma generate && npx nest build",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\"",
     "start": "nest start",
     "start:dev": "npm run clean:build && nest start --watch",
