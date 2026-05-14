@@ -5,13 +5,12 @@ interface AppShellProps {
   title?: string;
   showBack?: boolean;
   backHref?: string;
-  onSearchClick?: () => void;
 }
 
-export function AppShell({ children, title, showBack, backHref, onSearchClick }: AppShellProps) {
+export function AppShell({ children, title, showBack, backHref }: AppShellProps) {
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <Header title={title} showBack={showBack} backHref={backHref} onSearchClick={onSearchClick} />
+      <Header title={title} showBack={showBack} backHref={backHref} />
       <main className="flex-1 w-full max-w-2xl mx-auto px-4 pt-4 pb-8">
         {children}
       </main>

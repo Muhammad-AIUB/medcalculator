@@ -1,19 +1,17 @@
 'use client';
 import Link from 'next/link';
-import { Activity, Search } from 'lucide-react';
+import { Activity } from 'lucide-react';
 import { ThemeToggle } from '@/components/ui/theme-toggle';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
-  onSearchClick?: () => void;
   title?: string;
   showBack?: boolean;
   backHref?: string;
   className?: string;
 }
 
-export function Header({ onSearchClick, title, showBack, backHref = '/', className }: HeaderProps) {
+export function Header({ title, showBack, backHref = '/', className }: HeaderProps) {
   return (
     <header className={cn(
       'sticky top-0 z-40 w-full border-b border-border/60 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80',
@@ -41,14 +39,7 @@ export function Header({ onSearchClick, title, showBack, backHref = '/', classNa
           <h1 className="flex-1 text-base font-semibold text-foreground truncate">{title}</h1>
         )}
         {!title && <div className="flex-1" />}
-        <div className="flex items-center gap-1">
-          {onSearchClick && (
-            <Button variant="ghost" size="icon" onClick={onSearchClick} aria-label="Search calculators">
-              <Search className="h-5 w-5" />
-            </Button>
-          )}
-          <ThemeToggle />
-        </div>
+        <ThemeToggle />
       </div>
     </header>
   );

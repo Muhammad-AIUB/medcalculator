@@ -1,84 +1,38 @@
 'use client';
-import { useState, useMemo } from 'react';
+import { useMemo } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
 import { CalculatorCard } from '@/components/layout/calculator-card';
 import { CALCULATORS } from '@/lib/calculators/calculator-registry';
 import { useUIStore } from '@/store/ui.store';
-import { Search, Clock, X } from 'lucide-react';
+import { Clock } from 'lucide-react';
 import Link from 'next/link';
 import type { Calculator } from '@/types/calculator';
 
 export default function DashboardPage() {
-  const [search, setSearch] = useState('');
-  const [showSearch, setShowSearch] = useState(false);
   const { recentCalculators } = useUIStore();
-
-  const filtered = useMemo(() => {
-    let list = CALCULATORS;
-    if (search.trim()) {
-      const q = search.toLowerCase();
-      list = list.filter(
-        (c) =>
-          c.title.toLowerCase().includes(q) ||
-          c.description.toLowerCase().includes(q) ||
-          c.tags?.some((t) => t.toLowerCase().includes(q))
-      );
-    }
-    return list;
-  }, [search]);
 
   const recentCalcs = recentCalculators
     .map((id) => CALCULATORS.find((c) => c.id === id))
     .filter(Boolean) as Calculator[];
 
-  // Group by category label when not searching
   const categoryLabel = (cat: string) =>
     cat.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 
   const grouped = useMemo(() => {
-    if (search.trim()) {
-      return { Results: filtered };
-    }
-    return filtered.reduce<Record<string, Calculator[]>>((acc, c) => {
+    return CALCULATORS.reduce<Record<string, Calculator[]>>((acc, c) => {
       const cat = categoryLabel(c.category);
       if (!acc[cat]) acc[cat] = [];
       acc[cat].push(c);
       return acc;
     }, {});
-  }, [filtered, search]);
+  }, []);
 
   return (
-    <AppShell onSearchClick={() => setShowSearch((s) => !s)}>
+    <AppShell>
       <div className="space-y-5">
 
-        {/* Search bar */}
-        {showSearch && (
-          <div className="relative">
-            <Search
-              className="absolute left-3.5 top-1/2 -translate-y-1/2 text-muted-foreground"
-              style={{ width: 18, height: 18 }}
-            />
-            <input
-              autoFocus
-              type="text"
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              placeholder="Search calculators, tags..."
-              className="w-full h-12 pl-10 pr-10 rounded-xl border border-input bg-background text-sm focus:outline-none focus:ring-2 focus:ring-primary"
-            />
-            {search && (
-              <button
-                onClick={() => setSearch('')}
-                className="absolute right-3 top-1/2 -translate-y-1/2 p-1 hover:bg-muted rounded-full"
-              >
-                <X className="h-4 w-4 text-muted-foreground" />
-              </button>
-            )}
-          </div>
-        )}
-
         {/* Recent calculators */}
-        {recentCalcs.length > 0 && !search && (
+        {recentCalcs.length > 0 && (
           <section>
             <div className="flex items-center gap-2 mb-3">
               <Clock className="h-4 w-4 text-muted-foreground" />
@@ -106,11 +60,9 @@ export default function DashboardPage() {
         {/* Calculator groups */}
         {Object.entries(grouped).map(([group, calcs]) => (
           <section key={group}>
-            {Object.keys(grouped).length > 1 && (
-              <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
-                {group}
-              </h2>
-            )}
+            <h2 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-3">
+              {group}
+            </h2>
             <div className="grid grid-cols-1 gap-2.5">
               {calcs.map((calc) => (
                 <CalculatorCard key={calc.id} calculator={calc} />
@@ -118,17 +70,6 @@ export default function DashboardPage() {
             </div>
           </section>
         ))}
-
-        {/* Empty state */}
-        {filtered.length === 0 && (
-          <div className="text-center py-16">
-            <p className="text-4xl mb-3">🔍</p>
-            <p className="text-base font-semibold text-foreground">No calculators found</p>
-            <p className="text-sm text-muted-foreground mt-1">
-              Try a different search term
-            </p>
-          </div>
-        )}
       </div>
     </AppShell>
   );
