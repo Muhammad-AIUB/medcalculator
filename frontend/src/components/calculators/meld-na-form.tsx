@@ -105,7 +105,7 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
       </FieldRow>
 
       {/* Dialysis toggle */}
-      <div className="flex items-center justify-between p-4 rounded-lg border-2 border-cyan-500/60 bg-background">
+      <div className="flex items-center justify-between p-4 rounded-lg border-2 border-[#0E7490]/50 bg-background">
         <div>
           <p className="text-sm font-semibold">On Dialysis</p>
           <p className="text-xs text-muted-foreground">Sets creatinine to 4.0 mg/dL</p>
@@ -115,7 +115,7 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
           onClick={() => setOnDialysis(v => { const next = !v; saveField(CID, 'dialysis', String(next)); return next; })}
           className={cn(
             'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
-            onDialysis ? 'bg-cyan-600' : 'bg-muted-foreground/30'
+            onDialysis ? 'bg-[#0E7490]' : 'bg-muted-foreground/30'
           )}
         >
           <span className={cn(

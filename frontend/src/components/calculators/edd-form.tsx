@@ -87,7 +87,7 @@ export function EddForm({ onResult }: EddFormProps) {
               max={today}
               value={lmpDate}
               onChange={e => { setLmpDate(e.target.value); saveField(CID, 'lmpDate', e.target.value); }}
-              className="flex h-11 w-full rounded-lg border-2 border-cyan-500/60 bg-background px-3 text-base font-medium outline-none focus:border-cyan-500"
+              className="flex h-11 w-full rounded-lg border-2 border-[#0E7490]/50 bg-background px-3 text-base font-medium outline-none focus:border-cyan-500"
             />
           </FieldRow>
 
@@ -99,7 +99,7 @@ export function EddForm({ onResult }: EddFormProps) {
                 max={45}
                 value={cycleLength}
                 onChange={e => { setCycleLength(e.target.value); saveField(CID, 'cycleLength', e.target.value); }}
-                className="flex-1 accent-cyan-600"
+                className="flex-1 accent-[#0E7490]"
               />
               <ResultBox value={cycleLength} suffix="days" />
             </div>
@@ -115,7 +115,7 @@ export function EddForm({ onResult }: EddFormProps) {
               max={today}
               value={scanDate}
               onChange={e => { setScanDate(e.target.value); saveField(CID, 'scanDate', e.target.value); }}
-              className="flex h-11 w-full rounded-lg border-2 border-cyan-500/60 bg-background px-3 text-base font-medium outline-none focus:border-cyan-500"
+              className="flex h-11 w-full rounded-lg border-2 border-[#0E7490]/50 bg-background px-3 text-base font-medium outline-none focus:border-cyan-500"
             />
           </FieldRow>
 

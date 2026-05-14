@@ -155,7 +155,7 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
             return (
               <div key={drug.name} className={cn(
                 'rounded-lg border-2 transition-all overflow-hidden',
-                drug.enabled ? 'border-cyan-500 bg-cyan-50/40 dark:bg-cyan-950/20' : 'border-border bg-card'
+                drug.enabled ? 'border-[#0E7490] bg-[#0E7490]/5 dark:bg-[#0E7490]/10' : 'border-border bg-card'
               )}>
                 <div className="flex items-center gap-3 px-4 py-3">
                   <button
@@ -163,14 +163,14 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
                     onClick={() => toggleDrug(i)}
                     className={cn(
                       'relative inline-flex h-5 w-9 items-center rounded-full transition-colors shrink-0',
-                      drug.enabled ? 'bg-cyan-600' : 'bg-muted-foreground/30'
+                      drug.enabled ? 'bg-[#0E7490]' : 'bg-muted-foreground/30'
                     )}
                   >
                     <span className={cn('inline-block h-3.5 w-3.5 transform rounded-full bg-white shadow transition-transform', drug.enabled ? 'translate-x-4' : 'translate-x-0.5')} />
                   </button>
                   <span className="text-sm font-semibold flex-1">{drug.name}</span>
                   {drug.enabled && drug.dose && parseFloat(drug.dose) > 0 && (
-                    <span className="text-xs font-bold text-cyan-600">Active</span>
+                    <span className="text-xs font-bold text-[#0E7490]">Active</span>
                   )}
                 </div>
                 {drug.enabled && (
@@ -182,12 +182,12 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
                       placeholder="Dose"
                       value={drug.dose}
                       onChange={e => updateDrug(i, 'dose', e.target.value)}
-                      className="flex-1 h-11 rounded-lg border-2 border-cyan-500/60 bg-background px-3 text-sm font-medium outline-none focus:border-cyan-500 [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
+                      className="flex-1 h-11 rounded-lg border-2 border-[#0E7490]/50 bg-background px-3 text-sm font-medium outline-none focus:border-[#0E7490] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
                     />
                     <select
                       value={drug.unit}
                       onChange={e => updateDrug(i, 'unit', e.target.value)}
-                      className="rounded-lg border-2 border-cyan-500/60 bg-background px-2 text-xs font-medium text-foreground focus:outline-none h-11"
+                      className="rounded-lg border-2 border-[#0E7490]/50 bg-background px-2 text-xs font-medium text-foreground focus:outline-none h-11"
                     >
                       {drugDef.units.map(u => <option key={u} value={u}>{u}</option>)}
                     </select>

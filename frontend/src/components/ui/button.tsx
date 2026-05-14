@@ -16,7 +16,7 @@ const buttonVariants = cva(
         secondary: 'bg-secondary text-secondary-foreground hover:bg-secondary/80',
         ghost: 'hover:bg-accent hover:text-accent-foreground',
         link: 'text-primary underline-offset-4 hover:underline',
-        medical: 'bg-cyan-600 text-white hover:bg-cyan-700 shadow-sm shadow-cyan-200 dark:shadow-cyan-900',
+        medical: 'bg-[#0E7490] text-white hover:bg-[#0c6378] shadow-sm shadow-cyan-900/20',
         danger: 'bg-red-500 text-white hover:bg-red-600',
         success: 'bg-emerald-500 text-white hover:bg-emerald-600',
         warning: 'bg-amber-500 text-white hover:bg-amber-600',

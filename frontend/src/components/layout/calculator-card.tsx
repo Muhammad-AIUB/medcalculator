@@ -57,7 +57,7 @@ export function CalculatorCard({ calculator }: CalculatorCardProps) {
           <Badge variant="neutral" className="text-[10px] capitalize">
             {categoryLabels[calculator.category] ?? calculator.category}
           </Badge>
-          <span className="text-xs font-semibold text-cyan-600 dark:text-cyan-400">Calculate →</span>
+          <span className="text-xs font-semibold" style={{ color: '#0E7490' }}>Calculate →</span>
         </div>
       </Link>
     </div>

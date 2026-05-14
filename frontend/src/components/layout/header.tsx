@@ -1,7 +1,6 @@
 'use client';
 import Link from 'next/link';
 import { Activity } from 'lucide-react';
-import { ThemeToggle } from '@/components/ui/theme-toggle';
 import { cn } from '@/lib/utils';
 
 interface HeaderProps {
@@ -13,33 +12,40 @@ interface HeaderProps {
 
 export function Header({ title, showBack, backHref = '/', className }: HeaderProps) {
   return (
-    <header className={cn(
-      'sticky top-0 z-40 w-full border-b border-border/60 bg-background/95 backdrop-blur-md supports-[backdrop-filter]:bg-background/80',
-      className
-    )}>
+    <header
+      className={cn('sticky top-0 z-40 w-full', className)}
+      style={{ background: '#0F2744', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+    >
       <div className="flex h-14 items-center gap-3 px-4 max-w-2xl mx-auto">
         {showBack ? (
-          <Link href={backHref} className="flex items-center justify-center h-9 w-9 rounded-xl hover:bg-accent transition-colors">
-            <svg className="h-5 w-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <Link
+            href={backHref}
+            className="flex items-center justify-center h-9 w-9 rounded-xl hover:bg-white/10 transition-colors"
+          >
+            <svg className="h-5 w-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
             </svg>
           </Link>
         ) : (
           <Link href="/" className="flex items-center gap-2.5 shrink-0">
-            <div className="h-8 w-8 rounded-xl bg-cyan-600 flex items-center justify-center shadow-sm shadow-cyan-200 dark:shadow-cyan-900">
+            <div
+              className="h-8 w-8 rounded-xl flex items-center justify-center shadow-sm"
+              style={{ background: '#0E7490' }}
+            >
               <Activity style={{ width: 18, height: 18 }} className="text-white" />
             </div>
-            <div className="hidden sm:block">
-              <p className="text-sm font-bold text-foreground leading-none">MedCalc Pro</p>
-              <p className="text-[10px] text-muted-foreground leading-none mt-0.5">Clinical Calculator</p>
+            <div>
+              <p className="text-sm font-bold text-white leading-none">MedCalc Pro</p>
+              <p className="text-[10px] leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
+                Clinical Calculator
+              </p>
             </div>
           </Link>
         )}
         {title && (
-          <h1 className="flex-1 text-base font-semibold text-foreground truncate">{title}</h1>
+          <h1 className="flex-1 text-base font-semibold text-white truncate">{title}</h1>
         )}
         {!title && <div className="flex-1" />}
-        <ThemeToggle />
       </div>
     </header>
   );

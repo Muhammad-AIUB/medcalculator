@@ -152,7 +152,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
     });
   }, [liveResult]);
 
-  const sectionClass = 'rounded-lg border-2 border-cyan-500/30 bg-card p-4 space-y-3';
+  const sectionClass = 'rounded-lg border-2 border-[#0E7490]/30 bg-card p-4 space-y-3';
   const clearAll = () => { setPao2(''); setFio2(''); setSpo2(''); setVentilated(false); setPlatelets(''); setBilMgStr(''); setBilUmolStr(''); setMapStr(''); setGcs(''); setCreatMgStr(''); setCreatUmolStr(''); setUrineOutput(''); saveField(CID, 'bilMg', ''); saveField(CID, 'bilUmol', ''); saveField(CID, 'creatMg', ''); saveField(CID, 'creatUmol', ''); saveField(CID, 'pao2', ''); saveField(CID, 'fio2', ''); saveField(CID, 'spo2', ''); saveField(CID, 'vent', ''); saveField(CID, 'plt', ''); saveField(CID, 'map', ''); saveField(CID, 'gcs', ''); saveField(CID, 'urine', ''); };
 
   return (
@@ -174,7 +174,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
           <button
             type="button"
             onClick={() => setVentilated(v => { const next = !v; saveField(CID, 'vent', String(next)); return next; })}
-            className={cn('relative inline-flex h-6 w-11 items-center rounded-full transition-colors', ventilated ? 'bg-cyan-600' : 'bg-muted-foreground/30')}
+            className={cn('relative inline-flex h-6 w-11 items-center rounded-full transition-colors', ventilated ? 'bg-[#0E7490]' : 'bg-muted-foreground/30')}
           >
             <span className={cn('inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform', ventilated ? 'translate-x-6' : 'translate-x-1')} />
           </button>
@@ -215,7 +215,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
           <ScoreLabel score={partialScores.neuro} />
         </div>
         <div className="flex items-center gap-3">
-          <input type="range" min={3} max={15} value={gcs} onChange={e => { setGcs(e.target.value); saveField(CID, 'gcs', e.target.value); }} className="flex-1 accent-cyan-600" />
+          <input type="range" min={3} max={15} value={gcs} onChange={e => { setGcs(e.target.value); saveField(CID, 'gcs', e.target.value); }} className="flex-1 accent-[#0E7490]" />
           <ResultBox value={gcs} />
         </div>
       </div>

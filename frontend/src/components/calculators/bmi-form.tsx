@@ -126,7 +126,7 @@ export function BmiForm({ onResult }: BmiFormProps) {
           {(['male', 'female'] as const).map((s) => (
             <button key={s} type="button" onClick={() => { setSex(s); saveField(CID, 'sex', s); }}
               className={cn('h-11 rounded-lg border text-sm font-medium transition-all',
-                sex === s ? 'border-cyan-500 bg-cyan-50 text-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-300'
+                sex === s ? 'border-[#0E7490] bg-[#0E7490]/10 text-[#0E7490] dark:bg-[#0E7490]/20 dark:text-cyan-300'
                   : 'border-border bg-background text-muted-foreground hover:border-muted-foreground')}>
               {s === 'male' ? 'Male' : 'Female'}
             </button>

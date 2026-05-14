@@ -149,7 +149,7 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
               className={cn(
                 'w-full text-left px-4 py-3 rounded-lg border text-sm transition-all',
                 ascites === opt.value
-                  ? 'border-cyan-500 bg-cyan-50 text-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-300 font-medium'
+                  ? 'border-[#0E7490] bg-[#0E7490]/10 text-[#0E7490] dark:bg-[#0E7490]/20 dark:text-cyan-300 font-medium'
                   : 'border-border bg-background text-foreground hover:border-muted-foreground'
               )}
             >
@@ -174,7 +174,7 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
               className={cn(
                 'w-full text-left px-4 py-3 rounded-lg border text-sm transition-all',
                 encephalopathy === opt.value
-                  ? 'border-cyan-500 bg-cyan-50 text-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-300 font-medium'
+                  ? 'border-[#0E7490] bg-[#0E7490]/10 text-[#0E7490] dark:bg-[#0E7490]/20 dark:text-cyan-300 font-medium'
                   : 'border-border bg-background text-foreground hover:border-muted-foreground'
               )}
             >

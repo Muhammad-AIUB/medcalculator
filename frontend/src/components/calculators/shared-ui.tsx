@@ -29,8 +29,8 @@ export function NumInput({
 }) {
   return (
     <div className={cn(
-      'flex items-stretch overflow-hidden rounded-lg border-2 border-cyan-500/60 bg-background',
-      disabled ? 'opacity-50' : 'focus-within:border-cyan-500',
+      'flex items-stretch overflow-hidden rounded-lg border-2 bg-background',
+      disabled ? 'opacity-50 border-[#0E7490]/40' : 'border-[#0E7490]/50 focus-within:border-[#0E7490]',
     )}>
       <input
         type="number"
@@ -54,7 +54,7 @@ export function NumInput({
 
 export function ResultBox({ value, suffix, alignRight }: { value: string; suffix?: string; alignRight?: boolean }) {
   return (
-    <div className="flex items-stretch overflow-hidden rounded-lg border-2 border-cyan-500/60 bg-background">
+    <div className="flex items-stretch overflow-hidden rounded-lg border-2 border-[#0E7490]/50 bg-background">
       <div className={cn(
         'min-w-0 flex-1 h-11 px-3 flex items-center text-base font-semibold',
         alignRight ? 'justify-end' : '',
@@ -93,9 +93,9 @@ export function OptionButtons<T extends string | undefined>({
           type="button"
           onClick={() => onChange(opt.value)}
           className={cn(
-            'h-11 rounded-lg border text-sm font-medium transition-all',
+            'h-11 rounded-lg border-2 text-sm font-medium transition-all',
             value === opt.value
-              ? 'border-cyan-500 bg-cyan-50 text-cyan-700 dark:bg-cyan-950/30 dark:text-cyan-300'
+              ? 'border-[#0E7490] bg-[#0E7490]/10 text-[#0E7490] dark:bg-[#0E7490]/20 dark:text-cyan-300 font-semibold'
               : 'border-border bg-background text-muted-foreground hover:border-muted-foreground'
           )}
         >

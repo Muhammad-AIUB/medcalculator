@@ -92,7 +92,7 @@ export function TsatForm({ onResult }: TsatFormProps) {
           onChange={(v) => { setTibcMethod(v); saveField(CID, 'tibcMethod', v); const u = v === 'tibc' ? 'µg/dL' : 'mg/dL'; setTibcUnit(u); saveField(CID, 'tibcUnit', u); }}
           columns={2}
         />
-        <div className="mt-2 flex items-stretch overflow-hidden rounded-lg border-2 border-cyan-500/60 bg-background focus-within:border-cyan-500">
+        <div className="mt-2 flex items-stretch overflow-hidden rounded-lg border-2 border-[#0E7490]/50 bg-background focus-within:border-cyan-500">
           <input
             type="number"
             inputMode="decimal"
