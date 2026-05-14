@@ -3,7 +3,6 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateEGFR } from '@/lib/calculators/egfr';
-import { Save } from 'lucide-react';
 import { FieldRow, NumInput, ResultBox, OrDivider, OptionButtons, InterpretationTable, round, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'egfr';
@@ -69,6 +68,8 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
       warnings: liveEgfr && liveEgfr < 15 ? ['eGFR < 15: Consider nephrology referral for renal replacement therapy'] : [],
     });
   };
+  const clearAll = () => { setMgdlStr(''); setUmolStr(''); setAgeStr(''); setSex('male'); setFormula('ckd-epi-2021'); saveField(CID, 'mgdl', ''); saveField(CID, 'umol', ''); saveField(CID, 'age', ''); saveField(CID, 'sex', ''); saveField(CID, 'formula', ''); };
+
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
@@ -105,10 +106,14 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
         />
       </FieldRow>
 
-      <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
-        <Save className="h-4 w-4" />
-        Save to History
-      </Button>
+      <div className="grid grid-cols-[1fr_auto] gap-2">
+        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
+          Calculate
+        </Button>
+        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
+          Clear
+        </Button>
+      </div>
     </form>
   );
 }

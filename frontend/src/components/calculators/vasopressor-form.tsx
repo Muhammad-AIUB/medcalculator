@@ -3,7 +3,6 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateVasopressor } from '@/lib/calculators/vasopressor';
-import { Save } from 'lucide-react';
 import { FieldRow, NumInput, ResultBox, OrDivider, InterpretationTable, round, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'vasopressor';
@@ -111,6 +110,8 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
       warnings: raw.score && raw.score > 30 ? ['VIS > 30: Refractory shock — very high mortality risk'] : [],
     });
   };
+  const clearAll = () => { setKgStr(''); setLbStr(''); setDrugs([]); saveField(CID, 'kg', ''); saveField(CID, 'lb', ''); saveField(CID, 'drugs', ''); };
+
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
@@ -185,10 +186,14 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
           })}
         </div>
       </FieldRow>
-      <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
-        <Save className="h-4 w-4" />
-        Save to History
-      </Button>
+      <div className="grid grid-cols-[1fr_auto] gap-2">
+        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
+          Calculate
+        </Button>
+        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
+          Clear
+        </Button>
+      </div>
     </form>
   );
 }

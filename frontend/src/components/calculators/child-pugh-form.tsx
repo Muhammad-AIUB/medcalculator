@@ -3,7 +3,6 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateChildPugh } from '@/lib/calculators/child-pugh';
-import { Save } from 'lucide-react';
 import { FieldRow, NumInput, ResultBox, OrDivider, OptionButtons, InterpretationTable, round, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'child-pugh';
@@ -108,6 +107,8 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
     const c = score === 1 ? 'bg-emerald-100 text-emerald-700' : score === 2 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700';
     return <span className={cn('ml-auto px-2 py-0.5 rounded text-xs font-bold', c)}>{score} pt{score > 1 ? 's' : ''}</span>;
   };
+  const clearAll = () => { setBilMgStr(''); setBilUmolStr(''); setAlbGdlStr(''); setAlbGlStr(''); setInrStr(''); setAscites(undefined); setEncephalopathy(undefined); saveField(CID, 'bilMg', ''); saveField(CID, 'bilUmol', ''); saveField(CID, 'albGdl', ''); saveField(CID, 'albGl', ''); saveField(CID, 'inr', ''); saveField(CID, 'ascites', ''); saveField(CID, 'enceph', ''); };
+
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
@@ -185,10 +186,14 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
       </FieldRow>
 
       {/* Live score */}
-      <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
-        <Save className="h-4 w-4" />
-        Save to History
-      </Button>
+      <div className="grid grid-cols-[1fr_auto] gap-2">
+        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
+          Calculate
+        </Button>
+        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
+          Clear
+        </Button>
+      </div>
     </form>
   );
 }

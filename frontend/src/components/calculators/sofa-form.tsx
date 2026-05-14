@@ -3,7 +3,6 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateSOFA } from '@/lib/calculators/sofa';
-import { Save } from 'lucide-react';
 import { FieldRow, NumInput, ResultBox, OrDivider, InterpretationTable, round, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'sofa';
@@ -146,6 +145,8 @@ export function SofaForm({ onResult }: SofaFormProps) {
   };
 
   const sectionClass = 'rounded-lg border-2 border-cyan-500/30 bg-card p-4 space-y-3';
+  const clearAll = () => { setPao2(''); setFio2(''); setSpo2(''); setVentilated(false); setPlatelets(''); setBilMgStr(''); setBilUmolStr(''); setMapStr(''); setGcs(''); setCreatMgStr(''); setCreatUmolStr(''); setUrineOutput(''); saveField(CID, 'bilMg', ''); saveField(CID, 'bilUmol', ''); saveField(CID, 'creatMg', ''); saveField(CID, 'creatUmol', ''); saveField(CID, 'pao2', ''); saveField(CID, 'fio2', ''); saveField(CID, 'spo2', ''); saveField(CID, 'vent', ''); saveField(CID, 'plt', ''); saveField(CID, 'map', ''); saveField(CID, 'gcs', ''); saveField(CID, 'urine', ''); };
+
 
   return (
     <form onSubmit={handleSave} className="space-y-4">
@@ -222,10 +223,14 @@ export function SofaForm({ onResult }: SofaFormProps) {
         </div>
         <NumInput value={urineOutput} onChange={(v) => { setUrineOutput(v); saveField(CID, 'urine', v); }} suffix="mL/24h" step="10" min={0} max={10000} placeholder="optional" />
       </div>
-      <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
-        <Save className="h-4 w-4" />
-        Save to History
-      </Button>
+      <div className="grid grid-cols-[1fr_auto] gap-2">
+        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
+          Calculate
+        </Button>
+        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
+          Clear
+        </Button>
+      </div>
     </form>
   );
 }

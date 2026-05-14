@@ -3,7 +3,6 @@ import React, { useState, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateEDD } from '@/lib/calculators/edd';
-import { Save } from 'lucide-react';
 import { FieldRow, NumInput, ResultBox, OptionButtons, InterpretationTable } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'edd';
@@ -63,6 +62,8 @@ export function EddForm({ onResult }: EddFormProps) {
       formulaUsed: method === 'lmp' ? "Naegele's Rule" : 'Ultrasound Dating',
     });
   };
+  const clearAll = () => { setMethod('lmp'); setLmpDate(''); setCycleLength(''); setScanDate(''); setGaWeeks(''); setGaDays(''); saveField(CID, 'method', ''); saveField(CID, 'lmpDate', ''); saveField(CID, 'cycleLength', ''); saveField(CID, 'scanDate', ''); saveField(CID, 'gaWeeks', ''); saveField(CID, 'gaDays', ''); };
+
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
@@ -143,10 +144,14 @@ export function EddForm({ onResult }: EddFormProps) {
           {String(trimester)}
         </p>
       )}
-      <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
-        <Save className="h-4 w-4" />
-        Save to History
-      </Button>
+      <div className="grid grid-cols-[1fr_auto] gap-2">
+        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
+          Calculate
+        </Button>
+        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
+          Clear
+        </Button>
+      </div>
     </form>
   );
 }

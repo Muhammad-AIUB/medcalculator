@@ -3,7 +3,6 @@ import React, { useState, useCallback, useMemo } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateTSAT } from '@/lib/calculators/tsat';
-import { Save } from 'lucide-react';
 import { FieldRow, NumInput, ResultBox, OrDivider, OptionButtons, InterpretationTable, round, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'tsat';
@@ -80,6 +79,8 @@ export function TsatForm({ onResult }: TsatFormProps) {
   };
 
   const tibcUnits = tibcMethod === 'tibc' ? ['µg/dL', 'µmol/L'] : ['mg/dL', 'g/L', 'g/dL'];
+  const clearAll = () => { setIronUgStr(''); setIronUmolStr(''); setTibcMethod('tibc'); setTibcStr(''); setTibcUnit(''); setFerritinStr(''); saveField(CID, 'ironUg', ''); saveField(CID, 'ironUmol', ''); saveField(CID, 'tibcMethod', ''); saveField(CID, 'tibcUnit', ''); saveField(CID, 'tibc', ''); saveField(CID, 'ferritin', ''); };
+
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
@@ -125,10 +126,14 @@ export function TsatForm({ onResult }: TsatFormProps) {
       <FieldRow label="Serum Ferritin" hint="optional">
         <NumInput value={ferritinStr} onChange={(v) => { setFerritinStr(v); saveField(CID, 'ferritin', v); }} suffix="ng/mL" step="1" min={0} max={5000} />
       </FieldRow>
-      <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
-        <Save className="h-4 w-4" />
-        Save to History
-      </Button>
+      <div className="grid grid-cols-[1fr_auto] gap-2">
+        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
+          Calculate
+        </Button>
+        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
+          Clear
+        </Button>
+      </div>
     </form>
   );
 }

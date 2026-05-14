@@ -3,7 +3,6 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateBMI } from '@/lib/calculators/bmi';
-import { Save } from 'lucide-react';
 import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'bmi';
@@ -135,8 +134,7 @@ export function BmiForm({ onResult }: BmiFormProps) {
 
       <div className="grid grid-cols-[1fr_auto] gap-2">
         <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
-          <Save className="h-4 w-4" />
-          Save to History
+          Calculate
         </Button>
         <Button type="button" variant="outline" size="lg" onClick={clearAll}>
           Clear

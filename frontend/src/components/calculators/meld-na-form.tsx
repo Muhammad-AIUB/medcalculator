@@ -3,7 +3,7 @@ import React, { useState, useMemo, useCallback } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateMELDNa } from '@/lib/calculators/meld-na';
-import { Save, AlertTriangle } from 'lucide-react';
+import { AlertTriangle } from 'lucide-react';
 import { FieldRow, NumInput, ResultBox, OrDivider, InterpretationTable, round, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'meld-na';
@@ -88,6 +88,8 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
       warnings: liveScore >= 25 ? ['MELD-Na ≥ 25: High transplant priority. Consider urgent hepatology/transplant referral.'] : [],
     });
   };
+  const clearAll = () => { setBilMgStr(''); setBilUmolStr(''); setInrStr(''); setCreatMgStr(''); setCreatUmolStr(''); setSodiumStr(''); setOnDialysis(false); saveField(CID, 'bilMg', ''); saveField(CID, 'bilUmol', ''); saveField(CID, 'creatMg', ''); saveField(CID, 'creatUmol', ''); saveField(CID, 'inr', ''); saveField(CID, 'dialysis', ''); saveField(CID, 'sodium', ''); };
+
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
@@ -142,10 +144,14 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
       <FieldRow label="Serum Sodium">
         <NumInput value={sodiumStr} onChange={(v) => { setSodiumStr(v); saveField(CID, 'sodium', v); }} suffix="mEq/L" step="1" min={100} max={160} />
       </FieldRow>
-      <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
-        <Save className="h-4 w-4" />
-        Save to History
-      </Button>
+      <div className="grid grid-cols-[1fr_auto] gap-2">
+        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
+          Calculate
+        </Button>
+        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
+          Clear
+        </Button>
+      </div>
     </form>
   );
 }
