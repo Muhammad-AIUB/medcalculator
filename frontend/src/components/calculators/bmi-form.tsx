@@ -103,7 +103,15 @@ export function BmiForm({ onResult }: BmiFormProps) {
     });
   };
 
-  const canSave = heightCm > 0 && weightKg > 0;
+  const heightInvalid = heightCm > 0 && (heightCm < 50 || heightCm > 300);
+  const weightInvalid = weightKg > 0 && (weightKg < 1 || weightKg > 500);
+  const canSave = heightCm > 0 && weightKg > 0 && !heightInvalid && !weightInvalid;
+
+  const clearAll = () => {
+    setCmStr(''); setFtStr(''); setInStr(''); setKgStr(''); setLbStr('');
+    saveField(CID, 'cm', ''); saveField(CID, 'ft', ''); saveField(CID, 'in', '');
+    saveField(CID, 'kg', ''); saveField(CID, 'lb', '');
+  };
 
   return (
     <form onSubmit={handleSave} className="space-y-6">
@@ -116,6 +124,11 @@ export function BmiForm({ onResult }: BmiFormProps) {
             <NumInput value={inStr} onChange={onInChange} suffix="in" min={0} max={11.9} step="0.1" />
           </div>
         </div>
+        {heightInvalid && (
+          <p className="text-xs font-medium text-red-600 mt-1">
+            ⚠ Height should be between 50–300 cm (1.5–9.8 ft)
+          </p>
+        )}
       </FieldRow>
 
       <FieldRow label="Your Weight">
@@ -124,6 +137,11 @@ export function BmiForm({ onResult }: BmiFormProps) {
           <OrDivider />
           <NumInput value={lbStr} onChange={onLbChange} suffix="pound" min={1} max={1100} step="0.1" />
         </div>
+        {weightInvalid && (
+          <p className="text-xs font-medium text-red-600 mt-1">
+            ⚠ Weight should be between 1–500 kg
+          </p>
+        )}
       </FieldRow>
 
       <FieldRow label="Biological Sex" hint="for Ideal Weight">
@@ -169,10 +187,15 @@ export function BmiForm({ onResult }: BmiFormProps) {
         </div>
       </div>
 
-      <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
-        <Save className="h-4 w-4" />
-        Save to History
-      </Button>
+      <div className="grid grid-cols-[1fr_auto] gap-2">
+        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
+          <Save className="h-4 w-4" />
+          Save to History
+        </Button>
+        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
+          Clear
+        </Button>
+      </div>
     </form>
   );
 }
