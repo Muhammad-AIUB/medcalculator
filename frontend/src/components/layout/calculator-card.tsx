@@ -3,7 +3,6 @@ import Link from 'next/link';
 import { cn } from '@/lib/utils';
 import { Badge } from '@/components/ui/badge';
 import type { Calculator } from '@/types/calculator';
-import * as Icons from 'lucide-react';
 
 const categoryColors: Record<string, string> = {
   'renal':         'bg-blue-50   border-blue-100   dark:bg-blue-950/20  dark:border-blue-900',
@@ -40,8 +39,6 @@ interface CalculatorCardProps {
 }
 
 export function CalculatorCard({ calculator }: CalculatorCardProps) {
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  const IconComp = (Icons as any)[calculator.icon] ?? (Icons as any)['Calculator'];
   const bg = categoryColors[calculator.category] ?? 'bg-card border-border';
   const iconBg = iconColors[calculator.category] ?? 'bg-cyan-500';
 
@@ -49,11 +46,11 @@ export function CalculatorCard({ calculator }: CalculatorCardProps) {
     <div className={cn('relative rounded-2xl border p-4 transition-all duration-150 hover:shadow-md active:scale-[0.98]', bg)}>
       <Link href={`/calculators/${calculator.id}`} className="block">
         <div className="flex items-start gap-3">
-          <div className={cn('h-10 w-10 rounded-xl flex items-center justify-center shrink-0 shadow-sm', iconBg)}>
-            <IconComp className="h-5 w-5 text-white" />
+          <div className={cn('h-11 w-11 rounded-xl flex items-center justify-center shrink-0 shadow-sm text-2xl leading-none', iconBg)}>
+            <span aria-hidden>{calculator.emoji}</span>
           </div>
           <div className="flex-1 min-w-0 pr-6">
-            <h3 className="text-sm font-semibold text-foreground leading-tight">{calculator.title}</h3>
+            <h3 className="text-sm font-semibold text-foreground leading-tight pt-1">{calculator.title}</h3>
           </div>
         </div>
         <div className="flex items-center justify-between mt-3">

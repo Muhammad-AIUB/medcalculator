@@ -67,7 +67,7 @@ export const CALCULATORS: Calculator[] = [
     id: 'child-pugh',
     title: 'Child-Pugh Score',
     shortTitle: 'Child-Pugh',
-    emoji: '🫀',
+    emoji: '🩺',
     description:
       'Assess severity of liver cirrhosis and predict surgical risk with Class A/B/C stratification',
     category: 'liver',
@@ -132,7 +132,7 @@ export const CALCULATORS: Calculator[] = [
     id: 'meld-na',
     title: 'MELD-Na Score',
     shortTitle: 'MELD-Na',
-    emoji: '📊',
+    emoji: '🧬',
     description:
       'Model for End-Stage Liver Disease with sodium for transplant priority and 90-day mortality estimation',
     category: 'liver',
@@ -243,7 +243,7 @@ export const CALCULATORS: Calculator[] = [
     id: 'edd',
     title: 'EDD Calculator',
     shortTitle: 'EDD',
-    emoji: '🤰',
+    emoji: '👶',
     description:
       "Estimate due date via Naegele's rule (LMP) or ultrasound dating with gestational milestones",
     category: 'obstetric',
@@ -282,7 +282,7 @@ export const CALCULATORS: Calculator[] = [
     id: 'sofa',
     title: 'SOFA Score',
     shortTitle: 'SOFA',
-    emoji: '🏥',
+    emoji: '🫀',
     description:
       'Sequential Organ Failure Assessment for ICU mortality prediction and sepsis diagnosis (6 organ systems, 0–24)',
     category: 'critical-care',
