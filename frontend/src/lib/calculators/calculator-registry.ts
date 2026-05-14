@@ -71,7 +71,7 @@ export const CALCULATORS: Calculator[] = [
     description:
       'Assess severity of liver cirrhosis and predict surgical risk with Class A/B/C stratification',
     category: 'liver',
-    icon: 'Activity',
+    icon: 'ClipboardList',
     color: 'text-amber-600',
     bgColor: 'bg-amber-50 dark:bg-amber-950',
     tags: ['liver', 'cirrhosis', 'hepatology', 'surgical risk'],
@@ -136,7 +136,7 @@ export const CALCULATORS: Calculator[] = [
     description:
       'Model for End-Stage Liver Disease with sodium for transplant priority and 90-day mortality estimation',
     category: 'liver',
-    icon: 'BarChart3',
+    icon: 'ListOrdered',
     color: 'text-orange-600',
     bgColor: 'bg-orange-50 dark:bg-orange-950',
     tags: ['liver', 'transplant', 'MELD', 'mortality', 'UNOS'],
@@ -344,7 +344,7 @@ export const CALCULATORS: Calculator[] = [
     description:
       'Vasoactive-Inotropic Score (VIS) with auto-conversion for dopamine, norepinephrine, epinephrine, vasopressin and more',
     category: 'critical-care',
-    icon: 'Zap',
+    icon: 'Syringe',
     color: 'text-violet-600',
     bgColor: 'bg-violet-50 dark:bg-violet-950',
     tags: ['vasopressors', 'shock', 'VIS', 'ICU', 'hemodynamics', 'inotropes'],
@@ -366,7 +366,7 @@ export const CALCULATORS: Calculator[] = [
     description:
       'Transferrin Saturation for iron status assessment — iron deficiency, overload, and CKD anemia interpretation',
     category: 'nutrition',
-    icon: 'FlaskConical',
+    icon: 'TestTube',
     color: 'text-teal-600',
     bgColor: 'bg-teal-50 dark:bg-teal-950',
     tags: ['iron', 'TSAT', 'anemia', 'ferritin', 'TIBC', 'transferrin', 'CKD anemia'],
