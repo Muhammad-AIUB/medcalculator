@@ -1,9 +1,9 @@
 'use client';
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateEDD } from '@/lib/calculators/edd';
-import { FieldRow, NumInput, ResultBox, OptionButtons, InterpretationTable } from './shared-ui';
+import { FieldRow, NumInput, ResultBox, OptionButtons } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'edd';
 
@@ -40,13 +40,13 @@ export function EddForm({ onResult }: EddFormProps) {
   const currentWeek = liveResult?.subResults?.find(sr => sr.label?.toLowerCase().includes('current'))?.value ?? '';
   const trimester = liveResult?.subResults?.find(sr => sr.label?.toLowerCase().includes('trimester'))?.value ?? '';
 
-  const canSave = method === 'lmp' ? !!lmpDate : (!!scanDate && !!gaWeeks);
+  const onResultRef = useRef(onResult);
+  useEffect(() => { onResultRef.current = onResult; });
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSave || !liveResult) return;
+  useEffect(() => {
+    if (!liveResult) return;
     const severity = liveResult.severity as any;
-    onResult({
+    onResultRef.current({
       outputs: [
         {
           id: 'edd', label: 'Estimated Due Date', value: eddDate,
@@ -61,12 +61,12 @@ export function EddForm({ onResult }: EddFormProps) {
       references: liveResult.references,
       formulaUsed: method === 'lmp' ? "Naegele's Rule" : 'Ultrasound Dating',
     });
-  };
-  const clearAll = () => { setMethod('lmp'); setLmpDate(''); setCycleLength(''); setScanDate(''); setGaWeeks(''); setGaDays(''); saveField(CID, 'method', ''); saveField(CID, 'lmpDate', ''); saveField(CID, 'cycleLength', ''); saveField(CID, 'scanDate', ''); saveField(CID, 'gaWeeks', ''); saveField(CID, 'gaDays', ''); };
+  }, [liveResult]);
 
+  const clearAll = () => { setMethod('lmp'); setLmpDate(''); setCycleLength('28'); setScanDate(''); setGaWeeks(''); setGaDays('0'); saveField(CID, 'method', ''); saveField(CID, 'lmpDate', ''); saveField(CID, 'cycleLength', ''); saveField(CID, 'scanDate', ''); saveField(CID, 'gaWeeks', ''); saveField(CID, 'gaDays', ''); };
 
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <div className="space-y-6">
       <FieldRow label="Calculate Based On">
         <OptionButtons
           options={[
@@ -144,14 +144,10 @@ export function EddForm({ onResult }: EddFormProps) {
           {String(trimester)}
         </p>
       )}
-      <div className="grid grid-cols-[1fr_auto] gap-2">
-        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
-          Calculate
-        </Button>
-        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
-          Clear
-        </Button>
-      </div>
-    </form>
+
+      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
+        Clear
+      </Button>
+    </div>
   );
 }

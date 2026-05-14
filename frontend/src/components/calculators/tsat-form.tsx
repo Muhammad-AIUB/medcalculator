@@ -1,9 +1,8 @@
 'use client';
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import { calculateTSAT } from '@/lib/calculators/tsat';
-import { FieldRow, NumInput, ResultBox, OrDivider, OptionButtons, InterpretationTable, round, fmt } from './shared-ui';
+import { FieldRow, NumInput, OrDivider, OptionButtons, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'tsat';
 
@@ -34,56 +33,47 @@ export function TsatForm({ onResult }: TsatFormProps) {
 
   const ironUg = parseFloat(ironUgStr) || 0;
   const tibcVal = parseFloat(tibcStr) || 0;
+  const canSave = ironUg > 0 && tibcVal > 0;
 
-  const liveTsat = useMemo(() => {
-    if (ironUg <= 0 || tibcVal <= 0) return 0;
+  const liveResult = useMemo(() => {
+    if (!canSave) return null;
     try {
-      const raw = calculateTSAT({
+      return calculateTSAT({
         serumIron: ironUg, serumIronUnit: 'µg/dL',
         tibcMethod, tibcValue: tibcVal, tibcUnit,
         ferritin: ferritinStr ? parseFloat(ferritinStr) : undefined,
       });
-      return raw.score ?? 0;
-    } catch { return 0; }
-  }, [ironUg, tibcMethod, tibcVal, tibcUnit, ferritinStr]);
+    } catch { return null; }
+  }, [canSave, ironUg, tibcMethod, tibcVal, tibcUnit, ferritinStr]);
 
-  const tsatColor = !liveTsat ? '' : liveTsat < 20 ? 'text-amber-600' : liveTsat <= 50 ? 'text-emerald-600' : 'text-red-600';
-  const tsatLabel = !liveTsat ? '' : liveTsat < 16 ? 'Iron deficiency likely' : liveTsat < 20 ? 'Low — possible iron deficiency' : liveTsat <= 50 ? 'Normal' : 'Elevated — possible iron overload';
+  const onResultRef = useRef(onResult);
+  useEffect(() => { onResultRef.current = onResult; });
 
-  const canSave = ironUg > 0 && tibcVal > 0;
-
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSave) return;
-    const raw = calculateTSAT({
-      serumIron: ironUg, serumIronUnit: 'µg/dL',
-      tibcMethod, tibcValue: tibcVal, tibcUnit,
-      ferritin: ferritinStr ? parseFloat(ferritinStr) : undefined,
-    });
-    const severity = raw.severity as any;
-    onResult({
+  useEffect(() => {
+    if (!liveResult) return;
+    const severity = liveResult.severity as any;
+    onResultRef.current({
       outputs: [
         {
-          id: 'tsat', label: 'Transferrin Saturation (TSAT)', value: raw.score ?? 0, unit: '%',
-          interpretation: { text: raw.interpretation, severity, classification: raw.label },
+          id: 'tsat', label: 'Transferrin Saturation (TSAT)', value: liveResult.score ?? 0, unit: '%',
+          interpretation: { text: liveResult.interpretation, severity, classification: liveResult.label },
         },
-        ...(raw.subResults?.map((sr, i) => ({
+        ...(liveResult.subResults?.map((sr, i) => ({
           id: `sub-${i}`, label: sr.label, value: sr.value, unit: sr.unit,
           interpretation: { text: String(sr.value), severity: (sr.severity ?? 'neutral') as any },
         })) ?? []),
       ],
       inputs: { serumIron: ironUg, serumIronUnit: 'µg/dL', tibcMethod, tibcValue: tibcVal, tibcUnit, ferritin: ferritinStr },
-      references: raw.references,
+      references: liveResult.references,
       formulaUsed: 'TSAT = (Fe / TIBC) × 100',
     });
-  };
+  }, [liveResult]);
 
   const tibcUnits = tibcMethod === 'tibc' ? ['µg/dL', 'µmol/L'] : ['mg/dL', 'g/L', 'g/dL'];
-  const clearAll = () => { setIronUgStr(''); setIronUmolStr(''); setTibcMethod('tibc'); setTibcStr(''); setTibcUnit(''); setFerritinStr(''); saveField(CID, 'ironUg', ''); saveField(CID, 'ironUmol', ''); saveField(CID, 'tibcMethod', ''); saveField(CID, 'tibcUnit', ''); saveField(CID, 'tibc', ''); saveField(CID, 'ferritin', ''); };
-
+  const clearAll = () => { setIronUgStr(''); setIronUmolStr(''); setTibcMethod('tibc'); setTibcStr(''); setTibcUnit('µg/dL'); setFerritinStr(''); saveField(CID, 'ironUg', ''); saveField(CID, 'ironUmol', ''); saveField(CID, 'tibcMethod', ''); saveField(CID, 'tibcUnit', ''); saveField(CID, 'tibc', ''); saveField(CID, 'ferritin', ''); };
 
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <div className="space-y-6">
       <FieldRow label="Serum Iron">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput value={ironUgStr} onChange={onIronUgChange} suffix="µg/dL" step="1" min={1} max={500} />
@@ -126,14 +116,10 @@ export function TsatForm({ onResult }: TsatFormProps) {
       <FieldRow label="Serum Ferritin" hint="optional">
         <NumInput value={ferritinStr} onChange={(v) => { setFerritinStr(v); saveField(CID, 'ferritin', v); }} suffix="ng/mL" step="1" min={0} max={5000} />
       </FieldRow>
-      <div className="grid grid-cols-[1fr_auto] gap-2">
-        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
-          Calculate
-        </Button>
-        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
-          Clear
-        </Button>
-      </div>
-    </form>
+
+      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
+        Clear
+      </Button>
+    </div>
   );
 }

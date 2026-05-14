@@ -1,9 +1,8 @@
 'use client';
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
-import { cn } from '@/lib/utils';
 import { calculateEGFR } from '@/lib/calculators/egfr';
-import { FieldRow, NumInput, ResultBox, OrDivider, OptionButtons, InterpretationTable, round, fmt } from './shared-ui';
+import { FieldRow, NumInput, OrDivider, OptionButtons, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'egfr';
 
@@ -43,15 +42,14 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
   }, [creatMgdl, age, sex, formula]);
 
   const liveEgfr = liveResult?.score ?? 0;
-  const stageColor = !liveEgfr ? '' : liveEgfr >= 60 ? 'text-emerald-600' : liveEgfr >= 30 ? 'text-amber-600' : 'text-red-600';
 
-  const canSave = creatMgdl > 0 && age >= 18;
+  const onResultRef = useRef(onResult);
+  useEffect(() => { onResultRef.current = onResult; });
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSave || !liveResult) return;
+  useEffect(() => {
+    if (!liveResult) return;
     const severity = liveResult.severity as any;
-    onResult({
+    onResultRef.current({
       outputs: [
         {
           id: 'egfr', label: 'eGFR', value: liveResult.score ?? 0, unit: 'mL/min/1.73m²',
@@ -67,12 +65,12 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
       references: liveResult.references,
       warnings: liveEgfr && liveEgfr < 15 ? ['eGFR < 15: Consider nephrology referral for renal replacement therapy'] : [],
     });
-  };
+  }, [liveResult]);
+
   const clearAll = () => { setMgdlStr(''); setUmolStr(''); setAgeStr(''); setSex('male'); setFormula('ckd-epi-2021'); saveField(CID, 'mgdl', ''); saveField(CID, 'umol', ''); saveField(CID, 'age', ''); saveField(CID, 'sex', ''); saveField(CID, 'formula', ''); };
 
-
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <div className="space-y-6">
       <FieldRow label="Creatinine">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput value={mgdlStr} onChange={onMgdlChange} suffix="mg/dL" step="0.01" min={0.1} max={30} />
@@ -106,14 +104,9 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
         />
       </FieldRow>
 
-      <div className="grid grid-cols-[1fr_auto] gap-2">
-        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
-          Calculate
-        </Button>
-        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
-          Clear
-        </Button>
-      </div>
-    </form>
+      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
+        Clear
+      </Button>
+    </div>
   );
 }

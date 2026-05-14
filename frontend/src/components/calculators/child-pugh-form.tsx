@@ -1,9 +1,9 @@
 'use client';
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateChildPugh } from '@/lib/calculators/child-pugh';
-import { FieldRow, NumInput, ResultBox, OrDivider, OptionButtons, InterpretationTable, round, fmt } from './shared-ui';
+import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'child-pugh';
 
@@ -66,52 +66,52 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
     return { bil, alb, inr: i, asc, enc, total: filled.reduce((a, b) => a + b, 0), count: filled.length };
   }, [bilMg, albGdl, inr, ascites, encephalopathy]);
 
-  const liveClass = useMemo(() => {
-    if (partialScores.count < 5) return null;
-    const t = partialScores.total;
-    if (t <= 6) return { label: 'Class A — Well-compensated', tone: 'text-emerald-600' };
-    if (t <= 9) return { label: 'Class B — Significant functional compromise', tone: 'text-amber-600' };
-    return { label: 'Class C — Decompensated disease', tone: 'text-red-600' };
-  }, [partialScores]);
-
   const canSave = bilMg > 0 && albGdl > 0 && inr > 0 && !!ascites && !!encephalopathy;
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSave) return;
-    const raw = calculateChildPugh({
-      bilirubin: bilMg, bilirubinUnit: 'mg/dL',
-      albumin: albGdl, albuminUnit: 'g/dL',
-      inr, ascites: ascites!, encephalopathy: encephalopathy!,
-    });
-    const severity = raw.severity as any;
-    onResult({
+  const liveResult = useMemo(() => {
+    if (!canSave) return null;
+    try {
+      return calculateChildPugh({
+        bilirubin: bilMg, bilirubinUnit: 'mg/dL',
+        albumin: albGdl, albuminUnit: 'g/dL',
+        inr, ascites: ascites!, encephalopathy: encephalopathy!,
+      });
+    } catch { return null; }
+  }, [canSave, bilMg, albGdl, inr, ascites, encephalopathy]);
+
+  const onResultRef = useRef(onResult);
+  useEffect(() => { onResultRef.current = onResult; });
+
+  useEffect(() => {
+    if (!liveResult) return;
+    const severity = liveResult.severity as any;
+    onResultRef.current({
       outputs: [
         {
-          id: 'child-pugh', label: 'Child-Pugh Score', value: raw.score ?? 0, unit: '/15',
-          interpretation: { text: raw.interpretation, severity, classification: raw.label },
+          id: 'child-pugh', label: 'Child-Pugh Score', value: liveResult.score ?? 0, unit: '/15',
+          interpretation: { text: liveResult.interpretation, severity, classification: liveResult.label },
         },
-        ...(raw.subResults?.map((sr, i) => ({
+        ...(liveResult.subResults?.map((sr, i) => ({
           id: `sub-${i}`, label: sr.label, value: sr.value, unit: sr.unit,
           interpretation: { text: String(sr.value), severity: (sr.severity ?? 'neutral') as any },
         })) ?? []),
       ],
       inputs: { bilirubin: bilMg, bilirubinUnit: 'mg/dL', albumin: albGdl, albuminUnit: 'g/dL', inr, ascites, encephalopathy },
-      references: raw.references,
+      references: liveResult.references,
       formulaUsed: 'Child-Pugh',
     });
-  };
+  }, [liveResult]);
 
   const ScoreTag = ({ score }: { score: number | null }) => {
     if (score === null) return null;
     const c = score === 1 ? 'bg-emerald-100 text-emerald-700' : score === 2 ? 'bg-amber-100 text-amber-700' : 'bg-red-100 text-red-700';
     return <span className={cn('ml-auto px-2 py-0.5 rounded text-xs font-bold', c)}>{score} pt{score > 1 ? 's' : ''}</span>;
   };
+
   const clearAll = () => { setBilMgStr(''); setBilUmolStr(''); setAlbGdlStr(''); setAlbGlStr(''); setInrStr(''); setAscites(undefined); setEncephalopathy(undefined); saveField(CID, 'bilMg', ''); saveField(CID, 'bilUmol', ''); saveField(CID, 'albGdl', ''); saveField(CID, 'albGl', ''); saveField(CID, 'inr', ''); saveField(CID, 'ascites', ''); saveField(CID, 'enceph', ''); };
 
-
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <div className="space-y-6">
       <FieldRow label="Total Bilirubin">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput value={bilMgStr} onChange={onBilMgChange} suffix="mg/dL" step="0.1" min={0.1} max={50} />
@@ -185,15 +185,9 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
         <div className="flex justify-end mt-1"><ScoreTag score={partialScores.enc} /></div>
       </FieldRow>
 
-      {/* Live score */}
-      <div className="grid grid-cols-[1fr_auto] gap-2">
-        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
-          Calculate
-        </Button>
-        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
-          Clear
-        </Button>
-      </div>
-    </form>
+      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
+        Clear
+      </Button>
+    </div>
   );
 }

@@ -1,10 +1,10 @@
 'use client';
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateMELDNa } from '@/lib/calculators/meld-na';
 import { AlertTriangle } from 'lucide-react';
-import { FieldRow, NumInput, ResultBox, OrDivider, InterpretationTable, round, fmt } from './shared-ui';
+import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'meld-na';
 
@@ -63,15 +63,14 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
   }, [bilMg, inr, creatMg, sodium, onDialysis]);
 
   const liveScore = liveResult?.score ?? 0;
-  const scoreColor = !liveScore ? '' : liveScore < 15 ? 'text-emerald-600' : liveScore < 25 ? 'text-amber-600' : 'text-red-600';
 
-  const canSave = bilMg > 0 && inr > 0 && creatMg > 0 && sodium > 0;
+  const onResultRef = useRef(onResult);
+  useEffect(() => { onResultRef.current = onResult; });
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSave || !liveResult) return;
+  useEffect(() => {
+    if (!liveResult) return;
     const severity = liveResult.severity as any;
-    onResult({
+    onResultRef.current({
       outputs: [
         {
           id: 'meld-na', label: 'MELD-Na Score', value: liveResult.score ?? 0,
@@ -87,12 +86,12 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
       formulaUsed: 'MELD-Na',
       warnings: liveScore >= 25 ? ['MELD-Na ≥ 25: High transplant priority. Consider urgent hepatology/transplant referral.'] : [],
     });
-  };
+  }, [liveResult]);
+
   const clearAll = () => { setBilMgStr(''); setBilUmolStr(''); setInrStr(''); setCreatMgStr(''); setCreatUmolStr(''); setSodiumStr(''); setOnDialysis(false); saveField(CID, 'bilMg', ''); saveField(CID, 'bilUmol', ''); saveField(CID, 'creatMg', ''); saveField(CID, 'creatUmol', ''); saveField(CID, 'inr', ''); saveField(CID, 'dialysis', ''); saveField(CID, 'sodium', ''); };
 
-
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <div className="space-y-6">
       <FieldRow label="Total Bilirubin">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput value={bilMgStr} onChange={onBilMgChange} suffix="mg/dL" step="0.1" min={0.1} max={50} />
@@ -144,14 +143,10 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
       <FieldRow label="Serum Sodium">
         <NumInput value={sodiumStr} onChange={(v) => { setSodiumStr(v); saveField(CID, 'sodium', v); }} suffix="mEq/L" step="1" min={100} max={160} />
       </FieldRow>
-      <div className="grid grid-cols-[1fr_auto] gap-2">
-        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
-          Calculate
-        </Button>
-        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
-          Clear
-        </Button>
-      </div>
-    </form>
+
+      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
+        Clear
+      </Button>
+    </div>
   );
 }

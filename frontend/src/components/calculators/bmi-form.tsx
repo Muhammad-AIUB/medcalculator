@@ -1,5 +1,5 @@
 'use client';
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateBMI } from '@/lib/calculators/bmi';
@@ -58,12 +58,18 @@ export function BmiForm({ onResult }: BmiFormProps) {
     setKgStr(kg); saveField(CID, 'kg', kg);
   }, []);
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!heightCm || !weightKg) return;
+  const heightInvalid = heightCm > 0 && (heightCm < 50 || heightCm > 300);
+  const weightInvalid = weightKg > 0 && (weightKg < 1 || weightKg > 500);
+  const canSave = heightCm > 0 && weightKg > 0 && !heightInvalid && !weightInvalid;
+
+  const onResultRef = useRef(onResult);
+  useEffect(() => { onResultRef.current = onResult; });
+
+  useEffect(() => {
+    if (!canSave) return;
     const raw = calculateBMI({ heightCm, weightKg, sex });
     const severity = raw.severity as any;
-    onResult({
+    onResultRef.current({
       outputs: [
         { id: 'bmi', label: 'BMI', value: raw.score ?? 0, unit: 'kg/m²',
           interpretation: { text: raw.interpretation, severity, classification: raw.label } },
@@ -76,11 +82,7 @@ export function BmiForm({ onResult }: BmiFormProps) {
       references: raw.references,
       formulaUsed: 'WHO BMI',
     });
-  };
-
-  const heightInvalid = heightCm > 0 && (heightCm < 50 || heightCm > 300);
-  const weightInvalid = weightKg > 0 && (weightKg < 1 || weightKg > 500);
-  const canSave = heightCm > 0 && weightKg > 0 && !heightInvalid && !weightInvalid;
+  }, [heightCm, weightKg, sex, canSave]);
 
   const clearAll = () => {
     setCmStr(''); setFtStr(''); setInStr(''); setKgStr(''); setLbStr('');
@@ -89,7 +91,7 @@ export function BmiForm({ onResult }: BmiFormProps) {
   };
 
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <div className="space-y-6">
       <FieldRow label="Your Height">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput value={cmStr} onChange={onCmChange} suffix="cm" min={50} max={300} step="0.1" />
@@ -132,14 +134,9 @@ export function BmiForm({ onResult }: BmiFormProps) {
         </div>
       </FieldRow>
 
-      <div className="grid grid-cols-[1fr_auto] gap-2">
-        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
-          Calculate
-        </Button>
-        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
-          Clear
-        </Button>
-      </div>
-    </form>
+      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
+        Clear
+      </Button>
+    </div>
   );
 }

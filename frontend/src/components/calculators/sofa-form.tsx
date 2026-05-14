@@ -1,9 +1,9 @@
 'use client';
-import React, { useState, useCallback, useMemo } from 'react';
+import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateSOFA } from '@/lib/calculators/sofa';
-import { FieldRow, NumInput, ResultBox, OrDivider, InterpretationTable, round, fmt } from './shared-ui';
+import { FieldRow, NumInput, ResultBox, OrDivider, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'sofa';
 
@@ -108,48 +108,55 @@ export function SofaForm({ onResult }: SofaFormProps) {
 
   const canSave = !!platelets && bilMg > 0 && !!mapStr && !!gcs && creatMg > 0;
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSave) return;
-    const raw = calculateSOFA({
-      pao2: pao2 ? parseFloat(pao2) : undefined,
-      fio2: fio2 ? parseFloat(fio2) : undefined,
-      spo2: spo2 ? parseFloat(spo2) : undefined,
-      ventilated,
-      platelets: parseFloat(platelets),
-      bilirubin: bilMg,
-      bilirubinUnit: 'mg/dL',
-      map: parseFloat(mapStr),
-      gcs: parseFloat(gcs) || 15,
-      creatinine: creatMg,
-      creatinineUnit: 'mg/dL',
-      urineOutput: urineOutput ? parseFloat(urineOutput) : undefined,
-    });
-    const severity = raw.severity as any;
-    onResult({
+  const liveResult = useMemo(() => {
+    if (!canSave) return null;
+    try {
+      return calculateSOFA({
+        pao2: pao2 ? parseFloat(pao2) : undefined,
+        fio2: fio2 ? parseFloat(fio2) : undefined,
+        spo2: spo2 ? parseFloat(spo2) : undefined,
+        ventilated,
+        platelets: parseFloat(platelets),
+        bilirubin: bilMg,
+        bilirubinUnit: 'mg/dL',
+        map: parseFloat(mapStr),
+        gcs: parseFloat(gcs) || 15,
+        creatinine: creatMg,
+        creatinineUnit: 'mg/dL',
+        urineOutput: urineOutput ? parseFloat(urineOutput) : undefined,
+      });
+    } catch { return null; }
+  }, [canSave, pao2, fio2, spo2, ventilated, platelets, bilMg, mapStr, gcs, creatMg, urineOutput]);
+
+  const onResultRef = useRef(onResult);
+  useEffect(() => { onResultRef.current = onResult; });
+
+  useEffect(() => {
+    if (!liveResult) return;
+    const severity = liveResult.severity as any;
+    onResultRef.current({
       outputs: [
         {
-          id: 'sofa', label: 'SOFA Score', value: raw.score ?? 0, unit: '/24',
-          interpretation: { text: raw.interpretation, severity, classification: raw.label },
+          id: 'sofa', label: 'SOFA Score', value: liveResult.score ?? 0, unit: '/24',
+          interpretation: { text: liveResult.interpretation, severity, classification: liveResult.label },
         },
-        ...(raw.subResults?.map((sr, i) => ({
+        ...(liveResult.subResults?.map((sr, i) => ({
           id: `sub-${i}`, label: sr.label, value: sr.value, unit: sr.unit,
           interpretation: { text: String(sr.value), severity: (sr.severity ?? 'neutral') as any },
         })) ?? []),
       ],
       inputs: { pao2, fio2, spo2, ventilated, platelets, bilirubin: bilMg, bilirubinUnit: 'mg/dL', map: mapStr, gcs, creatinine: creatMg, creatinineUnit: 'mg/dL', urineOutput },
-      references: raw.references,
+      references: liveResult.references,
       formulaUsed: 'SOFA 2016',
-      warnings: raw.score && raw.score >= 11 ? ['SOFA ≥ 11: Predicted mortality > 40%'] : [],
+      warnings: liveResult.score && liveResult.score >= 11 ? ['SOFA ≥ 11: Predicted mortality > 40%'] : [],
     });
-  };
+  }, [liveResult]);
 
   const sectionClass = 'rounded-lg border-2 border-cyan-500/30 bg-card p-4 space-y-3';
   const clearAll = () => { setPao2(''); setFio2(''); setSpo2(''); setVentilated(false); setPlatelets(''); setBilMgStr(''); setBilUmolStr(''); setMapStr(''); setGcs(''); setCreatMgStr(''); setCreatUmolStr(''); setUrineOutput(''); saveField(CID, 'bilMg', ''); saveField(CID, 'bilUmol', ''); saveField(CID, 'creatMg', ''); saveField(CID, 'creatUmol', ''); saveField(CID, 'pao2', ''); saveField(CID, 'fio2', ''); saveField(CID, 'spo2', ''); saveField(CID, 'vent', ''); saveField(CID, 'plt', ''); saveField(CID, 'map', ''); saveField(CID, 'gcs', ''); saveField(CID, 'urine', ''); };
 
-
   return (
-    <form onSubmit={handleSave} className="space-y-4">
+    <div className="space-y-4">
       {/* Respiratory */}
       <div className={sectionClass}>
         <div className="flex items-center gap-2">
@@ -223,14 +230,10 @@ export function SofaForm({ onResult }: SofaFormProps) {
         </div>
         <NumInput value={urineOutput} onChange={(v) => { setUrineOutput(v); saveField(CID, 'urine', v); }} suffix="mL/24h" step="10" min={0} max={10000} placeholder="optional" />
       </div>
-      <div className="grid grid-cols-[1fr_auto] gap-2">
-        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
-          Calculate
-        </Button>
-        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
-          Clear
-        </Button>
-      </div>
-    </form>
+
+      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
+        Clear
+      </Button>
+    </div>
   );
 }

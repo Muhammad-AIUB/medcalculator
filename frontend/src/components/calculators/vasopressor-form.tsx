@@ -1,9 +1,9 @@
 'use client';
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateVasopressor } from '@/lib/calculators/vasopressor';
-import { FieldRow, NumInput, ResultBox, OrDivider, InterpretationTable, round, fmt } from './shared-ui';
+import { FieldRow, NumInput, ResultBox, OrDivider, round, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'vasopressor';
 
@@ -84,37 +84,49 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
 
   const canSave = weightKg > 0 && drugs.some(d => d.enabled && parseFloat(d.dose) > 0);
 
-  const handleSave = (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!canSave) return;
-    const raw = calculateVasopressor({
-      weight: weightKg,
-      weightUnit: 'kg',
-      drugs: drugs.map(d => ({ ...d, dose: parseFloat(d.dose) || 0 })),
-    });
-    const severity = raw.severity as any;
-    onResult({
+  const liveResult = useMemo(() => {
+    if (!canSave) return null;
+    try {
+      return calculateVasopressor({
+        weight: weightKg,
+        weightUnit: 'kg',
+        drugs: drugs.map(d => ({ ...d, dose: parseFloat(d.dose) || 0 })),
+      });
+    } catch { return null; }
+  }, [canSave, weightKg, drugs]);
+
+  const onResultRef = useRef(onResult);
+  useEffect(() => { onResultRef.current = onResult; });
+
+  useEffect(() => {
+    if (!liveResult) return;
+    const severity = liveResult.severity as any;
+    onResultRef.current({
       outputs: [
         {
-          id: 'vis', label: 'Vasoactive-Inotropic Score (VIS)', value: raw.score ?? 0,
-          interpretation: { text: raw.interpretation, severity, classification: raw.label },
+          id: 'vis', label: 'Vasoactive-Inotropic Score (VIS)', value: liveResult.score ?? 0,
+          interpretation: { text: liveResult.interpretation, severity, classification: liveResult.label },
         },
-        ...(raw.subResults?.map((sr, i) => ({
+        ...(liveResult.subResults?.map((sr, i) => ({
           id: `sub-${i}`, label: sr.label, value: sr.value, unit: sr.unit,
           interpretation: { text: String(sr.value), severity: (sr.severity ?? 'neutral') as any },
         })) ?? []),
       ],
       inputs: { weight: weightKg, weightUnit: 'kg', drugs },
-      references: raw.references,
+      references: liveResult.references,
       formulaUsed: 'VIS Score',
-      warnings: raw.score && raw.score > 30 ? ['VIS > 30: Refractory shock — very high mortality risk'] : [],
+      warnings: liveResult.score && liveResult.score > 30 ? ['VIS > 30: Refractory shock — very high mortality risk'] : [],
     });
-  };
-  const clearAll = () => { setKgStr(''); setLbStr(''); setDrugs([]); saveField(CID, 'kg', ''); saveField(CID, 'lb', ''); saveField(CID, 'drugs', ''); };
+  }, [liveResult]);
 
+  const clearAll = () => {
+    setKgStr(''); setLbStr('');
+    setDrugs(DRUGS.map(d => ({ name: d.name, dose: '', unit: d.defaultUnit, enabled: false })));
+    saveField(CID, 'kg', ''); saveField(CID, 'lb', ''); saveField(CID, 'drugs', '');
+  };
 
   return (
-    <form onSubmit={handleSave} className="space-y-6">
+    <div className="space-y-6">
       <FieldRow label="Patient Weight">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput value={kgStr} onChange={onKgChange} suffix="kg" step="0.1" min={1} max={300} />
@@ -186,14 +198,10 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
           })}
         </div>
       </FieldRow>
-      <div className="grid grid-cols-[1fr_auto] gap-2">
-        <Button type="submit" variant="medical" size="lg" disabled={!canSave}>
-          Calculate
-        </Button>
-        <Button type="button" variant="outline" size="lg" onClick={clearAll}>
-          Clear
-        </Button>
-      </div>
-    </form>
+
+      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
+        Clear
+      </Button>
+    </div>
   );
 }
