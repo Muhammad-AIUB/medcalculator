@@ -142,26 +142,6 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
       <FieldRow label="Serum Sodium">
         <NumInput value={sodiumStr} onChange={(v) => { setSodiumStr(v); saveField(CID, 'sodium', v); }} suffix="mEq/L" step="1" min={100} max={160} />
       </FieldRow>
-
-      <FieldRow label="Result">
-        <div className="flex items-center gap-3">
-          <ResultBox value={liveScore > 0 ? liveScore.toString() : ''} />
-        </div>
-        {liveResult && (
-          <p className={cn('mt-2 text-sm font-semibold', scoreColor)}>
-            {liveResult.label} — 90-day mortality: {liveResult.subResults?.find(sr => sr.label?.toLowerCase().includes('mortality'))?.value ?? liveResult.interpretation}
-          </p>
-        )}
-      </FieldRow>
-
-      <InterpretationTable rows={[
-        ['MELD-Na <9', '< 2% mortality (3 months)'],
-        ['MELD-Na 10–19', '6–12% mortality'],
-        ['MELD-Na 20–29', '19–26% mortality'],
-        ['MELD-Na 30–39', '53–65% mortality'],
-        ['MELD-Na ≥40', '> 71% mortality'],
-      ]} />
-
       <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
         <Save className="h-4 w-4" />
         Save to History

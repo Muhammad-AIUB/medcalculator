@@ -185,21 +185,6 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
       </FieldRow>
 
       {/* Live score */}
-      <FieldRow label="Result">
-        <div className="flex items-center gap-3">
-          <ResultBox value={partialScores.count === 5 ? partialScores.total.toString() : ''} suffix="/15" />
-        </div>
-        {liveClass && (
-          <p className={cn('mt-2 text-sm font-semibold', liveClass.tone)}>{liveClass.label}</p>
-        )}
-      </FieldRow>
-
-      <InterpretationTable rows={[
-        ['Score 5–6', 'Class A — Well-compensated'],
-        ['Score 7–9', 'Class B — Significant compromise'],
-        ['Score 10–15', 'Class C — Decompensated'],
-      ]} />
-
       <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
         <Save className="h-4 w-4" />
         Save to History

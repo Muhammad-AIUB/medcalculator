@@ -222,15 +222,6 @@ export function SofaForm({ onResult }: SofaFormProps) {
         </div>
         <NumInput value={urineOutput} onChange={(v) => { setUrineOutput(v); saveField(CID, 'urine', v); }} suffix="mL/24h" step="10" min={0} max={10000} placeholder="optional" />
       </div>
-
-      <InterpretationTable rows={[
-        ['SOFA 0–6', 'Low mortality (<10%)'],
-        ['SOFA 7–9', 'Moderate mortality (15–20%)'],
-        ['SOFA 10–12', 'High mortality (40–50%)'],
-        ['SOFA 13–14', 'Very high mortality (50–60%)'],
-        ['SOFA ≥15', 'Mortality > 80%'],
-      ]} />
-
       <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
         <Save className="h-4 w-4" />
         Save to History

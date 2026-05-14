@@ -125,23 +125,6 @@ export function TsatForm({ onResult }: TsatFormProps) {
       <FieldRow label="Serum Ferritin" hint="optional">
         <NumInput value={ferritinStr} onChange={(v) => { setFerritinStr(v); saveField(CID, 'ferritin', v); }} suffix="ng/mL" step="1" min={0} max={5000} />
       </FieldRow>
-
-      <FieldRow label="Result">
-        <div className="flex items-center gap-3">
-          <ResultBox value={liveTsat > 0 ? liveTsat.toString() : ''} suffix="%" />
-        </div>
-        {liveTsat > 0 && (
-          <p className={cn('mt-2 text-sm font-semibold', tsatColor)}>{tsatLabel}</p>
-        )}
-      </FieldRow>
-
-      <InterpretationTable rows={[
-        ['TSAT <16%', 'Iron deficiency likely'],
-        ['TSAT 16–19%', 'Low — possible iron deficiency'],
-        ['TSAT 20–50%', 'Normal'],
-        ['TSAT >50%', 'Elevated — possible iron overload'],
-      ]} />
-
       <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
         <Save className="h-4 w-4" />
         Save to History

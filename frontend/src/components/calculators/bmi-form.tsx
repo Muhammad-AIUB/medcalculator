@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateBMI } from '@/lib/calculators/bmi';
 import { Save } from 'lucide-react';
-import { FieldRow, NumInput, ResultBox, OrDivider, InterpretationTable, round, fmt } from './shared-ui';
+import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
 const CID = 'bmi';
 
@@ -58,30 +58,6 @@ export function BmiForm({ onResult }: BmiFormProps) {
     const kg = Number.isFinite(lb) && lb > 0 ? fmt(lb / 2.20462, 1) : '';
     setKgStr(kg); saveField(CID, 'kg', kg);
   }, []);
-
-  const liveBmi = useMemo(() => {
-    if (heightCm <= 0 || weightKg <= 0) return 0;
-    const m = heightCm / 100;
-    return round(weightKg / (m * m), 1);
-  }, [heightCm, weightKg]);
-
-  const interpretation = useMemo(() => {
-    if (liveBmi <= 0) return null;
-    if (liveBmi < 18.5) return { label: 'Below normal weight', tone: 'text-sky-600' };
-    if (liveBmi < 25) return { label: 'Normal weight', tone: 'text-emerald-600' };
-    if (liveBmi < 30) return { label: 'Overweight', tone: 'text-amber-600' };
-    if (liveBmi < 35) return { label: 'Class I Obesity', tone: 'text-orange-600' };
-    if (liveBmi < 40) return { label: 'Class II Obesity', tone: 'text-red-600' };
-    return { label: 'Class III Obesity', tone: 'text-red-700' };
-  }, [liveBmi]);
-
-  const ibw = useMemo(() => {
-    if (heightCm <= 0) return null;
-    const heightIn = heightCm / 2.54;
-    const base = sex === 'female' ? 45.5 : 50;
-    const kg = Math.max(base + 2.3 * (heightIn - 60), 30);
-    return { kg: round(kg, 1), lb: round(kg * 2.20462, 1) };
-  }, [heightCm, sex]);
 
   const handleSave = (e: React.FormEvent) => {
     e.preventDefault();
@@ -144,7 +120,7 @@ export function BmiForm({ onResult }: BmiFormProps) {
         )}
       </FieldRow>
 
-      <FieldRow label="Biological Sex" hint="for Ideal Weight">
+      <FieldRow label="Biological Sex">
         <div className="grid grid-cols-2 gap-2">
           {(['male', 'female'] as const).map((s) => (
             <button key={s} type="button" onClick={() => { setSex(s); saveField(CID, 'sex', s); }}
@@ -156,36 +132,6 @@ export function BmiForm({ onResult }: BmiFormProps) {
           ))}
         </div>
       </FieldRow>
-
-      <FieldRow label="Result">
-        <div className="flex items-center gap-3">
-          <ResultBox value={liveBmi > 0 ? liveBmi.toString() : ''} />
-          <span className="text-sm text-muted-foreground">kg/m²</span>
-        </div>
-        {interpretation && (
-          <p className={cn('mt-2 text-sm font-semibold', interpretation.tone)}>{interpretation.label}</p>
-        )}
-      </FieldRow>
-
-      <InterpretationTable rows={[
-        ['BMI <18.5', 'Below normal weight'],
-        ['BMI ≥18.5 and <25', 'Normal weight'],
-        ['BMI ≥25 and <30', 'Overweight'],
-        ['BMI ≥30 and <35', 'Class I Obesity'],
-        ['BMI ≥35 and <40', 'Class II Obesity'],
-        ['BMI ≥40', 'Class III Obesity'],
-      ]} />
-
-      <div className="rounded-lg bg-muted/40 p-4 space-y-3">
-        <div className="grid grid-cols-[auto_1fr] gap-3 items-center">
-          <span className="text-sm font-semibold text-foreground">Your Ideal Weight:</span>
-          <div className="space-y-2">
-            <ResultBox value={ibw ? ibw.lb.toString() : ''} suffix="pound" alignRight />
-            <div className="text-center text-xs text-muted-foreground">OR</div>
-            <ResultBox value={ibw ? ibw.kg.toString() : ''} suffix="kg" alignRight />
-          </div>
-        </div>
-      </div>
 
       <div className="grid grid-cols-[1fr_auto] gap-2">
         <Button type="submit" variant="medical" size="lg" disabled={!canSave}>

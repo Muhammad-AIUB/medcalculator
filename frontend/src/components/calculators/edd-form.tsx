@@ -143,15 +143,6 @@ export function EddForm({ onResult }: EddFormProps) {
           {String(trimester)}
         </p>
       )}
-
-      <InterpretationTable rows={[
-        ['Weeks 1–13', '1st Trimester'],
-        ['Weeks 14–27', '2nd Trimester'],
-        ['Weeks 28–40', '3rd Trimester'],
-        ['Week 37+', 'Full Term'],
-        ['Week 42+', 'Post-Term'],
-      ]} />
-
       <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
         <Save className="h-4 w-4" />
         Save to History

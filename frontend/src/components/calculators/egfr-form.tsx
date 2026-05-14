@@ -105,30 +105,6 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
         />
       </FieldRow>
 
-      <FieldRow label="Result">
-        <div className="flex items-center gap-3">
-          <ResultBox value={liveEgfr > 0 ? liveEgfr.toString() : ''} suffix="mL/min/1.73m²" />
-        </div>
-        {liveResult && (
-          <p className={cn('mt-2 text-sm font-semibold', stageColor)}>
-            {liveResult.label}
-          </p>
-        )}
-      </FieldRow>
-
-      <InterpretationTable rows={[
-        ['Stage 1 — GFR 90+', 'Normal kidney function'],
-        ['Stage 2 — GFR 60–89', 'Mildly reduced kidney function'],
-        ['Stage 3A — GFR 45–59', 'Moderately reduced kidney function'],
-        ['Stage 3B — GFR 30–44', 'Moderately reduced kidney function'],
-        ['Stage 4 — GFR 15–29', 'Severely reduced kidney function'],
-        ['Stage 5 — GFR <15', 'Very severe, or end-stage kidney failure'],
-      ]} />
-
-      <p className="text-xs text-muted-foreground italic">
-        Note: {formula === 'ckd-epi-2021' ? 'CKD-EPI 2021 (race-free)' : 'MDRD Equation'} is used
-      </p>
-
       <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
         <Save className="h-4 w-4" />
         Save to History

@@ -185,14 +185,6 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
           })}
         </div>
       </FieldRow>
-
-      <InterpretationTable rows={[
-        ['VIS 0–5', 'Low vasoactive support'],
-        ['VIS 5–15', 'Moderate support'],
-        ['VIS 15–30', 'High support'],
-        ['VIS >30', 'Refractory shock — very high mortality'],
-      ]} />
-
       <Button type="submit" variant="medical" className="w-full" size="lg" disabled={!canSave}>
         <Save className="h-4 w-4" />
         Save to History
