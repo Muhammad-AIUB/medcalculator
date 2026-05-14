@@ -6,27 +6,15 @@ import { CALCULATORS } from '@/lib/calculators/calculator-registry';
 import { useUIStore } from '@/store/ui.store';
 import { Search, Clock, X } from 'lucide-react';
 import Link from 'next/link';
-import { cn } from '@/lib/utils';
 import type { Calculator } from '@/types/calculator';
-
-const CATEGORY_TABS = [
-  { id: 'all',          label: 'All' },
-  { id: 'critical-care',label: 'Critical Care' },
-  { id: 'renal',        label: 'Renal' },
-  { id: 'liver',        label: 'Liver' },
-  { id: 'nutrition',    label: 'Nutrition' },
-  { id: 'obstetric',    label: 'Obstetric' },
-];
 
 export default function DashboardPage() {
   const [search, setSearch] = useState('');
-  const [activeCategory, setActiveCategory] = useState('all');
   const [showSearch, setShowSearch] = useState(false);
   const { recentCalculators } = useUIStore();
 
   const filtered = useMemo(() => {
     let list = CALCULATORS;
-    if (activeCategory !== 'all') list = list.filter((c) => c.category === activeCategory);
     if (search.trim()) {
       const q = search.toLowerCase();
       list = list.filter(
@@ -37,18 +25,18 @@ export default function DashboardPage() {
       );
     }
     return list;
-  }, [search, activeCategory]);
+  }, [search]);
 
   const recentCalcs = recentCalculators
     .map((id) => CALCULATORS.find((c) => c.id === id))
     .filter(Boolean) as Calculator[];
 
-  // Group by category label when in "All" view without search
+  // Group by category label when not searching
   const categoryLabel = (cat: string) =>
     cat.replace(/-/g, ' ').replace(/\b\w/g, (l) => l.toUpperCase());
 
   const grouped = useMemo(() => {
-    if (activeCategory !== 'all' || search.trim()) {
+    if (search.trim()) {
       return { Results: filtered };
     }
     return filtered.reduce<Record<string, Calculator[]>>((acc, c) => {
@@ -57,7 +45,7 @@ export default function DashboardPage() {
       acc[cat].push(c);
       return acc;
     }, {});
-  }, [filtered, activeCategory, search]);
+  }, [filtered, search]);
 
   return (
     <AppShell onSearchClick={() => setShowSearch((s) => !s)}>
@@ -115,26 +103,6 @@ export default function DashboardPage() {
           </section>
         )}
 
-        {/* Category tabs */}
-        {!search && (
-          <div className="flex gap-2 overflow-x-auto pb-1 -mx-1 px-1 scrollbar-hide">
-            {CATEGORY_TABS.map((cat) => (
-              <button
-                key={cat.id}
-                onClick={() => setActiveCategory(cat.id)}
-                className={cn(
-                  'flex-shrink-0 px-3.5 py-1.5 rounded-full text-xs font-semibold transition-colors border',
-                  activeCategory === cat.id
-                    ? 'bg-cyan-600 text-white border-cyan-600'
-                    : 'bg-background text-muted-foreground border-border hover:border-cyan-400 hover:text-cyan-600'
-                )}
-              >
-                {cat.label}
-              </button>
-            ))}
-          </div>
-        )}
-
         {/* Calculator groups */}
         {Object.entries(grouped).map(([group, calcs]) => (
           <section key={group}>
@@ -157,7 +125,7 @@ export default function DashboardPage() {
             <p className="text-4xl mb-3">🔍</p>
             <p className="text-base font-semibold text-foreground">No calculators found</p>
             <p className="text-sm text-muted-foreground mt-1">
-              Try a different search term or category
+              Try a different search term
             </p>
           </div>
         )}
