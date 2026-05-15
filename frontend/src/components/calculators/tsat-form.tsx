@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
 import { calculateTSAT } from '@/lib/calculators/tsat';
 import { FieldRow, NumInput, OrDivider, OptionButtons, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
@@ -117,9 +116,6 @@ export function TsatForm({ onResult }: TsatFormProps) {
         <NumInput value={ferritinStr} onChange={(v) => { setFerritinStr(v); saveField(CID, 'ferritin', v); }} suffix="ng/mL" step="1" min={0} max={5000} />
       </FieldRow>
 
-      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
-        Clear
-      </Button>
     </div>
   );
 }

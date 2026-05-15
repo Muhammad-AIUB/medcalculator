@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
 import { calculateEGFR } from '@/lib/calculators/egfr';
 import { FieldRow, NumInput, OrDivider, OptionButtons, fmt } from './shared-ui';
 import { getSaved, saveField } from './use-persist-form';
@@ -104,9 +103,6 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
         />
       </FieldRow>
 
-      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
-        Clear
-      </Button>
     </div>
   );
 }

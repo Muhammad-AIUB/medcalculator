@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateSOFA } from '@/lib/calculators/sofa';
 import { FieldRow, NumInput, ResultBox, OrDivider, fmt } from './shared-ui';
@@ -231,9 +230,6 @@ export function SofaForm({ onResult }: SofaFormProps) {
         <NumInput value={urineOutput} onChange={(v) => { setUrineOutput(v); saveField(CID, 'urine', v); }} suffix="mL/24h" step="10" min={0} max={10000} placeholder="optional" />
       </div>
 
-      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
-        Clear
-      </Button>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateEDD } from '@/lib/calculators/edd';
 import { FieldRow, NumInput, ResultBox, OptionButtons } from './shared-ui';
@@ -145,9 +144,6 @@ export function EddForm({ onResult }: EddFormProps) {
         </p>
       )}
 
-      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
-        Clear
-      </Button>
     </div>
   );
 }

@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateChildPugh } from '@/lib/calculators/child-pugh';
 import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
@@ -185,9 +184,6 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
         <div className="flex justify-end mt-1"><ScoreTag score={partialScores.enc} /></div>
       </FieldRow>
 
-      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
-        Clear
-      </Button>
     </div>
   );
 }

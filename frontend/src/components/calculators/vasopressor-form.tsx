@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateVasopressor } from '@/lib/calculators/vasopressor';
 import { FieldRow, NumInput, ResultBox, OrDivider, round, fmt } from './shared-ui';
@@ -199,9 +198,6 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
         </div>
       </FieldRow>
 
-      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
-        Clear
-      </Button>
     </div>
   );
 }

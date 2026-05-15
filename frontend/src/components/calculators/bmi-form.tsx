@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateBMI } from '@/lib/calculators/bmi';
 import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
@@ -134,9 +133,6 @@ export function BmiForm({ onResult }: BmiFormProps) {
         </div>
       </FieldRow>
 
-      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
-        Clear
-      </Button>
     </div>
   );
 }

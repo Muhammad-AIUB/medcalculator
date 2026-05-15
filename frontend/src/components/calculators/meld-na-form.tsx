@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { Button } from '@/components/ui/button';
 import { cn } from '@/lib/utils';
 import { calculateMELDNa } from '@/lib/calculators/meld-na';
 import { AlertTriangle } from 'lucide-react';
@@ -144,9 +143,6 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
         <NumInput value={sodiumStr} onChange={(v) => { setSodiumStr(v); saveField(CID, 'sodium', v); }} suffix="mEq/L" step="1" min={100} max={160} />
       </FieldRow>
 
-      <Button type="button" variant="outline" size="lg" className="w-full" onClick={clearAll}>
-        Clear
-      </Button>
     </div>
   );
 }
