@@ -9,6 +9,9 @@ dist/
 build/
 out/
 
+# Capacitor Android (generated at build time by GitHub Actions)
+frontend/android/
+
 # Environment
 .env
 .env.local

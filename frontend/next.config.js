@@ -2,6 +2,11 @@ const path = require('path');
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
+  output: 'export',        // Static HTML export for Capacitor offline APK
+  trailingSlash: true,     // Required for static export routing
+  images: {
+    unoptimized: true,     // Required for static export (no Next.js image server)
+  },
   experimental: { optimizePackageImports: ['lucide-react'] },
   webpack(config) {
     config.resolve.alias = {
@@ -9,18 +14,6 @@ const nextConfig = {
       '@': path.resolve(__dirname, 'src'),
     };
     return config;
-  },
-  async headers() {
-    return [
-      {
-        source: '/(.*)',
-        headers: [
-          { key: 'X-Frame-Options', value: 'DENY' },
-          { key: 'X-Content-Type-Options', value: 'nosniff' },
-          { key: 'Referrer-Policy', value: 'strict-origin-when-cross-origin' },
-        ],
-      },
-    ];
   },
 };
 

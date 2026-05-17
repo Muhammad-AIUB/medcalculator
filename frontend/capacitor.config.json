@@ -1,0 +1,12 @@
+{
+  "appId": "com.medcalcpro.app",
+  "appName": "MedCalc Pro",
+  "webDir": "out",
+  "server": {
+    "androidScheme": "https"
+  },
+  "android": {
+    "allowMixedContent": true,
+    "backgroundColor": "#0F2744"
+  }
+}
