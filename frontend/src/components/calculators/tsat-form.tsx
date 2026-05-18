@@ -13,8 +13,11 @@ export function TsatForm({ onResult }: TsatFormProps) {
   const [ironUgStr, setIronUgStr] = useState(() => getSaved(CID, 'ironUg'));
   const [ironUmolStr, setIronUmolStr] = useState(() => getSaved(CID, 'ironUmol'));
   const [tibcMethod, setTibcMethod] = useState<'tibc' | 'transferrin'>(() => (getSaved(CID, 'tibcMethod') as 'tibc' | 'transferrin') || 'tibc');
-  const [tibcStr, setTibcStr] = useState(() => getSaved(CID, 'tibc'));
-  const [tibcUnit, setTibcUnit] = useState(() => getSaved(CID, 'tibcUnit') || 'µg/dL');
+  // TIBC: µg/dL and µmol/L side by side
+  const [tibcUgStr, setTibcUgStr] = useState(() => getSaved(CID, 'tibcUg'));
+  const [tibcUmolStr, setTibcUmolStr] = useState(() => getSaved(CID, 'tibcUmol'));
+  // Transferrin: mg/dL only
+  const [transferrinStr, setTransferrinStr] = useState(() => getSaved(CID, 'transferrin'));
   const [ferritinStr, setFerritinStr] = useState(() => getSaved(CID, 'ferritin'));
 
   const onIronUgChange = useCallback((v: string) => {
@@ -30,20 +33,38 @@ export function TsatForm({ onResult }: TsatFormProps) {
     setIronUgStr(ug); saveField(CID, 'ironUg', ug);
   }, []);
 
+  // TIBC: µg/dL ↔ µmol/L (factor 0.179, same as iron)
+  const onTibcUgChange = useCallback((v: string) => {
+    setTibcUgStr(v); saveField(CID, 'tibcUg', v);
+    const n = parseFloat(v);
+    const u = Number.isFinite(n) && n > 0 ? fmt(n * 0.179, 2) : '';
+    setTibcUmolStr(u); saveField(CID, 'tibcUmol', u);
+  }, []);
+  const onTibcUmolChange = useCallback((v: string) => {
+    setTibcUmolStr(v); saveField(CID, 'tibcUmol', v);
+    const n = parseFloat(v);
+    const ug = Number.isFinite(n) && n > 0 ? fmt(n / 0.179, 1) : '';
+    setTibcUgStr(ug); saveField(CID, 'tibcUg', ug);
+  }, []);
+
   const ironUg = parseFloat(ironUgStr) || 0;
-  const tibcVal = parseFloat(tibcStr) || 0;
-  const canSave = ironUg > 0 && tibcVal > 0;
+  const tibcUg = parseFloat(tibcUgStr) || 0;
+  const transferrinVal = parseFloat(transferrinStr) || 0;
+
+  const tibcValue = tibcMethod === 'tibc' ? tibcUg : transferrinVal;
+  const tibcUnit  = tibcMethod === 'tibc' ? 'µg/dL' : 'mg/dL';
+  const canSave = ironUg > 0 && tibcValue > 0;
 
   const liveResult = useMemo(() => {
     if (!canSave) return null;
     try {
       return calculateTSAT({
         serumIron: ironUg, serumIronUnit: 'µg/dL',
-        tibcMethod, tibcValue: tibcVal, tibcUnit,
+        tibcMethod, tibcValue, tibcUnit,
         ferritin: ferritinStr ? parseFloat(ferritinStr) : undefined,
       });
     } catch { return null; }
-  }, [canSave, ironUg, tibcMethod, tibcVal, tibcUnit, ferritinStr]);
+  }, [canSave, ironUg, tibcMethod, tibcValue, tibcUnit, ferritinStr]);
 
   const onResultRef = useRef(onResult);
   useEffect(() => { onResultRef.current = onResult; });
@@ -62,14 +83,11 @@ export function TsatForm({ onResult }: TsatFormProps) {
           interpretation: { text: String(sr.value), severity: (sr.severity ?? 'neutral') as any },
         })) ?? []),
       ],
-      inputs: { serumIron: ironUg, serumIronUnit: 'µg/dL', tibcMethod, tibcValue: tibcVal, tibcUnit, ferritin: ferritinStr },
+      inputs: { serumIron: ironUg, serumIronUnit: 'µg/dL', tibcMethod, tibcValue, tibcUnit, ferritin: ferritinStr },
       references: liveResult.references,
       formulaUsed: 'TSAT = (Fe / TIBC) × 100',
     });
   }, [liveResult]);
-
-  const tibcUnits = tibcMethod === 'tibc' ? ['µg/dL', 'µmol/L'] : ['mg/dL', 'g/L', 'g/dL'];
-  const clearAll = () => { setIronUgStr(''); setIronUmolStr(''); setTibcMethod('tibc'); setTibcStr(''); setTibcUnit('µg/dL'); setFerritinStr(''); saveField(CID, 'ironUg', ''); saveField(CID, 'ironUmol', ''); saveField(CID, 'tibcMethod', ''); saveField(CID, 'tibcUnit', ''); saveField(CID, 'tibc', ''); saveField(CID, 'ferritin', ''); };
 
   return (
     <div className="space-y-6">
@@ -88,34 +106,25 @@ export function TsatForm({ onResult }: TsatFormProps) {
             { value: 'transferrin' as const, label: 'Transferrin' },
           ]}
           value={tibcMethod}
-          onChange={(v) => { setTibcMethod(v); saveField(CID, 'tibcMethod', v); const u = v === 'tibc' ? 'µg/dL' : 'mg/dL'; setTibcUnit(u); saveField(CID, 'tibcUnit', u); }}
+          onChange={(v) => { setTibcMethod(v); saveField(CID, 'tibcMethod', v); }}
           columns={2}
         />
-        <div className="mt-2 flex items-stretch overflow-hidden rounded-lg border-2 border-[#0E7490]/50 bg-background focus-within:border-cyan-500">
-          <input
-            type="number"
-            inputMode="decimal"
-            min={0}
-            step="0.1"
-            placeholder={tibcMethod === 'tibc' ? 'e.g. 300' : 'e.g. 250'}
-            value={tibcStr}
-            onChange={e => { setTibcStr(e.target.value); saveField(CID, 'tibc', e.target.value); }}
-            className="min-w-0 flex-1 h-11 px-3 bg-transparent text-base font-medium text-right outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-          />
-          <select
-            value={tibcUnit}
-            onChange={e => { setTibcUnit(e.target.value); saveField(CID, 'tibcUnit', e.target.value); }}
-            className="border-l bg-muted/40 px-2 text-xs font-medium text-foreground focus:outline-none h-11"
-          >
-            {tibcUnits.map(u => <option key={u} value={u}>{u}</option>)}
-          </select>
+        <div className="mt-2">
+          {tibcMethod === 'tibc' ? (
+            <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+              <NumInput value={tibcUgStr} onChange={onTibcUgChange} suffix="µg/dL" step="1" min={1} max={1000} />
+              <OrDivider />
+              <NumInput value={tibcUmolStr} onChange={onTibcUmolChange} suffix="µmol/L" step="0.1" min={0.1} max={180} />
+            </div>
+          ) : (
+            <NumInput value={transferrinStr} onChange={(v) => { setTransferrinStr(v); saveField(CID, 'transferrin', v); }} suffix="mg/dL" step="1" min={1} max={600} />
+          )}
         </div>
       </FieldRow>
 
       <FieldRow label="Serum Ferritin" hint="optional">
         <NumInput value={ferritinStr} onChange={(v) => { setFerritinStr(v); saveField(CID, 'ferritin', v); }} suffix="ng/mL" step="1" min={0} max={5000} />
       </FieldRow>
-
     </div>
   );
 }
