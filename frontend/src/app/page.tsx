@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { AppShell } from '@/components/layout/app-shell';
 import { CALCULATORS } from '@/lib/calculators/calculator-registry';
+import { useUIStore } from '@/store/ui.store';
 import { X } from 'lucide-react';
 
 const SLOT_COUNT = 5;
@@ -10,6 +11,7 @@ const STORAGE_KEY = 'home-slots';
 
 export default function DashboardPage() {
   const router = useRouter();
+  const { history } = useUIStore();
   const [slots, setSlots] = useState<(string | null)[]>(Array(SLOT_COUNT).fill(null));
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
   const [search, setSearch] = useState('');
@@ -56,9 +58,15 @@ export default function DashboardPage() {
                 /* Filled slot */
                 <button
                   onClick={() => router.push(`/calculators/${calc.id}`)}
-                  className="flex-1 text-left px-4 py-4 rounded-xl border-2 border-[#0E7490] bg-[#0E7490]/10 text-sm font-semibold text-[#0E7490] active:scale-[0.98] transition-all"
+                  className="flex-1 text-left px-4 py-3 rounded-xl border-2 border-[#0E7490] bg-[#0E7490]/10 active:scale-[0.98] transition-all"
                 >
-                  {calc.title}
+                  <p className="text-sm font-semibold text-[#0E7490]">{calc.title}</p>
+                  {(() => {
+                    const last = history.find(h => h.calculatorId === calc.id);
+                    return last ? (
+                      <p className="text-xs text-muted-foreground mt-0.5">{last.summary}</p>
+                    ) : null;
+                  })()}
                 </button>
               ) : (
                 /* Empty slot */
