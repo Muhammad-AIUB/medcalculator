@@ -13,7 +13,6 @@ export default function DashboardPage() {
             href={`/calculators/${calc.id}`}
             className="flex items-center gap-3 w-full px-4 py-4 rounded-xl border-2 border-[#0E7490]/30 bg-card hover:border-[#0E7490] hover:bg-[#0E7490]/5 transition-all active:scale-[0.98]"
           >
-            <span className="text-2xl">{calc.emoji}</span>
             <span className="text-sm font-semibold text-foreground">{calc.title}</span>
           </Link>
         ))}
