@@ -137,21 +137,6 @@ export function CalculatorPageClient({ id }: Props) {
               {primary.interpretation?.text && (
                 <p className="text-sm text-gray-600">{primary.interpretation.text}</p>
               )}
-              {result.outputs?.length > 1 && (
-                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-200">
-                  {result.outputs.slice(1).map((out: any) => (
-                    <div key={out.id}>
-                      <p className="text-xs text-gray-500 font-medium">{out.label}</p>
-                      <p className="text-sm font-semibold">
-                        {typeof out.value === 'number'
-                          ? out.value.toLocaleString(undefined, { maximumFractionDigits: 1 })
-                          : out.value}
-                        {out.unit && <span className="text-xs text-gray-400 ml-1">{out.unit}</span>}
-                      </p>
-                    </div>
-                  ))}
-                </div>
-              )}
               {result.warnings?.length > 0 && (
                 <div className="pt-2 border-t border-amber-200 space-y-1">
                   {result.warnings.map((w: string, i: number) => (
