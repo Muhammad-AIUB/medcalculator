@@ -2,11 +2,9 @@
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useCallback } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
-import { ResultCard } from '@/components/ui/result-card';
 import { Button } from '@/components/ui/button';
 import { getCalculator } from '@/lib/calculators/calculator-registry';
 import { useUIStore } from '@/store/ui.store';
-import { Share2, RotateCcw } from 'lucide-react';
 import dynamic from 'next/dynamic';
 
 const EgfrForm = dynamic(() => import('@/components/calculators/egfr-form').then(m => ({ default: m.EgfrForm })), { ssr: false });
@@ -29,9 +27,23 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   tsat: TsatForm,
 };
 
-interface Props {
-  id: string;
-}
+const severityColors: Record<string, string> = {
+  success: '#10b981',
+  warning: '#f59e0b',
+  danger:  '#ef4444',
+  info:    '#3b82f6',
+  neutral: '#64748b',
+};
+
+const severityBg: Record<string, string> = {
+  success: '#f0fdf4',
+  warning: '#fffbeb',
+  danger:  '#fef2f2',
+  info:    '#eff6ff',
+  neutral: '#f8fafc',
+};
+
+interface Props { id: string; }
 
 export function CalculatorPageClient({ id }: Props) {
   const router = useRouter();
@@ -73,53 +85,87 @@ export function CalculatorPageClient({ id }: Props) {
     }
   }, [id, calculator, addToRecent, addHistoryEntry]);
 
-  const handleShare = async () => {
-    if (!result) return;
-    const text = result.outputs?.map((o: any) => `${o.label}: ${o.value}${o.unit ? ' ' + o.unit : ''}`).join('\n') ?? '';
-    if (navigator.share) {
-      await navigator.share({ title: calculator.title, text });
-    } else {
-      await navigator.clipboard.writeText(`${calculator.title}\n${text}`);
-    }
-  };
+  const primary = result?.outputs?.[0];
+  const sev = primary?.interpretation?.severity ?? 'neutral';
+  const color = severityColors[sev] ?? severityColors.neutral;
+  const bg = severityBg[sev] ?? severityBg.neutral;
 
   return (
     <AppShell title={calculator.title} showBack backHref="/">
-      <div className="space-y-4">
-        {result && (
-          <div className="flex justify-end gap-1.5">
-            <Button variant="ghost" size="icon-sm" onClick={handleShare} aria-label="Share">
-              <Share2 className="h-[18px] w-[18px]" />
-            </Button>
-          </div>
-        )}
+      <div className="space-y-6">
 
-        {result && (
-          <div className="sticky top-[56px] z-30 -mx-4 px-4 py-2 bg-background/95 backdrop-blur border-b border-border/60">
-            <ResultCard
-              calculatorName={calculator.title}
-              outputs={result.outputs}
-              warnings={result.warnings}
-              references={result.references}
-              formulaUsed={result.formulaUsed}
-            />
-          </div>
-        )}
+        {/* Form inputs */}
+        <FormComponent key={resetKey} onResult={handleResult} />
 
-        <div className="space-y-4">
-          <FormComponent key={resetKey} onResult={handleResult} />
-        </div>
-
-        {result && (
-          <Button
-            variant="outline"
-            className="w-full gap-2"
-            onClick={() => { setResult(null); setResetKey(k => k + 1); }}
+        {/* Result */}
+        {primary && (
+          <div
+            className="rounded-2xl border-2 p-5 space-y-3"
+            style={{ borderColor: color, background: bg }}
           >
-            <RotateCcw className="h-4 w-4" />
-            Reset Calculator
-          </Button>
+            {/* Main value */}
+            <div>
+              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
+                Result
+              </p>
+              <div className="flex items-baseline gap-2">
+                <span className="text-5xl font-bold" style={{ color }}>
+                  {typeof primary.value === 'number'
+                    ? primary.value.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                    : primary.value}
+                </span>
+                {primary.unit && (
+                  <span className="text-base font-medium text-gray-500">{primary.unit}</span>
+                )}
+              </div>
+              {primary.interpretation?.classification && (
+                <p className="mt-1 text-sm font-semibold" style={{ color }}>
+                  {primary.interpretation.classification}
+                </p>
+              )}
+              {primary.interpretation?.text && (
+                <p className="mt-1 text-sm text-gray-600">{primary.interpretation.text}</p>
+              )}
+            </div>
+
+            {/* Sub results */}
+            {result.outputs?.length > 1 && (
+              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-current/10">
+                {result.outputs.slice(1).map((out: any) => (
+                  <div key={out.id}>
+                    <p className="text-xs text-gray-500 font-medium">{out.label}</p>
+                    <p className="text-sm font-semibold">
+                      {typeof out.value === 'number'
+                        ? out.value.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                        : out.value}
+                      {out.unit && <span className="text-xs text-gray-400 ml-1">{out.unit}</span>}
+                    </p>
+                  </div>
+                ))}
+              </div>
+            )}
+
+            {/* Warnings */}
+            {result.warnings?.length > 0 && (
+              <div className="pt-2 border-t border-amber-200 space-y-1">
+                {result.warnings.map((w: string, i: number) => (
+                  <p key={i} className="text-xs text-amber-700">⚠ {w}</p>
+                ))}
+              </div>
+            )}
+          </div>
         )}
+
+        {/* Formula */}
+        {result?.formulaUsed && (
+          <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+              Formula Used
+            </p>
+            <p className="text-sm font-medium text-foreground">{result.formulaUsed}</p>
+          </div>
+        )}
+
       </div>
     </AppShell>
   );
