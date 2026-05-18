@@ -7,7 +7,7 @@ export default function DashboardPage() {
   return (
     <AppShell>
       <div className="space-y-3 py-2">
-        {CALCULATORS.map((calc) => (
+        {CALCULATORS.slice(0, 5).map((calc) => (
           <Link
             key={calc.id}
             href={`/calculators/${calc.id}`}
