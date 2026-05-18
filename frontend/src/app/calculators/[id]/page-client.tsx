@@ -88,7 +88,7 @@ export function CalculatorPageClient({ id }: Props) {
   const primary = result?.outputs?.[0];
   const sev = primary?.interpretation?.severity ?? 'neutral';
   const color = severityColors[sev] ?? severityColors.neutral;
-  const bg = severityBg[sev] ?? severityBg.neutral;
+  const bg = primary ? (severityBg[sev] ?? severityBg.neutral) : '#f8fafc';
 
   return (
     <AppShell title={calculator.title} showBack backHref="/">
@@ -97,17 +97,17 @@ export function CalculatorPageClient({ id }: Props) {
         {/* Form inputs */}
         <FormComponent key={resetKey} onResult={handleResult} />
 
-        {/* Result */}
-        {primary && (
-          <div
-            className="rounded-2xl border-2 p-5 space-y-3"
-            style={{ borderColor: color, background: bg }}
-          >
-            {/* Main value */}
-            <div>
-              <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
-                Result
-              </p>
+        {/* Result — always visible */}
+        <div
+          className="rounded-2xl border-2 p-5 space-y-3"
+          style={{ borderColor: primary ? color : '#e2e8f0', background: bg }}
+        >
+          <p className="text-xs font-semibold uppercase tracking-wider text-gray-500 mb-1">
+            Result
+          </p>
+
+          {primary ? (
+            <>
               <div className="flex items-baseline gap-2">
                 <span className="text-5xl font-bold" style={{ color }}>
                   {typeof primary.value === 'number'
@@ -119,52 +119,50 @@ export function CalculatorPageClient({ id }: Props) {
                 )}
               </div>
               {primary.interpretation?.classification && (
-                <p className="mt-1 text-sm font-semibold" style={{ color }}>
+                <p className="text-sm font-semibold" style={{ color }}>
                   {primary.interpretation.classification}
                 </p>
               )}
               {primary.interpretation?.text && (
-                <p className="mt-1 text-sm text-gray-600">{primary.interpretation.text}</p>
+                <p className="text-sm text-gray-600">{primary.interpretation.text}</p>
               )}
-            </div>
+              {result.outputs?.length > 1 && (
+                <div className="grid grid-cols-2 gap-3 pt-2 border-t border-gray-200">
+                  {result.outputs.slice(1).map((out: any) => (
+                    <div key={out.id}>
+                      <p className="text-xs text-gray-500 font-medium">{out.label}</p>
+                      <p className="text-sm font-semibold">
+                        {typeof out.value === 'number'
+                          ? out.value.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                          : out.value}
+                        {out.unit && <span className="text-xs text-gray-400 ml-1">{out.unit}</span>}
+                      </p>
+                    </div>
+                  ))}
+                </div>
+              )}
+              {result.warnings?.length > 0 && (
+                <div className="pt-2 border-t border-amber-200 space-y-1">
+                  {result.warnings.map((w: string, i: number) => (
+                    <p key={i} className="text-xs text-amber-700">⚠ {w}</p>
+                  ))}
+                </div>
+              )}
+            </>
+          ) : (
+            <p className="text-3xl font-bold text-gray-300">—</p>
+          )}
+        </div>
 
-            {/* Sub results */}
-            {result.outputs?.length > 1 && (
-              <div className="grid grid-cols-2 gap-3 pt-2 border-t border-current/10">
-                {result.outputs.slice(1).map((out: any) => (
-                  <div key={out.id}>
-                    <p className="text-xs text-gray-500 font-medium">{out.label}</p>
-                    <p className="text-sm font-semibold">
-                      {typeof out.value === 'number'
-                        ? out.value.toLocaleString(undefined, { maximumFractionDigits: 1 })
-                        : out.value}
-                      {out.unit && <span className="text-xs text-gray-400 ml-1">{out.unit}</span>}
-                    </p>
-                  </div>
-                ))}
-              </div>
-            )}
-
-            {/* Warnings */}
-            {result.warnings?.length > 0 && (
-              <div className="pt-2 border-t border-amber-200 space-y-1">
-                {result.warnings.map((w: string, i: number) => (
-                  <p key={i} className="text-xs text-amber-700">⚠ {w}</p>
-                ))}
-              </div>
-            )}
-          </div>
-        )}
-
-        {/* Formula */}
-        {result?.formulaUsed && (
-          <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
-            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
-              Formula Used
-            </p>
-            <p className="text-sm font-medium text-foreground">{result.formulaUsed}</p>
-          </div>
-        )}
+        {/* Formula — always visible */}
+        <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
+          <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+            Formula Used
+          </p>
+          <p className="text-sm font-medium text-foreground">
+            {result?.formulaUsed ?? '—'}
+          </p>
+        </div>
 
       </div>
     </AppShell>
