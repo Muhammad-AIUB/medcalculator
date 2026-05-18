@@ -27,6 +27,17 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   tsat: TsatForm,
 };
 
+const FORMULA_MAP: Record<string, string> = {
+  bmi:          'BMI = Weight (kg) ÷ Height² (m²)',
+  egfr:         'CKD-EPI 2021: eGFR = 142 × (Scr/κ)^α × (0.9938)^Age\nMDRD: eGFR = 175 × Scr^−1.154 × Age^−0.203',
+  'meld-na':    'MELD = 3.78×ln(Bilirubin) + 11.2×ln(INR) + 9.57×ln(Creatinine) + 6.43\nMELD-Na = MELD + 1.32×(137−Na) − [0.033×MELD×(137−Na)]',
+  'child-pugh': 'Score = Bilirubin + Albumin + INR + Ascites + Encephalopathy (each 1–3 pts)',
+  sofa:         'SOFA = Respiratory + Coagulation + Liver + Cardiovascular + CNS + Renal (each 0–4 pts)',
+  vasopressor:  'VIS = Dopamine + Dobutamine + (Epinephrine×100) + (Norepinephrine×100) + (Vasopressin×2.5) + (Milrinone×10) + Phenylephrine',
+  tsat:         'TSAT (%) = (Serum Iron ÷ TIBC) × 100',
+  edd:          "Naegele's Rule: EDD = LMP + 9 months + 7 days\nUltrasound: EDD = Scan Date − GA + 280 days",
+};
+
 const severityColors: Record<string, string> = {
   success: '#10b981',
   warning: '#f59e0b',
@@ -159,8 +170,8 @@ export function CalculatorPageClient({ id }: Props) {
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
             Formula Used
           </p>
-          <p className="text-sm font-medium text-foreground">
-            {result?.formulaUsed ?? '—'}
+          <p className="text-sm font-medium text-foreground whitespace-pre-line">
+            {FORMULA_MAP[id] ?? result?.formulaUsed ?? '—'}
           </p>
         </div>
 
