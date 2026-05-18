@@ -129,14 +129,6 @@ export function CalculatorPageClient({ id }: Props) {
                   <span className="text-base font-medium text-gray-500">{primary.unit}</span>
                 )}
               </div>
-              {primary.interpretation?.classification && (
-                <p className="text-sm font-semibold" style={{ color }}>
-                  {primary.interpretation.classification}
-                </p>
-              )}
-              {primary.interpretation?.text && (
-                <p className="text-sm text-gray-600">{primary.interpretation.text}</p>
-              )}
               {result.warnings?.length > 0 && (
                 <div className="pt-2 border-t border-amber-200 space-y-1">
                   {result.warnings.map((w: string, i: number) => (
