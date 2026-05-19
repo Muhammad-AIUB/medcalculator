@@ -28,11 +28,12 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
 };
 
 const BMI_FORMULA = 'Body mass index, kg/m2 = weight, kg / (height, m)2\nBody surface area (Mosteller), m2 = [(height, cm x weight, kg) / 3600]1/2';
+const MELD_NA_FORMULA = 'MELD = 3.78 x ln(bilirubin) + 11.2 x ln(INR) + 9.57 x ln(creatinine) + 6.43\nMELD-Na = MELD Score - Na - 0.025 x MELD x (140-Na) + 140';
 
 const FORMULA_MAP: Record<string, string> = {
   bmi:          'BMI = Weight (kg) ÷ Height² (m²)',
   egfr:         'CKD-EPI 2021: eGFR = 142 × (Scr/κ)^α × (0.9938)^Age\nMDRD: eGFR = 175 × Scr^−1.154 × Age^−0.203',
-  'meld-na':    'MELD = 3.78×ln(Bilirubin) + 11.2×ln(INR) + 9.57×ln(Creatinine) + 6.43\nMELD-Na = MELD + 1.32×(137−Na) − [0.033×MELD×(137−Na)]',
+  'meld-na':    MELD_NA_FORMULA,
   'child-pugh': 'Score = Bilirubin + Albumin + INR + Ascites + Encephalopathy (each 1–3 pts)',
   sofa:         'SOFA = Respiratory + Coagulation + Liver + Cardiovascular + CNS + Renal (each 0–4 pts)',
   vasopressor:  'VIS = Dopamine + Dobutamine + (Epinephrine×100) + (Norepinephrine×100) + (Vasopressin×2.5) + (Milrinone×10) + Phenylephrine',
@@ -150,7 +151,11 @@ export function CalculatorPageClient({ id }: Props) {
             Formula Used
           </p>
           <p className="text-sm font-medium text-foreground whitespace-pre-line">
-            {id === 'bmi' ? (result?.formulaUsed ?? BMI_FORMULA) : (result?.formulaUsed ?? FORMULA_MAP[id] ?? '—')}
+            {id === 'bmi'
+              ? (result?.formulaUsed ?? BMI_FORMULA)
+              : id === 'meld-na'
+                ? (result?.formulaUsed ?? MELD_NA_FORMULA)
+                : (result?.formulaUsed ?? FORMULA_MAP[id] ?? '—')}
           </p>
         </div>
 

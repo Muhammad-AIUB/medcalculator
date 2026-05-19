@@ -5,7 +5,7 @@ import {
   ICalculator,
   CalculatorRegistry
 } from '../calculator.registry';
-import { roundTo, clamp, safeLn } from '../../../../common/utils/calculation.utils';
+import { roundTo, safeLn } from '../../../../common/utils/calculation.utils';
 
 interface MeldMortality {
   score: number;
@@ -115,7 +115,7 @@ export class MeldNaCalculator implements ICalculator {
         min: 100,
         max: 160,
         validationRules: [{ type: 'required', message: 'Serum sodium is required' }],
-        helpText: 'Serum sodium (clamped to 125-137 mEq/L for MELD-Na calculation)',
+        helpText: 'Serum sodium used as Na in the MELD-Na calculation',
         clinicalRange: { min: 135, max: 145, unit: 'mEq/L', warning: 'Outside normal sodium range' },
       },
       {
@@ -149,7 +149,7 @@ export class MeldNaCalculator implements ICalculator {
     ],
     clinicalNotes: [
       'MELD-Na is the current UNOS/OPTN standard for transplant waitlist prioritization (replaced MELD in 2016).',
-      'Sodium values < 125 mEq/L are treated as 125; values > 137 are treated as 137 for MELD-Na.',
+      'MELD-Na = MELD Score - Na - 0.025 x MELD x (140-Na) + 140.',
       'Creatinine is capped at 4.0 mg/dL. Patients on dialysis ≥2×/week use creatinine = 4.0.',
       'All lab values use minimum of 1.0 mg/dL to prevent log(0) errors.',
     ],
@@ -220,17 +220,12 @@ export class MeldNaCalculator implements ICalculator {
       1,
     );
 
-    // ── Sodium clamped 125–137 for MELD-Na ───────────────────────────
-    const sodiumClamped = clamp(sodium, 125, 137);
-    if (sodium < 125) {
-      notes.push('Sodium clamped to 125 mEq/L for MELD-Na calculation (actual value lower).');
-    } else if (sodium > 137) {
-      notes.push('Sodium clamped to 137 mEq/L for MELD-Na calculation (actual value higher).');
-    }
+    // Use serum sodium directly as Na in the requested MELD-Na formula.
+    const sodiumUsed = sodium;
 
-    // ── MELD-Na = MELD - Na - (0.025 × MELD × (140 - Na)) + 140 ─────
+    // MELD-Na = MELD Score - Na - 0.025 x MELD x (140-Na) + 140
     const meldNa = roundTo(
-      meld - sodiumClamped - (0.025 * meld * (140 - sodiumClamped)) + 140,
+      meld - sodiumUsed - (0.025 * meld * (140 - sodiumUsed)) + 140,
       1,
     );
 
@@ -249,7 +244,7 @@ export class MeldNaCalculator implements ICalculator {
           bilirubin_used: roundTo(bilirubinCalc, 2),
           inr_used: roundTo(inrCalc, 2),
           creatinine_used: roundTo(creatinineCalc, 2),
-          sodium_clamped: sodiumClamped,
+          sodium_used: sodiumUsed,
         },
       },
       warnings,
