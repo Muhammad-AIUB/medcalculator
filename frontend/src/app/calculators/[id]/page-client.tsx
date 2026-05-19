@@ -37,7 +37,7 @@ const FORMULA_MAP: Record<string, string> = {
   bmi:          'BMI = Weight (kg) Ã· HeightÂ² (mÂ²)',
   egfr:         'CKD-EPI 2021: eGFR = 142 Ã— (Scr/Îº)^Î± Ã— (0.9938)^Age\nMDRD: eGFR = 175 Ã— Scr^âˆ’1.154 Ã— Age^âˆ’0.203',
   'meld-na':    MELD_NA_FORMULA,
-  'child-pugh': 'Score = Bilirubin + Albumin + INR + Ascites + Encephalopathy (each 1â€“3 pts)',
+  'child-pugh': 'Addition of assigned points.',
   sofa:         'SOFA = Respiratory + Coagulation + Liver + Cardiovascular + CNS + Renal (each 0â€“4 pts)',
   vasopressor:  'VIS = Dopamine + Dobutamine + (EpinephrineÃ—100) + (NorepinephrineÃ—100) + (VasopressinÃ—2.5) + (MilrinoneÃ—10) + Phenylephrine',
   tsat:         'TSAT (%) = (Serum Iron Ã· TIBC) Ã— 100',
