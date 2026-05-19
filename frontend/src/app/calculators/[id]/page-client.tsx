@@ -38,7 +38,7 @@ const SOFA2_FORMULA = 'To calculate the SOFA-2 Score, add the points for each va
 
 const FORMULA_MAP: Record<string, string> = {
   bmi:          'BMI = Weight (kg) Ã· HeightÂ² (mÂ²)',
-  egfr:         'CKD-EPI 2021: eGFR = 142 Ã— (Scr/Îº)^Î± Ã— (0.9938)^Age\nMDRD: eGFR = 175 Ã— Scr^âˆ’1.154 Ã— Age^âˆ’0.203',
+  egfr:         ‘GFR = 175 × Scr⁻¹·¹⁵⁴ × Age⁻⁰·²⁰³ × 1.212 (if Black) × 0.742 (if Female)’,
   'meld-na':    MELD_NA_FORMULA,
   'child-pugh': 'Addition of assigned points.',
   sofa:         'SOFA = Respiratory + Coagulation + Liver + Cardiovascular + CNS + Renal (each 0â€“4 pts)',

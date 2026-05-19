@@ -10,6 +10,7 @@ interface EGFRInput {
   age: number
   sex: 'male' | 'female'
   formula: EGFRFormula
+  black?: boolean
 }
 
 function getCKDStage(egfr: number): {
@@ -42,10 +43,11 @@ function calcCKDEPI2021(creatMgDL: number, age: number, sex: 'male' | 'female'):
   return MedicalUnitConverter.round(egfr, 1)
 }
 
-function calcMDRD(creatMgDL: number, age: number, sex: 'male' | 'female'): number {
+function calcMDRD(creatMgDL: number, age: number, sex: 'male' | 'female', black?: boolean): number {
   // 4-variable MDRD equation
-  const sexFactor = sex === 'female' ? 0.742 : 1.0
-  const egfr = 175 * Math.pow(creatMgDL, -1.154) * Math.pow(age, -0.203) * sexFactor
+  const sexFactor   = sex === 'female' ? 0.742 : 1.0
+  const raceFactor  = black ? 1.212 : 1.0
+  const egfr = 175 * Math.pow(creatMgDL, -1.154) * Math.pow(age, -0.203) * sexFactor * raceFactor
   return MedicalUnitConverter.round(egfr, 1)
 }
 
@@ -65,7 +67,7 @@ export function calculateEGFR(input: EGFRInput): CalculationResult {
     egfr = calcCKDEPI2021(creatMgDL, input.age, input.sex)
     formulaLabel = 'CKD-EPI 2021'
   } else {
-    egfr = calcMDRD(creatMgDL, input.age, input.sex)
+    egfr = calcMDRD(creatMgDL, input.age, input.sex, input.black)
     formulaLabel = 'MDRD 4-variable'
   }
 

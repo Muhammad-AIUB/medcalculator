@@ -1,105 +1,136 @@
 'use client';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { calculateEGFR } from '@/lib/calculators/egfr';
-import { FieldRow, NumInput, OrDivider, OptionButtons, fmt } from './shared-ui';
+import { NumInput, OrDivider, fmt } from './shared-ui';
+
 interface EgfrFormProps {
   onResult: (result: any) => void;
 }
 
+const TEAL = '#0E7490';
+
+function Toggle<T extends string>({
+  options,
+  value,
+  onChange,
+}: {
+  options: { value: T; label: string }[];
+  value: T;
+  onChange: (v: T) => void;
+}) {
+  return (
+    <div className="grid rounded-lg overflow-hidden border border-gray-200" style={{ gridTemplateColumns: `repeat(${options.length}, 1fr)` }}>
+      {options.map((opt) => {
+        const active = value === opt.value;
+        return (
+          <button
+            key={opt.value}
+            type="button"
+            onClick={() => onChange(opt.value)}
+            className="py-3 text-sm font-semibold transition-colors"
+            style={{ background: active ? TEAL : '#ffffff', color: active ? '#ffffff' : '#1e293b' }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
+    </div>
+  );
+}
+
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div className="py-5 border-b border-gray-100 last:border-0 flex items-start gap-4">
+      <div className="w-32 shrink-0 pt-1">
+        <p className="text-sm font-semibold text-foreground leading-snug">{label}</p>
+        {hint && <p className="text-xs mt-0.5" style={{ color: TEAL }}>{hint}</p>}
+      </div>
+      <div className="flex-1">{children}</div>
+    </div>
+  );
+}
+
 export function EgfrForm({ onResult }: EgfrFormProps) {
+  const [sex, setSex]       = useState<'female' | 'male'>('female');
+  const [ageStr, setAgeStr] = useState('');
   const [mgdlStr, setMgdlStr] = useState('');
   const [umolStr, setUmolStr] = useState('');
-  const [ageStr, setAgeStr] = useState('');
-  const [sex, setSex] = useState<'male' | 'female'>('male');
-  const [formula, setFormula] = useState<'ckd-epi-2021' | 'mdrd'>('ckd-epi-2021');
+  const [black, setBlack]   = useState(false);
 
   const onMgdlChange = useCallback((v: string) => {
     setMgdlStr(v);
     const n = parseFloat(v);
-    const u = Number.isFinite(n) && n > 0 ? fmt(n * 88.4, 1) : '';
-    setUmolStr(u);
+    setUmolStr(Number.isFinite(n) && n > 0 ? fmt(n * 88.4, 1) : '');
   }, []);
 
   const onUmolChange = useCallback((v: string) => {
     setUmolStr(v);
     const n = parseFloat(v);
-    const m = Number.isFinite(n) && n > 0 ? fmt(n / 88.4, 2) : '';
-    setMgdlStr(m);
+    setMgdlStr(Number.isFinite(n) && n > 0 ? fmt(n / 88.4, 2) : '');
   }, []);
 
   const creatMgdl = parseFloat(mgdlStr) || 0;
-  const age = parseInt(ageStr) || 0;
+  const age       = parseInt(ageStr) || 0;
 
   const liveResult = useMemo(() => {
-    if (creatMgdl <= 0 || age < 18) return null;
+    if (creatMgdl <= 0 || age < 1) return null;
     try {
-      return calculateEGFR({ creatinine: creatMgdl, creatinineUnit: 'mg/dL', age, sex, formula });
+      return calculateEGFR({ creatinine: creatMgdl, creatinineUnit: 'mg/dL', age, sex, formula: 'mdrd', black });
     } catch { return null; }
-  }, [creatMgdl, age, sex, formula]);
-
-  const liveEgfr = liveResult?.score ?? 0;
+  }, [creatMgdl, age, sex, black]);
 
   const onResultRef = useRef(onResult);
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
     if (!liveResult) return;
-    const severity = liveResult.severity as any;
     onResultRef.current({
-      outputs: [
-        {
-          id: 'egfr', label: 'eGFR', value: liveResult.score ?? 0, unit: 'mL/min/1.73m²',
-          interpretation: { text: liveResult.interpretation, severity, classification: liveResult.label },
-        },
-        ...(liveResult.subResults?.map((sr, i) => ({
-          id: `sub-${i}`, label: sr.label, value: sr.value, unit: sr.unit,
-          interpretation: { text: String(sr.value), severity: (sr.severity ?? 'neutral') as any },
-        })) ?? []),
-      ],
-      inputs: { creatinine: creatMgdl, creatinineUnit: 'mg/dL', age, sex, formula },
-      formulaUsed: formula === 'ckd-epi-2021' ? 'CKD-EPI 2021' : 'MDRD',
+      outputs: [{
+        id: 'egfr',
+        label: 'eGFR',
+        value: liveResult.score ?? 0,
+        unit: 'mL/min/1.73m²',
+        interpretation: { text: liveResult.interpretation, severity: liveResult.severity as any },
+      }],
+      inputs: { creatinine: creatMgdl, creatinineUnit: 'mg/dL', age, sex, black },
+      formulaUsed: 'GFR = 175 × Scr⁻¹·¹⁵⁴ × Age⁻⁰·²⁰³ × 1.212 (if Black) × 0.742 (if Female)',
       references: liveResult.references,
-      warnings: liveEgfr && liveEgfr < 15 ? ['eGFR < 15: Consider nephrology referral for renal replacement therapy'] : [],
     });
   }, [liveResult]);
 
-  const clearAll = () => { setMgdlStr(''); setUmolStr(''); setAgeStr(''); setSex('male'); setFormula('ckd-epi-2021'); };
-
   return (
-    <div className="space-y-6">
-      <FieldRow label="Creatinine">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <NumInput value={mgdlStr} onChange={onMgdlChange} suffix="mg/dL" step="0.01" min={0.1} max={30} />
-          <OrDivider />
-          <NumInput value={umolStr} onChange={onUmolChange} suffix="µmol/L" step="1" min={1} max={2650} />
-        </div>
-      </FieldRow>
-
-      <FieldRow label="Age">
-        <NumInput value={ageStr} onChange={(v) => { setAgeStr(v); }} suffix="year" step="1" min={18} max={120} />
-      </FieldRow>
-
-      <FieldRow label="Sex">
-        <OptionButtons
-          options={[{ value: 'male' as const, label: 'Male' }, { value: 'female' as const, label: 'Female' }]}
+    <div>
+      {/* 1. Sex */}
+      <Field label="Sex">
+        <Toggle
+          options={[{ value: 'female', label: 'Female' }, { value: 'male', label: 'Male' }]}
           value={sex}
-          onChange={(v) => { setSex(v); }}
-          columns={2}
+          onChange={setSex}
         />
-      </FieldRow>
+      </Field>
 
-      <FieldRow label="Formula">
-        <OptionButtons
-          options={[
-            { value: 'ckd-epi-2021' as const, label: 'CKD-EPI 2021' },
-            { value: 'mdrd' as const, label: 'MDRD' },
-          ]}
-          value={formula}
-          onChange={(v) => { setFormula(v); }}
-          columns={2}
+      {/* 2. Age */}
+      <Field label="Age">
+        <NumInput value={ageStr} onChange={setAgeStr} suffix="years" step="1" min={1} max={120} />
+      </Field>
+
+      {/* 3. Creatinine */}
+      <Field label="Creatinine">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+          <NumInput value={umolStr} onChange={onUmolChange} suffix="µmol/L" step="1" min={1} max={2650} />
+          <OrDivider />
+          <NumInput value={mgdlStr} onChange={onMgdlChange} suffix="mg/dL" step="0.01" min={0.1} max={30} />
+        </div>
+      </Field>
+
+      {/* 4. Black race */}
+      <Field label="Black race" hint="Race may/may not provide better estimates of GFR; optional">
+        <Toggle
+          options={[{ value: 'no', label: 'No' }, { value: 'yes', label: 'Yes' }]}
+          value={black ? 'yes' : 'no'}
+          onChange={(v) => setBlack(v === 'yes')}
         />
-      </FieldRow>
-
+      </Field>
     </div>
   );
 }
