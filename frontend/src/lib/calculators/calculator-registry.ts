@@ -445,6 +445,8 @@ export const CALCULATORS: Calculator[] = [
   },
 ]
 
+CALCULATORS.sort((a, b) => a.title.toLowerCase().localeCompare(b.title.toLowerCase()));
+
 export function getCalculator(id: string): Calculator | undefined {
   return CALCULATORS.find((c) => c.id === id)
 }
