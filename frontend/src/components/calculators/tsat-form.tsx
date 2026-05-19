@@ -2,49 +2,46 @@
 import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
 import { calculateTSAT } from '@/lib/calculators/tsat';
 import { FieldRow, NumInput, OrDivider, OptionButtons, fmt } from './shared-ui';
-import { getSaved, saveField } from './use-persist-form';
-const CID = 'tsat';
-
 interface TsatFormProps {
   onResult: (result: any) => void;
 }
 
 export function TsatForm({ onResult }: TsatFormProps) {
-  const [ironUgStr, setIronUgStr] = useState(() => getSaved(CID, 'ironUg'));
-  const [ironUmolStr, setIronUmolStr] = useState(() => getSaved(CID, 'ironUmol'));
-  const [tibcMethod, setTibcMethod] = useState<'tibc' | 'transferrin'>(() => (getSaved(CID, 'tibcMethod') as 'tibc' | 'transferrin') || 'tibc');
+  const [ironUgStr, setIronUgStr] = useState('');
+  const [ironUmolStr, setIronUmolStr] = useState('');
+  const [tibcMethod, setTibcMethod] = useState<'tibc' | 'transferrin'>('tibc');
   // TIBC: µg/dL and µmol/L side by side
-  const [tibcUgStr, setTibcUgStr] = useState(() => getSaved(CID, 'tibcUg'));
-  const [tibcUmolStr, setTibcUmolStr] = useState(() => getSaved(CID, 'tibcUmol'));
+  const [tibcUgStr, setTibcUgStr] = useState('');
+  const [tibcUmolStr, setTibcUmolStr] = useState('');
   // Transferrin: mg/dL only
-  const [transferrinStr, setTransferrinStr] = useState(() => getSaved(CID, 'transferrin'));
-  const [ferritinStr, setFerritinStr] = useState(() => getSaved(CID, 'ferritin'));
+  const [transferrinStr, setTransferrinStr] = useState('');
+  const [ferritinStr, setFerritinStr] = useState('');
 
   const onIronUgChange = useCallback((v: string) => {
-    setIronUgStr(v); saveField(CID, 'ironUg', v);
+    setIronUgStr(v);
     const n = parseFloat(v);
     const u = Number.isFinite(n) && n > 0 ? fmt(n * 0.179, 2) : '';
-    setIronUmolStr(u); saveField(CID, 'ironUmol', u);
+    setIronUmolStr(u);
   }, []);
   const onIronUmolChange = useCallback((v: string) => {
-    setIronUmolStr(v); saveField(CID, 'ironUmol', v);
+    setIronUmolStr(v);
     const n = parseFloat(v);
     const ug = Number.isFinite(n) && n > 0 ? fmt(n / 0.179, 1) : '';
-    setIronUgStr(ug); saveField(CID, 'ironUg', ug);
+    setIronUgStr(ug);
   }, []);
 
   // TIBC: µg/dL ↔ µmol/L (factor 0.179, same as iron)
   const onTibcUgChange = useCallback((v: string) => {
-    setTibcUgStr(v); saveField(CID, 'tibcUg', v);
+    setTibcUgStr(v);
     const n = parseFloat(v);
     const u = Number.isFinite(n) && n > 0 ? fmt(n * 0.179, 2) : '';
-    setTibcUmolStr(u); saveField(CID, 'tibcUmol', u);
+    setTibcUmolStr(u);
   }, []);
   const onTibcUmolChange = useCallback((v: string) => {
-    setTibcUmolStr(v); saveField(CID, 'tibcUmol', v);
+    setTibcUmolStr(v);
     const n = parseFloat(v);
     const ug = Number.isFinite(n) && n > 0 ? fmt(n / 0.179, 1) : '';
-    setTibcUgStr(ug); saveField(CID, 'tibcUg', ug);
+    setTibcUgStr(ug);
   }, []);
 
   const ironUg = parseFloat(ironUgStr) || 0;
@@ -106,7 +103,7 @@ export function TsatForm({ onResult }: TsatFormProps) {
             { value: 'transferrin' as const, label: 'Transferrin' },
           ]}
           value={tibcMethod}
-          onChange={(v) => { setTibcMethod(v); saveField(CID, 'tibcMethod', v); }}
+          onChange={(v) => { setTibcMethod(v); }}
           columns={2}
         />
         <div className="mt-2">
@@ -117,13 +114,13 @@ export function TsatForm({ onResult }: TsatFormProps) {
               <NumInput value={tibcUmolStr} onChange={onTibcUmolChange} suffix="µmol/L" step="0.1" min={0.1} max={180} />
             </div>
           ) : (
-            <NumInput value={transferrinStr} onChange={(v) => { setTransferrinStr(v); saveField(CID, 'transferrin', v); }} suffix="mg/dL" step="1" min={1} max={600} />
+            <NumInput value={transferrinStr} onChange={(v) => { setTransferrinStr(v); }} suffix="mg/dL" step="1" min={1} max={600} />
           )}
         </div>
       </FieldRow>
 
       <FieldRow label="Serum Ferritin" hint="optional">
-        <NumInput value={ferritinStr} onChange={(v) => { setFerritinStr(v); saveField(CID, 'ferritin', v); }} suffix="ng/mL" step="1" min={0} max={5000} />
+        <NumInput value={ferritinStr} onChange={(v) => { setFerritinStr(v); }} suffix="ng/mL" step="1" min={0} max={5000} />
       </FieldRow>
     </div>
   );

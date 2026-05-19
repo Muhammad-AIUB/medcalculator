@@ -4,45 +4,42 @@ import { cn } from '@/lib/utils';
 import { calculateMELDNa } from '@/lib/calculators/meld-na';
 import { AlertTriangle } from 'lucide-react';
 import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
-import { getSaved, saveField } from './use-persist-form';
-const CID = 'meld-na';
-
 interface MeldNaFormProps {
   onResult: (result: any) => void;
 }
 
 export function MeldNaForm({ onResult }: MeldNaFormProps) {
-  const [bilMgStr, setBilMgStr] = useState(() => getSaved(CID, 'bilMg'));
-  const [bilUmolStr, setBilUmolStr] = useState(() => getSaved(CID, 'bilUmol'));
-  const [inrStr, setInrStr] = useState(() => getSaved(CID, 'inr'));
-  const [creatMgStr, setCreatMgStr] = useState(() => getSaved(CID, 'creatMg'));
-  const [creatUmolStr, setCreatUmolStr] = useState(() => getSaved(CID, 'creatUmol'));
-  const [sodiumStr, setSodiumStr] = useState(() => getSaved(CID, 'sodium'));
-  const [onDialysis, setOnDialysis] = useState(() => getSaved(CID, 'dialysis') === 'true');
+  const [bilMgStr, setBilMgStr] = useState('');
+  const [bilUmolStr, setBilUmolStr] = useState('');
+  const [inrStr, setInrStr] = useState('');
+  const [creatMgStr, setCreatMgStr] = useState('');
+  const [creatUmolStr, setCreatUmolStr] = useState('');
+  const [sodiumStr, setSodiumStr] = useState('');
+  const [onDialysis, setOnDialysis] = useState(false);
 
   const onBilMgChange = useCallback((v: string) => {
-    setBilMgStr(v); saveField(CID, 'bilMg', v);
+    setBilMgStr(v);
     const n = parseFloat(v);
     const u = Number.isFinite(n) && n > 0 ? fmt(n * 17.1, 1) : '';
-    setBilUmolStr(u); saveField(CID, 'bilUmol', u);
+    setBilUmolStr(u);
   }, []);
   const onBilUmolChange = useCallback((v: string) => {
-    setBilUmolStr(v); saveField(CID, 'bilUmol', v);
+    setBilUmolStr(v);
     const n = parseFloat(v);
     const m = Number.isFinite(n) && n > 0 ? fmt(n / 17.1, 2) : '';
-    setBilMgStr(m); saveField(CID, 'bilMg', m);
+    setBilMgStr(m);
   }, []);
   const onCreatMgChange = useCallback((v: string) => {
-    setCreatMgStr(v); saveField(CID, 'creatMg', v);
+    setCreatMgStr(v);
     const n = parseFloat(v);
     const u = Number.isFinite(n) && n > 0 ? fmt(n * 88.4, 1) : '';
-    setCreatUmolStr(u); saveField(CID, 'creatUmol', u);
+    setCreatUmolStr(u);
   }, []);
   const onCreatUmolChange = useCallback((v: string) => {
-    setCreatUmolStr(v); saveField(CID, 'creatUmol', v);
+    setCreatUmolStr(v);
     const n = parseFloat(v);
     const m = Number.isFinite(n) && n > 0 ? fmt(n / 88.4, 2) : '';
-    setCreatMgStr(m); saveField(CID, 'creatMg', m);
+    setCreatMgStr(m);
   }, []);
 
   const bilMg = parseFloat(bilMgStr) || 0;
@@ -87,7 +84,7 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
     });
   }, [liveResult]);
 
-  const clearAll = () => { setBilMgStr(''); setBilUmolStr(''); setInrStr(''); setCreatMgStr(''); setCreatUmolStr(''); setSodiumStr(''); setOnDialysis(false); saveField(CID, 'bilMg', ''); saveField(CID, 'bilUmol', ''); saveField(CID, 'creatMg', ''); saveField(CID, 'creatUmol', ''); saveField(CID, 'inr', ''); saveField(CID, 'dialysis', ''); saveField(CID, 'sodium', ''); };
+  const clearAll = () => { setBilMgStr(''); setBilUmolStr(''); setInrStr(''); setCreatMgStr(''); setCreatUmolStr(''); setSodiumStr(''); setOnDialysis(false); };
 
   return (
     <div className="space-y-6">
@@ -100,7 +97,7 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
       </FieldRow>
 
       <FieldRow label="INR">
-        <NumInput value={inrStr} onChange={(v) => { setInrStr(v); saveField(CID, 'inr', v); }} suffix="ratio" step="0.01" min={0.5} max={15} />
+        <NumInput value={inrStr} onChange={(v) => { setInrStr(v); }} suffix="ratio" step="0.01" min={0.5} max={15} />
       </FieldRow>
 
       {/* Dialysis toggle */}
@@ -111,7 +108,7 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
         </div>
         <button
           type="button"
-          onClick={() => setOnDialysis(v => { const next = !v; saveField(CID, 'dialysis', String(next)); return next; })}
+          onClick={() => setOnDialysis(v => !v)}
           className={cn(
             'relative inline-flex h-6 w-11 items-center rounded-full transition-colors',
             onDialysis ? 'bg-[#0E7490]' : 'bg-muted-foreground/30'
@@ -140,7 +137,7 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
       </FieldRow>
 
       <FieldRow label="Serum Sodium">
-        <NumInput value={sodiumStr} onChange={(v) => { setSodiumStr(v); saveField(CID, 'sodium', v); }} suffix="mEq/L" step="1" min={100} max={160} />
+        <NumInput value={sodiumStr} onChange={(v) => { setSodiumStr(v); }} suffix="mEq/L" step="1" min={100} max={160} />
       </FieldRow>
 
     </div>

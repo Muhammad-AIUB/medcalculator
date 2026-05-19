@@ -3,9 +3,6 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils';
 import { calculateChildPugh } from '@/lib/calculators/child-pugh';
 import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
-import { getSaved, saveField } from './use-persist-form';
-const CID = 'child-pugh';
-
 interface ChildPughFormProps {
   onResult: (result: any) => void;
 }
@@ -17,37 +14,37 @@ function scoreAscites(a: string) { return a === 'none' ? 1 : a === 'mild' ? 2 : 
 function scoreEnceph(e: string) { return e === 'none' ? 1 : e === 'grade1-2' ? 2 : 3; }
 
 export function ChildPughForm({ onResult }: ChildPughFormProps) {
-  const [bilMgStr, setBilMgStr] = useState(() => getSaved(CID, 'bilMg'));
-  const [bilUmolStr, setBilUmolStr] = useState(() => getSaved(CID, 'bilUmol'));
-  const [albGdlStr, setAlbGdlStr] = useState(() => getSaved(CID, 'albGdl'));
-  const [albGlStr, setAlbGlStr] = useState(() => getSaved(CID, 'albGl'));
-  const [inrStr, setInrStr] = useState(() => getSaved(CID, 'inr'));
-  const [ascites, setAscites] = useState<'none' | 'mild' | 'moderate-severe' | undefined>(() => (getSaved(CID, 'ascites') as any) || undefined);
-  const [encephalopathy, setEncephalopathy] = useState<'none' | 'grade1-2' | 'grade3-4' | undefined>(() => (getSaved(CID, 'enceph') as any) || undefined);
+  const [bilMgStr, setBilMgStr] = useState('');
+  const [bilUmolStr, setBilUmolStr] = useState('');
+  const [albGdlStr, setAlbGdlStr] = useState('');
+  const [albGlStr, setAlbGlStr] = useState('');
+  const [inrStr, setInrStr] = useState('');
+  const [ascites, setAscites] = useState<'none' | 'mild' | 'moderate-severe' | undefined>(undefined);
+  const [encephalopathy, setEncephalopathy] = useState<'none' | 'grade1-2' | 'grade3-4' | undefined>(undefined);
 
   const onBilMgChange = useCallback((v: string) => {
-    setBilMgStr(v); saveField(CID, 'bilMg', v);
+    setBilMgStr(v);
     const n = parseFloat(v);
     const u = Number.isFinite(n) && n > 0 ? fmt(n * 17.1, 1) : '';
-    setBilUmolStr(u); saveField(CID, 'bilUmol', u);
+    setBilUmolStr(u);
   }, []);
   const onBilUmolChange = useCallback((v: string) => {
-    setBilUmolStr(v); saveField(CID, 'bilUmol', v);
+    setBilUmolStr(v);
     const n = parseFloat(v);
     const m = Number.isFinite(n) && n > 0 ? fmt(n / 17.1, 2) : '';
-    setBilMgStr(m); saveField(CID, 'bilMg', m);
+    setBilMgStr(m);
   }, []);
   const onAlbGdlChange = useCallback((v: string) => {
-    setAlbGdlStr(v); saveField(CID, 'albGdl', v);
+    setAlbGdlStr(v);
     const n = parseFloat(v);
     const gl = Number.isFinite(n) && n > 0 ? fmt(n * 10, 1) : '';
-    setAlbGlStr(gl); saveField(CID, 'albGl', gl);
+    setAlbGlStr(gl);
   }, []);
   const onAlbGlChange = useCallback((v: string) => {
-    setAlbGlStr(v); saveField(CID, 'albGl', v);
+    setAlbGlStr(v);
     const n = parseFloat(v);
     const gdl = Number.isFinite(n) && n > 0 ? fmt(n / 10, 2) : '';
-    setAlbGdlStr(gdl); saveField(CID, 'albGdl', gdl);
+    setAlbGdlStr(gdl);
   }, []);
 
   const bilMg = parseFloat(bilMgStr) || 0;
@@ -107,7 +104,7 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
     return <span className={cn('ml-auto px-2 py-0.5 rounded text-xs font-bold', c)}>{score} pt{score > 1 ? 's' : ''}</span>;
   };
 
-  const clearAll = () => { setBilMgStr(''); setBilUmolStr(''); setAlbGdlStr(''); setAlbGlStr(''); setInrStr(''); setAscites(undefined); setEncephalopathy(undefined); saveField(CID, 'bilMg', ''); saveField(CID, 'bilUmol', ''); saveField(CID, 'albGdl', ''); saveField(CID, 'albGl', ''); saveField(CID, 'inr', ''); saveField(CID, 'ascites', ''); saveField(CID, 'enceph', ''); };
+  const clearAll = () => { setBilMgStr(''); setBilUmolStr(''); setAlbGdlStr(''); setAlbGlStr(''); setInrStr(''); setAscites(undefined); setEncephalopathy(undefined); };
 
   return (
     <div className="space-y-6">
@@ -130,7 +127,7 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
       </FieldRow>
 
       <FieldRow label="INR (PT)">
-        <NumInput value={inrStr} onChange={(v) => { setInrStr(v); saveField(CID, 'inr', v); }} suffix="ratio" step="0.01" min={0.5} max={15} />
+        <NumInput value={inrStr} onChange={(v) => { setInrStr(v); }} suffix="ratio" step="0.01" min={0.5} max={15} />
         <div className="flex justify-end mt-1"><ScoreTag score={partialScores.inr} /></div>
       </FieldRow>
 
@@ -144,7 +141,7 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
             <button
               key={opt.value}
               type="button"
-              onClick={() => { setAscites(opt.value); saveField(CID, 'ascites', opt.value); }}
+              onClick={() => { setAscites(opt.value); }}
               className={cn(
                 'w-full text-left px-4 py-3 rounded-lg border text-sm transition-all',
                 ascites === opt.value
@@ -169,7 +166,7 @@ export function ChildPughForm({ onResult }: ChildPughFormProps) {
             <button
               key={opt.value}
               type="button"
-              onClick={() => { setEncephalopathy(opt.value); saveField(CID, 'enceph', opt.value); }}
+              onClick={() => { setEncephalopathy(opt.value); }}
               className={cn(
                 'w-full text-left px-4 py-3 rounded-lg border text-sm transition-all',
                 encephalopathy === opt.value

@@ -3,9 +3,6 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils';
 import { calculateVasopressor } from '@/lib/calculators/vasopressor';
 import { FieldRow, NumInput, ResultBox, OrDivider, round, fmt } from './shared-ui';
-import { getSaved, saveField } from './use-persist-form';
-const CID = 'vasopressor';
-
 interface DrugState {
   name: string;
   dose: string;
@@ -33,25 +30,23 @@ interface VasopressorFormProps {
 }
 
 export function VasopressorForm({ onResult }: VasopressorFormProps) {
-  const [kgStr, setKgStr] = useState(() => getSaved(CID, 'kg'));
-  const [lbStr, setLbStr] = useState(() => getSaved(CID, 'lb'));
-  const [drugs, setDrugs] = useState<DrugState[]>(() => {
-    const saved = getSaved(CID, 'drugs');
-    if (saved) { try { return JSON.parse(saved); } catch {} }
-    return DRUGS.map(d => ({ name: d.name, dose: '', unit: d.defaultUnit, enabled: false }));
-  });
+  const [kgStr, setKgStr] = useState('');
+  const [lbStr, setLbStr] = useState('');
+  const [drugs, setDrugs] = useState<DrugState[]>(() =>
+    DRUGS.map(d => ({ name: d.name, dose: '', unit: d.defaultUnit, enabled: false }))
+  );
 
   const onKgChange = useCallback((v: string) => {
-    setKgStr(v); saveField(CID, 'kg', v);
+    setKgStr(v);
     const n = parseFloat(v);
     const lb = Number.isFinite(n) && n > 0 ? fmt(n * 2.20462, 1) : '';
-    setLbStr(lb); saveField(CID, 'lb', lb);
+    setLbStr(lb);
   }, []);
   const onLbChange = useCallback((v: string) => {
-    setLbStr(v); saveField(CID, 'lb', v);
+    setLbStr(v);
     const n = parseFloat(v);
     const kg = Number.isFinite(n) && n > 0 ? fmt(n / 2.20462, 1) : '';
-    setKgStr(kg); saveField(CID, 'kg', kg);
+    setKgStr(kg);
   }, []);
 
   const weightKg = parseFloat(kgStr) || 0;
@@ -77,9 +72,8 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
 
   const visColor = !liveVIS ? '' : liveVIS <= 5 ? 'text-emerald-600' : liveVIS <= 15 ? 'text-amber-600' : 'text-red-600';
 
-  const saveDrugs = (next: DrugState[]) => saveField(CID, 'drugs', JSON.stringify(next));
-  const toggleDrug = (i: number) => setDrugs(prev => { const next = prev.map((d, idx) => idx === i ? { ...d, enabled: !d.enabled } : d); saveDrugs(next); return next; });
-  const updateDrug = (i: number, field: 'dose' | 'unit', value: string) => setDrugs(prev => { const next = prev.map((d, idx) => idx === i ? { ...d, [field]: value } : d); saveDrugs(next); return next; });
+  const toggleDrug = (i: number) => setDrugs(prev => prev.map((d, idx) => idx === i ? { ...d, enabled: !d.enabled } : d));
+  const updateDrug = (i: number, field: 'dose' | 'unit', value: string) => setDrugs(prev => prev.map((d, idx) => idx === i ? { ...d, [field]: value } : d));
 
   const canSave = weightKg > 0 && drugs.some(d => d.enabled && parseFloat(d.dose) > 0);
 
@@ -121,7 +115,6 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
   const clearAll = () => {
     setKgStr(''); setLbStr('');
     setDrugs(DRUGS.map(d => ({ name: d.name, dose: '', unit: d.defaultUnit, enabled: false })));
-    saveField(CID, 'kg', ''); saveField(CID, 'lb', ''); saveField(CID, 'drugs', '');
   };
 
   return (

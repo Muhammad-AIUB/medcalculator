@@ -3,9 +3,6 @@ import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils';
 import { calculateSOFA } from '@/lib/calculators/sofa';
 import { FieldRow, NumInput, ResultBox, OrDivider, fmt } from './shared-ui';
-import { getSaved, saveField } from './use-persist-form';
-const CID = 'sofa';
-
 interface SofaFormProps {
   onResult: (result: any) => void;
 }
@@ -23,42 +20,42 @@ function ScoreLabel({ score }: { score: number | null }) {
 }
 
 export function SofaForm({ onResult }: SofaFormProps) {
-  const [pao2, setPao2] = useState(() => getSaved(CID, 'pao2'));
-  const [fio2, setFio2] = useState(() => getSaved(CID, 'fio2'));
-  const [spo2, setSpo2] = useState(() => getSaved(CID, 'spo2'));
-  const [ventilated, setVentilated] = useState(() => getSaved(CID, 'vent') === 'true');
-  const [platelets, setPlatelets] = useState(() => getSaved(CID, 'plt'));
-  const [bilMgStr, setBilMgStr] = useState(() => getSaved(CID, 'bilMg'));
-  const [bilUmolStr, setBilUmolStr] = useState(() => getSaved(CID, 'bilUmol'));
-  const [mapStr, setMapStr] = useState(() => getSaved(CID, 'map'));
-  const [gcs, setGcs] = useState(() => getSaved(CID, 'gcs') || '15');
-  const [creatMgStr, setCreatMgStr] = useState(() => getSaved(CID, 'creatMg'));
-  const [creatUmolStr, setCreatUmolStr] = useState(() => getSaved(CID, 'creatUmol'));
-  const [urineOutput, setUrineOutput] = useState(() => getSaved(CID, 'urine'));
+  const [pao2, setPao2] = useState('');
+  const [fio2, setFio2] = useState('');
+  const [spo2, setSpo2] = useState('');
+  const [ventilated, setVentilated] = useState(false);
+  const [platelets, setPlatelets] = useState('');
+  const [bilMgStr, setBilMgStr] = useState('');
+  const [bilUmolStr, setBilUmolStr] = useState('');
+  const [mapStr, setMapStr] = useState('');
+  const [gcs, setGcs] = useState('15');
+  const [creatMgStr, setCreatMgStr] = useState('');
+  const [creatUmolStr, setCreatUmolStr] = useState('');
+  const [urineOutput, setUrineOutput] = useState('');
 
   const onBilMgChange = useCallback((v: string) => {
-    setBilMgStr(v); saveField(CID, 'bilMg', v);
+    setBilMgStr(v);
     const n = parseFloat(v);
     const u = Number.isFinite(n) && n > 0 ? fmt(n * 17.1, 1) : '';
-    setBilUmolStr(u); saveField(CID, 'bilUmol', u);
+    setBilUmolStr(u);
   }, []);
   const onBilUmolChange = useCallback((v: string) => {
-    setBilUmolStr(v); saveField(CID, 'bilUmol', v);
+    setBilUmolStr(v);
     const n = parseFloat(v);
     const m = Number.isFinite(n) && n > 0 ? fmt(n / 17.1, 2) : '';
-    setBilMgStr(m); saveField(CID, 'bilMg', m);
+    setBilMgStr(m);
   }, []);
   const onCreatMgChange = useCallback((v: string) => {
-    setCreatMgStr(v); saveField(CID, 'creatMg', v);
+    setCreatMgStr(v);
     const n = parseFloat(v);
     const u = Number.isFinite(n) && n > 0 ? fmt(n * 88.4, 1) : '';
-    setCreatUmolStr(u); saveField(CID, 'creatUmol', u);
+    setCreatUmolStr(u);
   }, []);
   const onCreatUmolChange = useCallback((v: string) => {
-    setCreatUmolStr(v); saveField(CID, 'creatUmol', v);
+    setCreatUmolStr(v);
     const n = parseFloat(v);
     const m = Number.isFinite(n) && n > 0 ? fmt(n / 88.4, 2) : '';
-    setCreatMgStr(m); saveField(CID, 'creatMg', m);
+    setCreatMgStr(m);
   }, []);
 
   const bilMg = parseFloat(bilMgStr) || 0;
@@ -152,7 +149,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
   }, [liveResult]);
 
   const sectionClass = 'rounded-lg border-2 border-[#0E7490]/30 bg-card p-4 space-y-3';
-  const clearAll = () => { setPao2(''); setFio2(''); setSpo2(''); setVentilated(false); setPlatelets(''); setBilMgStr(''); setBilUmolStr(''); setMapStr(''); setGcs(''); setCreatMgStr(''); setCreatUmolStr(''); setUrineOutput(''); saveField(CID, 'bilMg', ''); saveField(CID, 'bilUmol', ''); saveField(CID, 'creatMg', ''); saveField(CID, 'creatUmol', ''); saveField(CID, 'pao2', ''); saveField(CID, 'fio2', ''); saveField(CID, 'spo2', ''); saveField(CID, 'vent', ''); saveField(CID, 'plt', ''); saveField(CID, 'map', ''); saveField(CID, 'gcs', ''); saveField(CID, 'urine', ''); };
+  const clearAll = () => { setPao2(''); setFio2(''); setSpo2(''); setVentilated(false); setPlatelets(''); setBilMgStr(''); setBilUmolStr(''); setMapStr(''); setGcs(''); setCreatMgStr(''); setCreatUmolStr(''); setUrineOutput(''); };
 
   return (
     <div className="space-y-4">
@@ -164,15 +161,15 @@ export function SofaForm({ onResult }: SofaFormProps) {
           <ScoreLabel score={partialScores.pulm} />
         </div>
         <div className="grid grid-cols-2 gap-2">
-          <NumInput value={pao2} onChange={(v) => { setPao2(v); saveField(CID, 'pao2', v); }} suffix="PaO₂ mmHg" step="1" min={20} max={600} />
-          <NumInput value={fio2} onChange={(v) => { setFio2(v); saveField(CID, 'fio2', v); }} suffix="FiO₂" step="0.01" min={0.21} max={1.0} placeholder="0.21–1.0" />
+          <NumInput value={pao2} onChange={(v) => { setPao2(v); }} suffix="PaO₂ mmHg" step="1" min={20} max={600} />
+          <NumInput value={fio2} onChange={(v) => { setFio2(v); }} suffix="FiO₂" step="0.01" min={0.21} max={1.0} placeholder="0.21–1.0" />
         </div>
-        <NumInput value={spo2} onChange={(v) => { setSpo2(v); saveField(CID, 'spo2', v); }} suffix="SpO₂ %" step="1" min={50} max={100} placeholder="if PaO₂ unavailable" />
+        <NumInput value={spo2} onChange={(v) => { setSpo2(v); }} suffix="SpO₂ %" step="1" min={50} max={100} placeholder="if PaO₂ unavailable" />
         <div className="flex items-center justify-between">
           <span className="text-sm font-medium">Mechanically Ventilated</span>
           <button
             type="button"
-            onClick={() => setVentilated(v => { const next = !v; saveField(CID, 'vent', String(next)); return next; })}
+            onClick={() => setVentilated(v => !v)}
             className={cn('relative inline-flex h-6 w-11 items-center rounded-full transition-colors', ventilated ? 'bg-[#0E7490]' : 'bg-muted-foreground/30')}
           >
             <span className={cn('inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform', ventilated ? 'translate-x-6' : 'translate-x-1')} />
@@ -187,7 +184,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
           <h3 className="text-sm font-semibold">Coagulation</h3>
           <ScoreLabel score={partialScores.plat} />
         </div>
-        <NumInput value={platelets} onChange={(v) => { setPlatelets(v); saveField(CID, 'plt', v); }} suffix="×10³/µL" step="1" min={0} max={1000} />
+        <NumInput value={platelets} onChange={(v) => { setPlatelets(v); }} suffix="×10³/µL" step="1" min={0} max={1000} />
       </div>
 
       {/* Liver */}
@@ -203,7 +200,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
       {/* Cardiovascular */}
       <div className={sectionClass}>
         <h3 className="text-sm font-semibold">Cardiovascular</h3>
-        <NumInput value={mapStr} onChange={(v) => { setMapStr(v); saveField(CID, 'map', v); }} suffix="MAP mmHg" step="1" min={20} max={200} />
+        <NumInput value={mapStr} onChange={(v) => { setMapStr(v); }} suffix="MAP mmHg" step="1" min={20} max={200} />
       </div>
 
       {/* Neurological */}
@@ -214,7 +211,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
           <ScoreLabel score={partialScores.neuro} />
         </div>
         <div className="flex items-center gap-3">
-          <input type="range" min={3} max={15} value={gcs} onChange={e => { setGcs(e.target.value); saveField(CID, 'gcs', e.target.value); }} className="flex-1 accent-[#0E7490]" />
+          <input type="range" min={3} max={15} value={gcs} onChange={e => { setGcs(e.target.value); }} className="flex-1 accent-[#0E7490]" />
           <ResultBox value={gcs} />
         </div>
       </div>
@@ -227,7 +224,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
           <OrDivider />
           <NumInput value={creatUmolStr} onChange={onCreatUmolChange} suffix="µmol/L" step="1" />
         </div>
-        <NumInput value={urineOutput} onChange={(v) => { setUrineOutput(v); saveField(CID, 'urine', v); }} suffix="mL/24h" step="10" min={0} max={10000} placeholder="optional" />
+        <NumInput value={urineOutput} onChange={(v) => { setUrineOutput(v); }} suffix="mL/24h" step="10" min={0} max={10000} placeholder="optional" />
       </div>
 
     </div>

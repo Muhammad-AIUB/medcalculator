@@ -3,58 +3,55 @@ import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react'
 import { cn } from '@/lib/utils';
 import { calculateBMI } from '@/lib/calculators/bmi';
 import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
-import { getSaved, saveField } from './use-persist-form';
-const CID = 'bmi';
-
 interface BmiFormProps {
   onResult: (result: any) => void;
 }
 
 export function BmiForm({ onResult }: BmiFormProps) {
-  const [cmStr, setCmStr] = useState(() => getSaved(CID, 'cm'));
-  const [ftStr, setFtStr] = useState(() => getSaved(CID, 'ft'));
-  const [inStr, setInStr] = useState(() => getSaved(CID, 'in'));
-  const [kgStr, setKgStr] = useState(() => getSaved(CID, 'kg'));
-  const [lbStr, setLbStr] = useState(() => getSaved(CID, 'lb'));
-  const [sex, setSex] = useState<'male' | 'female'>(() => (getSaved(CID, 'sex') as 'male' | 'female') || 'male');
+  const [cmStr, setCmStr] = useState('');
+  const [ftStr, setFtStr] = useState('');
+  const [inStr, setInStr] = useState('');
+  const [kgStr, setKgStr] = useState('');
+  const [lbStr, setLbStr] = useState('');
+  const [sex, setSex] = useState<'male' | 'female'>('male');
 
   const heightCm = useMemo(() => parseFloat(cmStr) || 0, [cmStr]);
   const weightKg = useMemo(() => parseFloat(kgStr) || 0, [kgStr]);
 
   const onCmChange = useCallback((v: string) => {
-    setCmStr(v); saveField(CID, 'cm', v);
+    setCmStr(v);
     const cm = parseFloat(v);
     if (Number.isFinite(cm) && cm > 0) {
       const totalIn = cm / 2.54;
       const ft = Math.floor(totalIn / 12);
       const inches = totalIn - ft * 12;
-      setFtStr(ft.toString()); saveField(CID, 'ft', ft.toString());
-      setInStr(fmt(inches, 1)); saveField(CID, 'in', fmt(inches, 1));
-    } else { setFtStr(''); setInStr(''); saveField(CID, 'ft', ''); saveField(CID, 'in', ''); }
+      setFtStr(ft.toString());
+      setInStr(fmt(inches, 1));
+    } else { setFtStr(''); setInStr(''); }
   }, []);
 
   const syncFtIn = useCallback((ft: string, inches: string) => {
     const f = parseFloat(ft) || 0;
     const i = parseFloat(inches) || 0;
     const cm = f > 0 || i > 0 ? fmt(f * 30.48 + i * 2.54, 1) : '';
-    setCmStr(cm); saveField(CID, 'cm', cm);
+    setCmStr(cm);
   }, []);
 
-  const onFtChange = useCallback((v: string) => { setFtStr(v); saveField(CID, 'ft', v); syncFtIn(v, inStr); }, [inStr, syncFtIn]);
-  const onInChange = useCallback((v: string) => { setInStr(v); saveField(CID, 'in', v); syncFtIn(ftStr, v); }, [ftStr, syncFtIn]);
+  const onFtChange = useCallback((v: string) => { setFtStr(v); syncFtIn(v, inStr); }, [inStr, syncFtIn]);
+  const onInChange = useCallback((v: string) => { setInStr(v); syncFtIn(ftStr, v); }, [ftStr, syncFtIn]);
 
   const onKgChange = useCallback((v: string) => {
-    setKgStr(v); saveField(CID, 'kg', v);
+    setKgStr(v);
     const kg = parseFloat(v);
     const lb = Number.isFinite(kg) && kg > 0 ? fmt(kg * 2.20462, 1) : '';
-    setLbStr(lb); saveField(CID, 'lb', lb);
+    setLbStr(lb);
   }, []);
 
   const onLbChange = useCallback((v: string) => {
-    setLbStr(v); saveField(CID, 'lb', v);
+    setLbStr(v);
     const lb = parseFloat(v);
     const kg = Number.isFinite(lb) && lb > 0 ? fmt(lb / 2.20462, 1) : '';
-    setKgStr(kg); saveField(CID, 'kg', kg);
+    setKgStr(kg);
   }, []);
 
   const heightInvalid = heightCm > 0 && (heightCm < 50 || heightCm > 300);
@@ -85,8 +82,6 @@ export function BmiForm({ onResult }: BmiFormProps) {
 
   const clearAll = () => {
     setCmStr(''); setFtStr(''); setInStr(''); setKgStr(''); setLbStr('');
-    saveField(CID, 'cm', ''); saveField(CID, 'ft', ''); saveField(CID, 'in', '');
-    saveField(CID, 'kg', ''); saveField(CID, 'lb', '');
   };
 
   return (
@@ -123,7 +118,7 @@ export function BmiForm({ onResult }: BmiFormProps) {
       <FieldRow label="Biological Sex">
         <div className="grid grid-cols-2 gap-2">
           {(['male', 'female'] as const).map((s) => (
-            <button key={s} type="button" onClick={() => { setSex(s); saveField(CID, 'sex', s); }}
+            <button key={s} type="button" onClick={() => { setSex(s); }}
               className={cn('h-11 rounded-lg border text-sm font-medium transition-all',
                 sex === s ? 'border-[#0E7490] bg-[#0E7490]/10 text-[#0E7490] dark:bg-[#0E7490]/20 dark:text-cyan-300'
                   : 'border-border bg-background text-muted-foreground hover:border-muted-foreground')}>

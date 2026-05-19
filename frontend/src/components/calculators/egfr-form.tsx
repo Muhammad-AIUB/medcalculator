@@ -2,32 +2,29 @@
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import { calculateEGFR } from '@/lib/calculators/egfr';
 import { FieldRow, NumInput, OrDivider, OptionButtons, fmt } from './shared-ui';
-import { getSaved, saveField } from './use-persist-form';
-const CID = 'egfr';
-
 interface EgfrFormProps {
   onResult: (result: any) => void;
 }
 
 export function EgfrForm({ onResult }: EgfrFormProps) {
-  const [mgdlStr, setMgdlStr] = useState(() => getSaved(CID, 'mgdl'));
-  const [umolStr, setUmolStr] = useState(() => getSaved(CID, 'umol'));
-  const [ageStr, setAgeStr] = useState(() => getSaved(CID, 'age'));
-  const [sex, setSex] = useState<'male' | 'female'>(() => (getSaved(CID, 'sex') as 'male' | 'female') || 'male');
-  const [formula, setFormula] = useState<'ckd-epi-2021' | 'mdrd'>(() => (getSaved(CID, 'formula') as 'ckd-epi-2021' | 'mdrd') || 'ckd-epi-2021');
+  const [mgdlStr, setMgdlStr] = useState('');
+  const [umolStr, setUmolStr] = useState('');
+  const [ageStr, setAgeStr] = useState('');
+  const [sex, setSex] = useState<'male' | 'female'>('male');
+  const [formula, setFormula] = useState<'ckd-epi-2021' | 'mdrd'>('ckd-epi-2021');
 
   const onMgdlChange = useCallback((v: string) => {
-    setMgdlStr(v); saveField(CID, 'mgdl', v);
+    setMgdlStr(v);
     const n = parseFloat(v);
     const u = Number.isFinite(n) && n > 0 ? fmt(n * 88.4, 1) : '';
-    setUmolStr(u); saveField(CID, 'umol', u);
+    setUmolStr(u);
   }, []);
 
   const onUmolChange = useCallback((v: string) => {
-    setUmolStr(v); saveField(CID, 'umol', v);
+    setUmolStr(v);
     const n = parseFloat(v);
     const m = Number.isFinite(n) && n > 0 ? fmt(n / 88.4, 2) : '';
-    setMgdlStr(m); saveField(CID, 'mgdl', m);
+    setMgdlStr(m);
   }, []);
 
   const creatMgdl = parseFloat(mgdlStr) || 0;
@@ -66,7 +63,7 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
     });
   }, [liveResult]);
 
-  const clearAll = () => { setMgdlStr(''); setUmolStr(''); setAgeStr(''); setSex('male'); setFormula('ckd-epi-2021'); saveField(CID, 'mgdl', ''); saveField(CID, 'umol', ''); saveField(CID, 'age', ''); saveField(CID, 'sex', ''); saveField(CID, 'formula', ''); };
+  const clearAll = () => { setMgdlStr(''); setUmolStr(''); setAgeStr(''); setSex('male'); setFormula('ckd-epi-2021'); };
 
   return (
     <div className="space-y-6">
@@ -79,14 +76,14 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
       </FieldRow>
 
       <FieldRow label="Age">
-        <NumInput value={ageStr} onChange={(v) => { setAgeStr(v); saveField(CID, 'age', v); }} suffix="year" step="1" min={18} max={120} />
+        <NumInput value={ageStr} onChange={(v) => { setAgeStr(v); }} suffix="year" step="1" min={18} max={120} />
       </FieldRow>
 
       <FieldRow label="Sex">
         <OptionButtons
           options={[{ value: 'male' as const, label: 'Male' }, { value: 'female' as const, label: 'Female' }]}
           value={sex}
-          onChange={(v) => { setSex(v); saveField(CID, 'sex', v); }}
+          onChange={(v) => { setSex(v); }}
           columns={2}
         />
       </FieldRow>
@@ -98,7 +95,7 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
             { value: 'mdrd' as const, label: 'MDRD' },
           ]}
           value={formula}
-          onChange={(v) => { setFormula(v); saveField(CID, 'formula', v); }}
+          onChange={(v) => { setFormula(v); }}
           columns={2}
         />
       </FieldRow>

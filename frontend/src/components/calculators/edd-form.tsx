@@ -3,20 +3,17 @@ import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { cn } from '@/lib/utils';
 import { calculateEDD } from '@/lib/calculators/edd';
 import { FieldRow, NumInput, ResultBox, OptionButtons } from './shared-ui';
-import { getSaved, saveField } from './use-persist-form';
-const CID = 'edd';
-
 interface EddFormProps {
   onResult: (result: any) => void;
 }
 
 export function EddForm({ onResult }: EddFormProps) {
-  const [method, setMethod] = useState<'lmp' | 'ultrasound'>(() => (getSaved(CID, 'method') as 'lmp' | 'ultrasound') || 'lmp');
-  const [lmpDate, setLmpDate] = useState(() => getSaved(CID, 'lmpDate'));
-  const [cycleLength, setCycleLength] = useState(() => getSaved(CID, 'cycleLength') || '28');
-  const [scanDate, setScanDate] = useState(() => getSaved(CID, 'scanDate'));
-  const [gaWeeks, setGaWeeks] = useState(() => getSaved(CID, 'gaWeeks'));
-  const [gaDays, setGaDays] = useState(() => getSaved(CID, 'gaDays') || '0');
+  const [method, setMethod] = useState<'lmp' | 'ultrasound'>('lmp');
+  const [lmpDate, setLmpDate] = useState('');
+  const [cycleLength, setCycleLength] = useState('28');
+  const [scanDate, setScanDate] = useState('');
+  const [gaWeeks, setGaWeeks] = useState('');
+  const [gaDays, setGaDays] = useState('0');
 
   const today = new Date().toISOString().split('T')[0];
 
@@ -62,7 +59,7 @@ export function EddForm({ onResult }: EddFormProps) {
     });
   }, [liveResult]);
 
-  const clearAll = () => { setMethod('lmp'); setLmpDate(''); setCycleLength('28'); setScanDate(''); setGaWeeks(''); setGaDays('0'); saveField(CID, 'method', ''); saveField(CID, 'lmpDate', ''); saveField(CID, 'cycleLength', ''); saveField(CID, 'scanDate', ''); saveField(CID, 'gaWeeks', ''); saveField(CID, 'gaDays', ''); };
+  const clearAll = () => { setMethod('lmp'); setLmpDate(''); setCycleLength('28'); setScanDate(''); setGaWeeks(''); setGaDays('0'); };
 
   return (
     <div className="space-y-6">
@@ -73,7 +70,7 @@ export function EddForm({ onResult }: EddFormProps) {
             { value: 'ultrasound' as const, label: 'Ultrasound' },
           ]}
           value={method}
-          onChange={(v) => { setMethod(v); saveField(CID, 'method', v); }}
+          onChange={(v) => { setMethod(v); }}
           columns={2}
         />
       </FieldRow>
@@ -85,7 +82,7 @@ export function EddForm({ onResult }: EddFormProps) {
               type="date"
               max={today}
               value={lmpDate}
-              onChange={e => { setLmpDate(e.target.value); saveField(CID, 'lmpDate', e.target.value); }}
+              onChange={e => { setLmpDate(e.target.value); }}
               className="flex h-11 w-full rounded-lg border-2 border-[#0E7490]/50 bg-background px-3 text-base font-medium outline-none focus:border-cyan-500"
             />
           </FieldRow>
@@ -97,7 +94,7 @@ export function EddForm({ onResult }: EddFormProps) {
                 min={20}
                 max={45}
                 value={cycleLength}
-                onChange={e => { setCycleLength(e.target.value); saveField(CID, 'cycleLength', e.target.value); }}
+                onChange={e => { setCycleLength(e.target.value); }}
                 className="flex-1 accent-[#0E7490]"
               />
               <ResultBox value={cycleLength} suffix="days" />
@@ -113,15 +110,15 @@ export function EddForm({ onResult }: EddFormProps) {
               type="date"
               max={today}
               value={scanDate}
-              onChange={e => { setScanDate(e.target.value); saveField(CID, 'scanDate', e.target.value); }}
+              onChange={e => { setScanDate(e.target.value); }}
               className="flex h-11 w-full rounded-lg border-2 border-[#0E7490]/50 bg-background px-3 text-base font-medium outline-none focus:border-cyan-500"
             />
           </FieldRow>
 
           <FieldRow label="Gestational Age at Scan">
             <div className="grid grid-cols-2 gap-2">
-              <NumInput value={gaWeeks} onChange={(v) => { setGaWeeks(v); saveField(CID, 'gaWeeks', v); }} suffix="weeks" min={0} max={42} step="1" />
-              <NumInput value={gaDays} onChange={(v) => { setGaDays(v); saveField(CID, 'gaDays', v); }} suffix="days" min={0} max={6} step="1" />
+              <NumInput value={gaWeeks} onChange={(v) => { setGaWeeks(v); }} suffix="weeks" min={0} max={42} step="1" />
+              <NumInput value={gaDays} onChange={(v) => { setGaDays(v); }} suffix="days" min={0} max={6} step="1" />
             </div>
           </FieldRow>
         </>
