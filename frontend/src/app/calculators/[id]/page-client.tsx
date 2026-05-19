@@ -13,6 +13,7 @@ const MeldNaForm = dynamic(() => import('@/components/calculators/meld-na-form')
 const BmiForm = dynamic(() => import('@/components/calculators/bmi-form').then(m => ({ default: m.BmiForm })), { ssr: false });
 const EddForm = dynamic(() => import('@/components/calculators/edd-form').then(m => ({ default: m.EddForm })), { ssr: false });
 const SofaForm = dynamic(() => import('@/components/calculators/sofa-form').then(m => ({ default: m.SofaForm })), { ssr: false });
+const Sofa2Form = dynamic(() => import('@/components/calculators/sofa-2-form').then(m => ({ default: m.Sofa2Form })), { ssr: false });
 const GcsForm = dynamic(() => import('@/components/calculators/gcs-form').then(m => ({ default: m.GcsForm })), { ssr: false });
 const VasopressorForm = dynamic(() => import('@/components/calculators/vasopressor-form').then(m => ({ default: m.VasopressorForm })), { ssr: false });
 const TsatForm = dynamic(() => import('@/components/calculators/tsat-form').then(m => ({ default: m.TsatForm })), { ssr: false });
@@ -24,6 +25,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   bmi: BmiForm,
   edd: EddForm,
   sofa: SofaForm,
+  'sofa-2': Sofa2Form,
   gcs: GcsForm,
   vasopressor: VasopressorForm,
   tsat: TsatForm,
@@ -32,6 +34,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
 const BMI_FORMULA = 'Body mass index, kg/m2 = weight, kg / (height, m)2\nBody surface area (Mosteller), m2 = [(height, cm x weight, kg) / 3600]1/2';
 const MELD_NA_FORMULA = 'MELD = 3.78 x ln(bilirubin) + 11.2 x ln(INR) + 9.57 x ln(creatinine) + 6.43\nMELD-Na = MELD Score - Na - 0.025 x MELD x (140-Na) + 140';
 const GCS_FORMULA = 'The Glasgow Coma Score is calculated by addition of the total points selected under each component (eye, verbal, motor) below, e.g. "15 points".\nThe Glasgow Coma Scale is comprised of the individual components, e.g. "E(4) V(5) M(6)".';
+const SOFA2_FORMULA = 'To calculate the SOFA-2 Score, add the points for each variable.';
 
 const FORMULA_MAP: Record<string, string> = {
   bmi:          'BMI = Weight (kg) Ã· HeightÂ² (mÂ²)',
@@ -39,6 +42,7 @@ const FORMULA_MAP: Record<string, string> = {
   'meld-na':    MELD_NA_FORMULA,
   'child-pugh': 'Addition of assigned points.',
   sofa:         'SOFA = Respiratory + Coagulation + Liver + Cardiovascular + CNS + Renal (each 0â€“4 pts)',
+  'sofa-2':     SOFA2_FORMULA,
   vasopressor:  'VIS = Dopamine + Dobutamine + (EpinephrineÃ—100) + (NorepinephrineÃ—100) + (VasopressinÃ—2.5) + (MilrinoneÃ—10) + Phenylephrine',
   tsat:         'TSAT (%) = (Serum Iron Ã· TIBC) Ã— 100',
   edd:          "Naegele's Rule: EDD = LMP + 9 months + 7 days\nUltrasound: EDD = Scan Date âˆ’ GA + 280 days",

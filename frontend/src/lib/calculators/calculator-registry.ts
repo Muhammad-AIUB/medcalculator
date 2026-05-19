@@ -5,6 +5,7 @@ import { calculateMELDNa } from './meld-na'
 import { calculateBMI } from './bmi'
 import { calculateEDD } from './edd'
 import { calculateSOFA } from './sofa'
+import { calculateSOFA2 } from './sofa-2'
 import { calculateGCS } from './gcs'
 import { calculateVasopressor } from './vasopressor'
 import { calculateTSAT } from './tsat'
@@ -296,6 +297,28 @@ export const CALCULATORS: Calculator[] = [
         eye: (inputs.eye as number | 'NT') ?? 4,
         verbal: (inputs.verbal as number | 'NT') ?? 5,
         motor: (inputs.motor as number | 'NT') ?? 6,
+      }),
+  },
+  {
+    id: 'sofa-2',
+    title: 'SOFA-2',
+    shortTitle: 'SOFA-2',
+    emoji: 'SOFA-2',
+    description: 'SOFA-2 Score',
+    category: 'critical-care',
+    icon: 'ListChecks',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50 dark:bg-red-950',
+    tags: ['SOFA-2', 'ICU', 'sepsis', 'organ failure', 'critical care'],
+    inputs: [],
+    calculate: (inputs) =>
+      calculateSOFA2({
+        brain: Number(inputs.brain ?? 0),
+        respiratory: Number(inputs.respiratory ?? 0),
+        cardiovascular: Number(inputs.cardiovascular ?? 0),
+        liver: Number(inputs.liver ?? 0),
+        kidney: Number(inputs.kidney ?? 0),
+        hemostasis: Number(inputs.hemostasis ?? 0),
       }),
   },
   {
