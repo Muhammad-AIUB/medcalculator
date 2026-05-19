@@ -1,16 +1,23 @@
 'use client';
 import { useRouter } from 'next/navigation';
 import { Home, RefreshCw, LogOut } from 'lucide-react';
+import { clearAppData } from '@/lib/app-data';
 
 export function BottomBar() {
   const router = useRouter();
 
+  const handleRefresh = () => {
+    clearAppData();
+    window.location.reload();
+  };
+
   const handleExit = () => {
     if (confirm('Exit MedCalc Pro?')) {
+      clearAppData();
       window.close();
       setTimeout(() => {
         document.body.innerHTML =
-          '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui;color:#666;text-align:center;padding:20px;"><div><h1 style="font-size:24px;margin-bottom:8px;">Goodbye 👋</h1><p>You can close this tab now.</p></div></div>';
+          '<div style="display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui;color:#666;text-align:center;padding:20px;"><div><h1 style="font-size:24px;margin-bottom:8px;">Goodbye</h1><p>Your app data has been removed. You can close this tab now.</p></div></div>';
       }, 100);
     }
   };
@@ -26,7 +33,7 @@ export function BottomBar() {
           <span className="text-[11px] font-semibold tracking-wide">HOME</span>
         </button>
         <button
-          onClick={() => window.location.reload()}
+          onClick={handleRefresh}
           className="flex flex-col items-center justify-center gap-1 transition-colors"
           style={{ color: '#38D8F5' }}
         >
