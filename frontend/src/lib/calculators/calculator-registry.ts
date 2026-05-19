@@ -5,6 +5,7 @@ import { calculateMELDNa } from './meld-na'
 import { calculateBMI } from './bmi'
 import { calculateEDD } from './edd'
 import { calculateSOFA } from './sofa'
+import { calculateGCS } from './gcs'
 import { calculateVasopressor } from './vasopressor'
 import { calculateTSAT } from './tsat'
 
@@ -276,6 +277,25 @@ export const CALCULATORS: Calculator[] = [
         scanDate: inputs.scanDate as string | undefined,
         gestationalWeeks: inputs.gestationalWeeks ? Number(inputs.gestationalWeeks) : undefined,
         gestationalDays: inputs.gestationalDays ? Number(inputs.gestationalDays) : undefined,
+      }),
+  },
+  {
+    id: 'gcs',
+    title: 'GCS',
+    shortTitle: 'GCS',
+    emoji: 'GCS',
+    description: 'Glasgow Coma Score',
+    category: 'critical-care',
+    icon: 'Brain',
+    color: 'text-sky-600',
+    bgColor: 'bg-sky-50 dark:bg-sky-950',
+    tags: ['GCS', 'Glasgow Coma Score', 'critical care', 'neurology'],
+    inputs: [],
+    calculate: (inputs) =>
+      calculateGCS({
+        eye: (inputs.eye as number | 'NT') ?? 4,
+        verbal: (inputs.verbal as number | 'NT') ?? 5,
+        motor: (inputs.motor as number | 'NT') ?? 6,
       }),
   },
   {

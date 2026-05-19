@@ -1,5 +1,6 @@
 'use client';
-import React, { useCallback, useState } from 'react';
+import React, { useCallback, useEffect, useMemo, useRef, useState } from 'react';
+import { calculateMELDNa } from '@/lib/calculators/meld-na';
 import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
 
 interface MeldNaFormProps {
@@ -16,7 +17,74 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
   const [sodiumMmolStr, setSodiumMmolStr] = useState('');
   const [sodiumMeqStr, setSodiumMeqStr] = useState('');
 
-  void onResult;
+  const bilMg = parseFloat(bilMgStr) || 0;
+  const inr = parseFloat(inrStr) || 0;
+  const creatMg = onDialysis ? 4.0 : (parseFloat(creatMgStr) || 0);
+  const sodium = parseFloat(sodiumMeqStr || sodiumMmolStr) || 0;
+
+  const liveResult = useMemo(() => {
+    if (bilMg <= 0 || inr <= 0 || creatMg <= 0 || sodium <= 0) return null;
+
+    try {
+      return calculateMELDNa({
+        bilirubin: bilMg,
+        bilirubinUnit: 'mg/dL',
+        inr,
+        creatinine: creatMg,
+        creatinineUnit: 'mg/dL',
+        sodium,
+        onDialysis,
+      });
+    } catch {
+      return null;
+    }
+  }, [bilMg, inr, creatMg, sodium, onDialysis]);
+
+  const onResultRef = useRef(onResult);
+  useEffect(() => {
+    onResultRef.current = onResult;
+  });
+
+  useEffect(() => {
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
+
+    const severity = liveResult.severity as any;
+    onResultRef.current({
+      outputs: [
+        {
+          id: 'meld-na',
+          label: 'MELD-Na Score',
+          value: liveResult.score ?? 0,
+          interpretation: { text: liveResult.interpretation, severity, classification: liveResult.label },
+        },
+        ...(liveResult.subResults?.map((sr, i) => ({
+          id: `sub-${i}`,
+          label: sr.label,
+          value: sr.value,
+          unit: sr.unit,
+          interpretation: { text: String(sr.value), severity: (sr.severity ?? 'neutral') as any },
+        })) ?? []),
+      ],
+      inputs: {
+        bilirubin: bilMg,
+        bilirubinUnit: 'mg/dL',
+        inr,
+        creatinine: creatMg,
+        creatinineUnit: 'mg/dL',
+        sodium,
+        sodiumUnit: 'mEq/L',
+        onDialysis,
+      },
+      references: liveResult.references,
+      formulaUsed: liveResult.formula,
+      warnings: (liveResult.score ?? 0) >= 25
+        ? ['MELD-Na >= 25: High transplant priority. Consider urgent hepatology/transplant referral.']
+        : [],
+    });
+  }, [liveResult, bilMg, inr, creatMg, sodium, onDialysis]);
 
   const onBilUmolChange = useCallback((v: string) => {
     setBilUmolStr(v);

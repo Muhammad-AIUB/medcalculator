@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useCallback } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
@@ -13,6 +13,7 @@ const MeldNaForm = dynamic(() => import('@/components/calculators/meld-na-form')
 const BmiForm = dynamic(() => import('@/components/calculators/bmi-form').then(m => ({ default: m.BmiForm })), { ssr: false });
 const EddForm = dynamic(() => import('@/components/calculators/edd-form').then(m => ({ default: m.EddForm })), { ssr: false });
 const SofaForm = dynamic(() => import('@/components/calculators/sofa-form').then(m => ({ default: m.SofaForm })), { ssr: false });
+const GcsForm = dynamic(() => import('@/components/calculators/gcs-form').then(m => ({ default: m.GcsForm })), { ssr: false });
 const VasopressorForm = dynamic(() => import('@/components/calculators/vasopressor-form').then(m => ({ default: m.VasopressorForm })), { ssr: false });
 const TsatForm = dynamic(() => import('@/components/calculators/tsat-form').then(m => ({ default: m.TsatForm })), { ssr: false });
 
@@ -23,22 +24,24 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   bmi: BmiForm,
   edd: EddForm,
   sofa: SofaForm,
+  gcs: GcsForm,
   vasopressor: VasopressorForm,
   tsat: TsatForm,
 };
 
 const BMI_FORMULA = 'Body mass index, kg/m2 = weight, kg / (height, m)2\nBody surface area (Mosteller), m2 = [(height, cm x weight, kg) / 3600]1/2';
 const MELD_NA_FORMULA = 'MELD = 3.78 x ln(bilirubin) + 11.2 x ln(INR) + 9.57 x ln(creatinine) + 6.43\nMELD-Na = MELD Score - Na - 0.025 x MELD x (140-Na) + 140';
+const GCS_FORMULA = 'The Glasgow Coma Score is calculated by addition of the total points selected under each component (eye, verbal, motor) below, e.g. "15 points".\nThe Glasgow Coma Scale is comprised of the individual components, e.g. "E(4) V(5) M(6)".';
 
 const FORMULA_MAP: Record<string, string> = {
-  bmi:          'BMI = Weight (kg) ÷ Height² (m²)',
-  egfr:         'CKD-EPI 2021: eGFR = 142 × (Scr/κ)^α × (0.9938)^Age\nMDRD: eGFR = 175 × Scr^−1.154 × Age^−0.203',
+  bmi:          'BMI = Weight (kg) Ã· HeightÂ² (mÂ²)',
+  egfr:         'CKD-EPI 2021: eGFR = 142 Ã— (Scr/Îº)^Î± Ã— (0.9938)^Age\nMDRD: eGFR = 175 Ã— Scr^âˆ’1.154 Ã— Age^âˆ’0.203',
   'meld-na':    MELD_NA_FORMULA,
-  'child-pugh': 'Score = Bilirubin + Albumin + INR + Ascites + Encephalopathy (each 1–3 pts)',
-  sofa:         'SOFA = Respiratory + Coagulation + Liver + Cardiovascular + CNS + Renal (each 0–4 pts)',
-  vasopressor:  'VIS = Dopamine + Dobutamine + (Epinephrine×100) + (Norepinephrine×100) + (Vasopressin×2.5) + (Milrinone×10) + Phenylephrine',
-  tsat:         'TSAT (%) = (Serum Iron ÷ TIBC) × 100',
-  edd:          "Naegele's Rule: EDD = LMP + 9 months + 7 days\nUltrasound: EDD = Scan Date − GA + 280 days",
+  'child-pugh': 'Score = Bilirubin + Albumin + INR + Ascites + Encephalopathy (each 1â€“3 pts)',
+  sofa:         'SOFA = Respiratory + Coagulation + Liver + Cardiovascular + CNS + Renal (each 0â€“4 pts)',
+  vasopressor:  'VIS = Dopamine + Dobutamine + (EpinephrineÃ—100) + (NorepinephrineÃ—100) + (VasopressinÃ—2.5) + (MilrinoneÃ—10) + Phenylephrine',
+  tsat:         'TSAT (%) = (Serum Iron Ã· TIBC) Ã— 100',
+  edd:          "Naegele's Rule: EDD = LMP + 9 months + 7 days\nUltrasound: EDD = Scan Date âˆ’ GA + 280 days",
 };
 
 const severityColors: Record<string, string> = {
@@ -72,7 +75,7 @@ export function CalculatorPageClient({ id }: Props) {
     return (
       <AppShell title="Not Found" showBack>
         <div className="text-center py-16">
-          <p className="text-4xl mb-3">⚠️</p>
+          <p className="text-4xl mb-3">âš ï¸</p>
           <p className="text-base font-semibold">Calculator not found</p>
           <Button className="mt-4" onClick={() => router.push('/')}>Go Home</Button>
         </div>
@@ -111,7 +114,7 @@ export function CalculatorPageClient({ id }: Props) {
         {/* Form inputs */}
         <FormComponent key={resetKey} onResult={handleResult} />
 
-        {/* Result — always visible */}
+        {/* Result â€” always visible */}
         <div
           className="rounded-2xl border-2 p-5 space-y-3"
           style={{ borderColor: primary ? color : '#e2e8f0', background: bg }}
@@ -135,17 +138,17 @@ export function CalculatorPageClient({ id }: Props) {
               {result.warnings?.length > 0 && (
                 <div className="pt-2 border-t border-amber-200 space-y-1">
                   {result.warnings.map((w: string, i: number) => (
-                    <p key={i} className="text-xs text-amber-700">⚠ {w}</p>
+                    <p key={i} className="text-xs text-amber-700">âš  {w}</p>
                   ))}
                 </div>
               )}
             </>
           ) : (
-            <p className="text-3xl font-bold text-gray-300">—</p>
+            <p className="text-3xl font-bold text-gray-300">â€”</p>
           )}
         </div>
 
-        {/* Formula — always visible */}
+        {/* Formula â€” always visible */}
         <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
             Formula Used
@@ -155,7 +158,9 @@ export function CalculatorPageClient({ id }: Props) {
               ? (result?.formulaUsed ?? BMI_FORMULA)
               : id === 'meld-na'
                 ? (result?.formulaUsed ?? MELD_NA_FORMULA)
-                : (result?.formulaUsed ?? FORMULA_MAP[id] ?? '—')}
+                : id === 'gcs'
+                  ? (result?.formulaUsed ?? GCS_FORMULA)
+                  : (result?.formulaUsed ?? FORMULA_MAP[id] ?? '—')}
           </p>
         </div>
 
