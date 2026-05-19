@@ -27,6 +27,8 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   tsat: TsatForm,
 };
 
+const BMI_FORMULA = 'Body mass index, kg/m2 = weight, kg / (height, m)2\nBody surface area (Mosteller), m2 = [(height, cm x weight, kg) / 3600]1/2';
+
 const FORMULA_MAP: Record<string, string> = {
   bmi:          'BMI = Weight (kg) ÷ Height² (m²)',
   egfr:         'CKD-EPI 2021: eGFR = 142 × (Scr/κ)^α × (0.9938)^Age\nMDRD: eGFR = 175 × Scr^−1.154 × Age^−0.203',
@@ -148,7 +150,7 @@ export function CalculatorPageClient({ id }: Props) {
             Formula Used
           </p>
           <p className="text-sm font-medium text-foreground whitespace-pre-line">
-            {FORMULA_MAP[id] ?? result?.formulaUsed ?? '—'}
+            {id === 'bmi' ? (result?.formulaUsed ?? BMI_FORMULA) : (result?.formulaUsed ?? FORMULA_MAP[id] ?? '—')}
           </p>
         </div>
 

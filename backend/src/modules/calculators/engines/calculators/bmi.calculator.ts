@@ -47,11 +47,11 @@ function getAsianClassification(bmi: number): BmiClassification {
 export class BmiCalculator implements ICalculator {
   readonly metadata: CalculatorMetadata = {
     id: 'bmi',
-    title: 'BMI & Ideal/Adjusted Body Weight',
+    title: 'BMI & Body Surface Area',
     description:
-      'Calculates BMI with WHO and Asian-specific classifications, Ideal Body Weight (Devine formula), and Adjusted Body Weight.',
+      'Calculates BMI with WHO and Asian-specific classifications plus body surface area using the Mosteller formula.',
     category: 'nutrition',
-    tags: ['BMI', 'body mass index', 'weight', 'obesity', 'nutrition', 'ideal body weight', 'IBW', 'ABW'],
+    tags: ['BMI', 'body mass index', 'BSA', 'Mosteller', 'weight', 'obesity', 'nutrition'],
     version: '1.0.0',
     references: [
       {
@@ -225,6 +225,7 @@ export class BmiCalculator implements ICalculator {
 
     // ── BMI ───────────────────────────────────────────────────────
     const bmi = roundTo(weightKg / (heightM * heightM), 1);
+    const bsa = roundTo(Math.sqrt(((heightM * 100) * weightKg) / 3600), 2);
     const useAsian = Boolean(inputs['useAsianCriteria']);
 
     const classification = useAsian
@@ -275,15 +276,13 @@ export class BmiCalculator implements ICalculator {
       inputs: inputs as Record<string, string | number | boolean | null | undefined>,
       outputs: {
         bmi,
+        body_surface_area_m2: bsa,
         bmi_category: classification.category,
         classification,
         weight_kg: roundTo(weightKg, 2),
         height_cm: roundTo(heightM * 100, 1),
         height_m: roundTo(heightM, 3),
         height_in: roundTo(heightInches, 1),
-        ibw_kg: ibw,
-        abw_kg: abw,
-        bmi_prime: bmiPrime,
         asian_classification: useAsian ? null : getAsianClassification(bmi),
       },
       warnings,

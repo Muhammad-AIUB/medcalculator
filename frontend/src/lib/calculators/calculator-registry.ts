@@ -194,12 +194,12 @@ export const CALCULATORS: Calculator[] = [
     shortTitle: 'BMI',
     emoji: '⚖️',
     description:
-      'Body Mass Index with WHO classification, Ideal Body Weight (Devine), and Adjusted Body Weight',
+      'Body Mass Index with WHO classification and body surface area by the Mosteller formula',
     category: 'nutrition',
     icon: 'Scale',
     color: 'text-emerald-600',
     bgColor: 'bg-emerald-50 dark:bg-emerald-950',
-    tags: ['BMI', 'obesity', 'weight', 'nutrition', 'IBW'],
+    tags: ['BMI', 'BSA', 'Mosteller', 'obesity', 'weight', 'nutrition'],
     inputs: [
       {
         id: 'height',
@@ -236,7 +236,7 @@ export const CALCULATORS: Calculator[] = [
       }
       let weightKg = Number(inputs.weight ?? 0)
       if (inputs.weightUnit === 'lb') weightKg = weightKg * 0.453592
-      return calculateBMI({ heightCm, weightKg, sex: inputs.sex as 'male' | 'female' | undefined })
+      return calculateBMI({ heightCm, weightKg })
     },
   },
   {

@@ -1,8 +1,8 @@
 'use client';
 import React, { useState, useMemo, useCallback, useEffect, useRef } from 'react';
-import { cn } from '@/lib/utils';
 import { calculateBMI } from '@/lib/calculators/bmi';
 import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
+
 interface BmiFormProps {
   onResult: (result: any) => void;
 }
@@ -13,7 +13,6 @@ export function BmiForm({ onResult }: BmiFormProps) {
   const [inStr, setInStr] = useState('');
   const [kgStr, setKgStr] = useState('');
   const [lbStr, setLbStr] = useState('');
-  const [sex, setSex] = useState<'male' | 'female'>('male');
 
   const heightCm = useMemo(() => parseFloat(cmStr) || 0, [cmStr]);
   const weightKg = useMemo(() => parseFloat(kgStr) || 0, [kgStr]);
@@ -27,7 +26,10 @@ export function BmiForm({ onResult }: BmiFormProps) {
       const inches = totalIn - ft * 12;
       setFtStr(ft.toString());
       setInStr(fmt(inches, 1));
-    } else { setFtStr(''); setInStr(''); }
+    } else {
+      setFtStr('');
+      setInStr('');
+    }
   }, []);
 
   const syncFtIn = useCallback((ft: string, inches: string) => {
@@ -37,8 +39,15 @@ export function BmiForm({ onResult }: BmiFormProps) {
     setCmStr(cm);
   }, []);
 
-  const onFtChange = useCallback((v: string) => { setFtStr(v); syncFtIn(v, inStr); }, [inStr, syncFtIn]);
-  const onInChange = useCallback((v: string) => { setInStr(v); syncFtIn(ftStr, v); }, [ftStr, syncFtIn]);
+  const onFtChange = useCallback((v: string) => {
+    setFtStr(v);
+    syncFtIn(v, inStr);
+  }, [inStr, syncFtIn]);
+
+  const onInChange = useCallback((v: string) => {
+    setInStr(v);
+    syncFtIn(ftStr, v);
+  }, [ftStr, syncFtIn]);
 
   const onKgChange = useCallback((v: string) => {
     setKgStr(v);
@@ -63,26 +72,30 @@ export function BmiForm({ onResult }: BmiFormProps) {
 
   useEffect(() => {
     if (!canSave) return;
-    const raw = calculateBMI({ heightCm, weightKg, sex });
+    const raw = calculateBMI({ heightCm, weightKg });
     const severity = raw.severity as any;
     onResultRef.current({
       outputs: [
-        { id: 'bmi', label: 'BMI', value: raw.score ?? 0, unit: 'kg/m²',
-          interpretation: { text: raw.interpretation, severity, classification: raw.label } },
+        {
+          id: 'bmi',
+          label: 'BMI',
+          value: raw.score ?? 0,
+          unit: 'kg/m2',
+          interpretation: { text: raw.interpretation, severity, classification: raw.label },
+        },
         ...(raw.subResults?.map((sr, i) => ({
-          id: `sub-${i}`, label: sr.label, value: sr.value, unit: sr.unit,
+          id: `sub-${i}`,
+          label: sr.label,
+          value: sr.value,
+          unit: sr.unit,
           interpretation: { text: String(sr.value), severity: (sr.severity ?? 'neutral') as any },
         })) ?? []),
       ],
-      inputs: { heightCm, weightKg, sex },
+      inputs: { heightCm, weightKg },
       references: raw.references,
-      formulaUsed: 'WHO BMI',
+      formulaUsed: raw.formula,
     });
-  }, [heightCm, weightKg, sex, canSave]);
-
-  const clearAll = () => {
-    setCmStr(''); setFtStr(''); setInStr(''); setKgStr(''); setLbStr('');
-  };
+  }, [heightCm, weightKg, canSave]);
 
   return (
     <div className="space-y-6">
@@ -97,7 +110,7 @@ export function BmiForm({ onResult }: BmiFormProps) {
         </div>
         {heightInvalid && (
           <p className="text-xs font-medium text-red-600 mt-1">
-            ⚠ Height should be between 50–300 cm (1.5–9.8 ft)
+            Height should be between 50-300 cm (1.5-9.8 ft)
           </p>
         )}
       </FieldRow>
@@ -110,24 +123,10 @@ export function BmiForm({ onResult }: BmiFormProps) {
         </div>
         {weightInvalid && (
           <p className="text-xs font-medium text-red-600 mt-1">
-            ⚠ Weight should be between 1–500 kg
+            Weight should be between 1-500 kg
           </p>
         )}
       </FieldRow>
-
-      <FieldRow label="Biological Sex">
-        <div className="grid grid-cols-2 gap-2">
-          {(['male', 'female'] as const).map((s) => (
-            <button key={s} type="button" onClick={() => { setSex(s); }}
-              className={cn('h-11 rounded-lg border text-sm font-medium transition-all',
-                sex === s ? 'border-[#0E7490] bg-[#0E7490]/10 text-[#0E7490] dark:bg-[#0E7490]/20 dark:text-cyan-300'
-                  : 'border-border bg-background text-muted-foreground hover:border-muted-foreground')}>
-              {s === 'male' ? 'Male' : 'Female'}
-            </button>
-          ))}
-        </div>
-      </FieldRow>
-
     </div>
   );
 }

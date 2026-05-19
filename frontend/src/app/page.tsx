@@ -43,8 +43,9 @@ export default function DashboardPage() {
     saveSlots(next);
   };
 
+  const normalizedSearch = search.trim().toLowerCase();
   const filtered = CALCULATORS.filter(c =>
-    c.title.toLowerCase().includes(search.toLowerCase())
+    c.title.toLowerCase().startsWith(normalizedSearch)
   );
 
   return (
@@ -93,11 +94,11 @@ export default function DashboardPage() {
       {/* Search modal */}
       {activeSlot !== null && (
         <div
-          className="fixed inset-0 z-50 flex items-end bg-black/50"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-4 py-8"
           onClick={() => { setActiveSlot(null); setSearch(''); }}
         >
           <div
-            className="w-full max-w-2xl mx-auto rounded-t-2xl overflow-hidden"
+            className="w-full max-w-2xl max-h-[80vh] rounded-2xl overflow-hidden"
             style={{ background: '#0F2744' }}
             onClick={e => e.stopPropagation()}
           >
@@ -114,7 +115,7 @@ export default function DashboardPage() {
             </div>
 
             {/* Results */}
-            <div className="max-h-72 overflow-y-auto">
+            <div className="max-h-[calc(80vh-77px)] overflow-y-auto">
               {filtered.map(calc => (
                 <button
                   key={calc.id}
