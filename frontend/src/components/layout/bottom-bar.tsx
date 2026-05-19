@@ -26,7 +26,7 @@ export function BottomBar() {
           <span className="text-[11px] font-semibold tracking-wide">HOME</span>
         </button>
         <button
-          onClick={() => window.location.reload()}
+          onClick={() => { localStorage.removeItem('medcalc-form-data'); window.location.reload(); }}
           className="flex flex-col items-center justify-center gap-1 transition-colors"
           style={{ color: '#38D8F5' }}
         >
