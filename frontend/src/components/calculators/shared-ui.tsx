@@ -86,22 +86,24 @@ export function OptionButtons<T extends string | undefined>({
   columns?: number;
 }) {
   return (
-    <div className={cn('grid gap-2', `grid-cols-${columns}`)}>
-      {options.map((opt) => (
-        <button
-          key={String(opt.value)}
-          type="button"
-          onClick={() => onChange(opt.value)}
-          className={cn(
-            'h-11 rounded-lg border-2 text-sm font-medium transition-all',
-            value === opt.value
-              ? 'border-[#0E7490] bg-[#0E7490]/10 text-[#0E7490] dark:bg-[#0E7490]/20 dark:text-cyan-300 font-semibold'
-              : 'border-border bg-background text-muted-foreground hover:border-muted-foreground'
-          )}
-        >
-          {opt.label}
-        </button>
-      ))}
+    <div className={cn('grid gap-0 rounded-lg overflow-hidden border border-gray-200', `grid-cols-${columns}`)}>
+      {options.map((opt) => {
+        const active = value === opt.value;
+        return (
+          <button
+            key={String(opt.value)}
+            type="button"
+            onClick={() => onChange(opt.value)}
+            className="h-11 text-sm font-semibold transition-colors"
+            style={{
+              background: active ? '#0E7490' : '#ffffff',
+              color:      active ? '#ffffff' : '#1e293b',
+            }}
+          >
+            {opt.label}
+          </button>
+        );
+      })}
     </div>
   );
 }
