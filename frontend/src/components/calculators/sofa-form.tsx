@@ -33,7 +33,10 @@ function OptionGroup({
             }}
           >
             <span className="font-medium">{opt.label}</span>
-            <span className="font-semibold text-xs ml-2 shrink-0" style={{ color: active ? 'rgba(255,255,255,0.8)' : '#94a3b8' }}>
+            <span
+              className="font-semibold text-xs ml-2 shrink-0"
+              style={{ color: active ? 'rgba(255,255,255,0.8)' : '#94a3b8' }}
+            >
               {opt.score === 0 ? '0' : `+${opt.score}`}
             </span>
           </button>
@@ -62,23 +65,21 @@ const getSeverity = (score: number) => {
 };
 
 export function SofaForm({ onResult }: SofaFormProps) {
-  const [respiratory, setRespiratory] = useState<number | null>(null);
-  const [ventilated, setVentilated]   = useState(false);
-  const [platelets, setPlatelets]     = useState<number | null>(null);
-  const [gcs, setGcs]                 = useState<number | null>(null);
-  const [bilirubin, setBilirubin]     = useState<number | null>(null);
-  const [cardio, setCardio]           = useState<number | null>(null);
-  const [renal, setRenal]             = useState<number | null>(null);
+  const [ventilated, setVentilated] = useState(false);
+  const [platelets, setPlatelets]   = useState<number | null>(null);
+  const [gcs, setGcs]               = useState<number | null>(null);
+  const [bilirubin, setBilirubin]   = useState<number | null>(null);
+  const [cardio, setCardio]         = useState<number | null>(null);
+  const [renal, setRenal]           = useState<number | null>(null);
 
-  const canSave = respiratory !== null && platelets !== null && gcs !== null &&
+  const canSave = platelets !== null && gcs !== null &&
                   bilirubin !== null && cardio !== null && renal !== null;
 
   const liveResult = useMemo(() => {
     if (!canSave) return null;
-    const score = (respiratory ?? 0) + (platelets ?? 0) + (gcs ?? 0) +
-                  (bilirubin ?? 0) + (cardio ?? 0) + (renal ?? 0);
+    const score = (platelets ?? 0) + (gcs ?? 0) + (bilirubin ?? 0) + (cardio ?? 0) + (renal ?? 0);
     return { score, severity: getSeverity(score) };
-  }, [canSave, respiratory, platelets, gcs, bilirubin, cardio, renal]);
+  }, [canSave, platelets, gcs, bilirubin, cardio, renal]);
 
   const onResultRef = useRef(onResult);
   useEffect(() => { onResultRef.current = onResult; });
@@ -90,30 +91,17 @@ export function SofaForm({ onResult }: SofaFormProps) {
         id: 'sofa',
         label: 'SOFA Score',
         value: liveResult.score,
-        unit: '/24',
+        unit: '/20',
         interpretation: { text: '', severity: liveResult.severity },
       }],
-      inputs: { respiratory, ventilated, platelets, gcs, bilirubin, cardio, renal },
-      formulaUsed: 'SOFA = Respiratory + Coagulation + Liver + Cardiovascular + CNS + Renal (each 0–4 pts)',
+      inputs: { ventilated, platelets, gcs, bilirubin, cardio, renal },
+      formulaUsed: 'SOFA = Coagulation + CNS + Liver + Cardiovascular + Renal (each 0–4 pts)',
     });
   }, [liveResult]);
 
   return (
     <div>
-      <Field label="PaO₂/FiO₂, mmHg (Respiratory)">
-        <OptionGroup
-          value={respiratory}
-          onChange={setRespiratory}
-          options={[
-            { label: '≥400', score: 0 },
-            { label: '300–399', score: 1 },
-            { label: '200–299', score: 2 },
-            { label: '100–199', score: 3 },
-            { label: '<100', score: 4 },
-          ]}
-        />
-      </Field>
-
+      {/* 1. Mechanical ventilation */}
       <Field label="On mechanical ventilation" hint="Including CPAP">
         <div className="grid grid-cols-2 rounded-lg overflow-hidden border border-gray-200">
           {(['No', 'Yes'] as const).map((opt) => {
@@ -124,7 +112,10 @@ export function SofaForm({ onResult }: SofaFormProps) {
                 type="button"
                 onClick={() => setVentilated(opt === 'Yes')}
                 className="py-3 text-sm font-semibold transition-colors"
-                style={{ background: active ? TEAL : '#ffffff', color: active ? '#ffffff' : '#1e293b' }}
+                style={{
+                  background: active ? TEAL : '#ffffff',
+                  color: active ? '#ffffff' : '#1e293b',
+                }}
               >
                 {opt}
               </button>
@@ -133,6 +124,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
         </div>
       </Field>
 
+      {/* 2. Platelets */}
       <Field label="Platelets, ×10³/µL">
         <OptionGroup
           value={platelets}
@@ -147,6 +139,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
         />
       </Field>
 
+      {/* 3. GCS */}
       <Field label="Glasgow Coma Scale" hint="If on sedatives, estimate assumed GCS off sedatives">
         <OptionGroup
           value={gcs}
@@ -161,6 +154,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
         />
       </Field>
 
+      {/* 4. Bilirubin */}
       <Field label="Bilirubin, mg/dL (µmol/L)">
         <OptionGroup
           value={bilirubin}
@@ -175,7 +169,11 @@ export function SofaForm({ onResult }: SofaFormProps) {
         />
       </Field>
 
-      <Field label="Mean arterial pressure OR administration of vasoactive agents required" hint="Listed doses are in units of mcg/kg/min">
+      {/* 5. Cardiovascular / MAP */}
+      <Field
+        label="Mean arterial pressure OR administration of vasoactive agents required"
+        hint="Listed doses are in units of mcg/kg/min"
+      >
         <OptionGroup
           value={cardio}
           onChange={setCardio}
@@ -189,6 +187,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
         />
       </Field>
 
+      {/* 6. Renal */}
       <Field label="Creatinine, mg/dL (µmol/L) (or urine output)">
         <OptionGroup
           value={renal}
