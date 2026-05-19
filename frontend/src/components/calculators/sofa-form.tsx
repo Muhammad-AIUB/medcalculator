@@ -1,232 +1,207 @@
 'use client';
-import React, { useState, useCallback, useMemo, useEffect, useRef } from 'react';
-import { cn } from '@/lib/utils';
-import { calculateSOFA } from '@/lib/calculators/sofa';
-import { FieldRow, NumInput, ResultBox, OrDivider, fmt } from './shared-ui';
+import React, { useState, useMemo, useEffect, useRef } from 'react';
+
 interface SofaFormProps {
   onResult: (result: any) => void;
 }
 
-function ScoreDot({ score }: { score: number | null }) {
-  if (score === null) return <span className="h-3 w-3 rounded-full bg-muted-foreground/20 inline-block" />;
-  const colors = ['bg-emerald-500', 'bg-yellow-400', 'bg-amber-500', 'bg-red-400', 'bg-red-600'];
-  return <span className={cn('h-3 w-3 rounded-full inline-block', colors[score] ?? 'bg-muted')} />;
+const TEAL = '#0E7490';
+
+function OptionGroup({
+  options,
+  value,
+  onChange,
+}: {
+  options: { label: string; score: number }[];
+  value: number | null;
+  onChange: (score: number) => void;
+}) {
+  return (
+    <div className="rounded-lg overflow-hidden border border-gray-200">
+      {options.map((opt, i) => {
+        const active = value === opt.score;
+        return (
+          <button
+            key={i}
+            type="button"
+            onClick={() => onChange(opt.score)}
+            className="w-full flex items-center justify-between px-4 py-3 text-sm text-left transition-colors"
+            style={{
+              background: active ? TEAL : '#ffffff',
+              color: active ? '#ffffff' : '#1e293b',
+              borderBottom: i < options.length - 1 ? '1px solid #e2e8f0' : 'none',
+            }}
+          >
+            <span className="font-medium">{opt.label}</span>
+            <span className="font-semibold text-xs ml-2 shrink-0" style={{ color: active ? 'rgba(255,255,255,0.8)' : '#94a3b8' }}>
+              {opt.score === 0 ? '0' : `+${opt.score}`}
+            </span>
+          </button>
+        );
+      })}
+    </div>
+  );
 }
 
-function ScoreLabel({ score }: { score: number | null }) {
-  if (score === null) return null;
-  const c = score === 0 ? 'text-emerald-600' : score <= 2 ? 'text-amber-600' : 'text-red-600';
-  return <span className={cn('text-xs font-bold ml-auto', c)}>{score}/4</span>;
+function Field({ label, hint, children }: { label: string; hint?: string; children: React.ReactNode }) {
+  return (
+    <div className="py-5 border-b border-gray-100 last:border-0 space-y-3">
+      <div>
+        <p className="text-sm font-semibold text-foreground leading-snug">{label}</p>
+        {hint && <p className="text-xs mt-0.5" style={{ color: TEAL }}>{hint}</p>}
+      </div>
+      {children}
+    </div>
+  );
 }
+
+const getSeverity = (score: number) => {
+  if (score <= 1) return 'success';
+  if (score <= 6) return 'warning';
+  return 'danger';
+};
 
 export function SofaForm({ onResult }: SofaFormProps) {
-  const [pao2, setPao2] = useState('');
-  const [fio2, setFio2] = useState('');
-  const [spo2, setSpo2] = useState('');
-  const [ventilated, setVentilated] = useState(false);
-  const [platelets, setPlatelets] = useState('');
-  const [bilMgStr, setBilMgStr] = useState('');
-  const [bilUmolStr, setBilUmolStr] = useState('');
-  const [mapStr, setMapStr] = useState('');
-  const [gcs, setGcs] = useState('15');
-  const [creatMgStr, setCreatMgStr] = useState('');
-  const [creatUmolStr, setCreatUmolStr] = useState('');
-  const [urineOutput, setUrineOutput] = useState('');
+  const [respiratory, setRespiratory] = useState<number | null>(null);
+  const [ventilated, setVentilated]   = useState(false);
+  const [platelets, setPlatelets]     = useState<number | null>(null);
+  const [gcs, setGcs]                 = useState<number | null>(null);
+  const [bilirubin, setBilirubin]     = useState<number | null>(null);
+  const [cardio, setCardio]           = useState<number | null>(null);
+  const [renal, setRenal]             = useState<number | null>(null);
 
-  const onBilMgChange = useCallback((v: string) => {
-    setBilMgStr(v);
-    const n = parseFloat(v);
-    const u = Number.isFinite(n) && n > 0 ? fmt(n * 17.1, 1) : '';
-    setBilUmolStr(u);
-  }, []);
-  const onBilUmolChange = useCallback((v: string) => {
-    setBilUmolStr(v);
-    const n = parseFloat(v);
-    const m = Number.isFinite(n) && n > 0 ? fmt(n / 17.1, 2) : '';
-    setBilMgStr(m);
-  }, []);
-  const onCreatMgChange = useCallback((v: string) => {
-    setCreatMgStr(v);
-    const n = parseFloat(v);
-    const u = Number.isFinite(n) && n > 0 ? fmt(n * 88.4, 1) : '';
-    setCreatUmolStr(u);
-  }, []);
-  const onCreatUmolChange = useCallback((v: string) => {
-    setCreatUmolStr(v);
-    const n = parseFloat(v);
-    const m = Number.isFinite(n) && n > 0 ? fmt(n / 88.4, 2) : '';
-    setCreatMgStr(m);
-  }, []);
-
-  const bilMg = parseFloat(bilMgStr) || 0;
-  const creatMg = parseFloat(creatMgStr) || 0;
-
-  const partialScores = useMemo(() => {
-    const pao2n = parseFloat(pao2);
-    const fio2n = parseFloat(fio2);
-    const spo2n = parseFloat(spo2);
-    const platN = parseFloat(platelets);
-    const gcsN = parseFloat(gcs);
-
-    let pulm: number | null = null;
-    if (fio2n > 0) {
-      const ratio = pao2n > 0 ? pao2n / fio2n : spo2n > 0 ? (spo2n / fio2n) * 0.64 : null;
-      if (ratio !== null) {
-        if (ratio >= 400) pulm = 0;
-        else if (ratio >= 300) pulm = 1;
-        else if (ratio >= 200 && !ventilated) pulm = 2;
-        else if (ratio >= 100 && ventilated) pulm = 3;
-        else if (ratio < 100 && ventilated) pulm = 4;
-        else pulm = 2;
-      }
-    }
-
-    let plat: number | null = null;
-    if (platN > 0) {
-      if (platN >= 150) plat = 0;
-      else if (platN >= 100) plat = 1;
-      else if (platN >= 50) plat = 2;
-      else if (platN >= 20) plat = 3;
-      else plat = 4;
-    }
-
-    let neuro: number | null = null;
-    if (gcsN > 0) {
-      if (gcsN === 15) neuro = 0;
-      else if (gcsN >= 13) neuro = 1;
-      else if (gcsN >= 10) neuro = 2;
-      else if (gcsN >= 6) neuro = 3;
-      else neuro = 4;
-    }
-
-    return { pulm, plat, neuro };
-  }, [pao2, fio2, spo2, ventilated, platelets, gcs]);
-
-  const canSave = !!platelets && bilMg > 0 && !!mapStr && !!gcs && creatMg > 0;
+  const canSave = respiratory !== null && platelets !== null && gcs !== null &&
+                  bilirubin !== null && cardio !== null && renal !== null;
 
   const liveResult = useMemo(() => {
     if (!canSave) return null;
-    try {
-      return calculateSOFA({
-        pao2: pao2 ? parseFloat(pao2) : undefined,
-        fio2: fio2 ? parseFloat(fio2) : undefined,
-        spo2: spo2 ? parseFloat(spo2) : undefined,
-        ventilated,
-        platelets: parseFloat(platelets),
-        bilirubin: bilMg,
-        bilirubinUnit: 'mg/dL',
-        map: parseFloat(mapStr),
-        gcs: parseFloat(gcs) || 15,
-        creatinine: creatMg,
-        creatinineUnit: 'mg/dL',
-        urineOutput: urineOutput ? parseFloat(urineOutput) : undefined,
-      });
-    } catch { return null; }
-  }, [canSave, pao2, fio2, spo2, ventilated, platelets, bilMg, mapStr, gcs, creatMg, urineOutput]);
+    const score = (respiratory ?? 0) + (platelets ?? 0) + (gcs ?? 0) +
+                  (bilirubin ?? 0) + (cardio ?? 0) + (renal ?? 0);
+    return { score, severity: getSeverity(score) };
+  }, [canSave, respiratory, platelets, gcs, bilirubin, cardio, renal]);
 
   const onResultRef = useRef(onResult);
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
     if (!liveResult) return;
-    const severity = liveResult.severity as any;
     onResultRef.current({
-      outputs: [
-        {
-          id: 'sofa', label: 'SOFA Score', value: liveResult.score ?? 0, unit: '/24',
-          interpretation: { text: liveResult.interpretation, severity, classification: liveResult.label },
-        },
-        ...(liveResult.subResults?.map((sr, i) => ({
-          id: `sub-${i}`, label: sr.label, value: sr.value, unit: sr.unit,
-          interpretation: { text: String(sr.value), severity: (sr.severity ?? 'neutral') as any },
-        })) ?? []),
-      ],
-      inputs: { pao2, fio2, spo2, ventilated, platelets, bilirubin: bilMg, bilirubinUnit: 'mg/dL', map: mapStr, gcs, creatinine: creatMg, creatinineUnit: 'mg/dL', urineOutput },
-      references: liveResult.references,
-      formulaUsed: 'SOFA 2016',
-      warnings: liveResult.score && liveResult.score >= 11 ? ['SOFA ≥ 11: Predicted mortality > 40%'] : [],
+      outputs: [{
+        id: 'sofa',
+        label: 'SOFA Score',
+        value: liveResult.score,
+        unit: '/24',
+        interpretation: { text: '', severity: liveResult.severity },
+      }],
+      inputs: { respiratory, ventilated, platelets, gcs, bilirubin, cardio, renal },
+      formulaUsed: 'SOFA = Respiratory + Coagulation + Liver + Cardiovascular + CNS + Renal (each 0–4 pts)',
     });
   }, [liveResult]);
 
-  const sectionClass = 'rounded-lg border-2 border-[#0E7490]/30 bg-card p-4 space-y-3';
-  const clearAll = () => { setPao2(''); setFio2(''); setSpo2(''); setVentilated(false); setPlatelets(''); setBilMgStr(''); setBilUmolStr(''); setMapStr(''); setGcs(''); setCreatMgStr(''); setCreatUmolStr(''); setUrineOutput(''); };
-
   return (
-    <div className="space-y-4">
-      {/* Respiratory */}
-      <div className={sectionClass}>
-        <div className="flex items-center gap-2">
-          <ScoreDot score={partialScores.pulm} />
-          <h3 className="text-sm font-semibold">Respiratory</h3>
-          <ScoreLabel score={partialScores.pulm} />
-        </div>
-        <div className="grid grid-cols-2 gap-2">
-          <NumInput value={pao2} onChange={(v) => { setPao2(v); }} suffix="PaO₂ mmHg" step="1" min={20} max={600} />
-          <NumInput value={fio2} onChange={(v) => { setFio2(v); }} suffix="FiO₂" step="0.01" min={0.21} max={1.0} placeholder="0.21–1.0" />
-        </div>
-        <NumInput value={spo2} onChange={(v) => { setSpo2(v); }} suffix="SpO₂ %" step="1" min={50} max={100} placeholder="if PaO₂ unavailable" />
-        <div className="flex items-center justify-between">
-          <span className="text-sm font-medium">Mechanically Ventilated</span>
-          <button
-            type="button"
-            onClick={() => setVentilated(v => !v)}
-            className={cn('relative inline-flex h-6 w-11 items-center rounded-full transition-colors', ventilated ? 'bg-[#0E7490]' : 'bg-muted-foreground/30')}
-          >
-            <span className={cn('inline-block h-4 w-4 transform rounded-full bg-white shadow transition-transform', ventilated ? 'translate-x-6' : 'translate-x-1')} />
-          </button>
-        </div>
-      </div>
+    <div>
+      <Field label="PaO₂/FiO₂, mmHg (Respiratory)">
+        <OptionGroup
+          value={respiratory}
+          onChange={setRespiratory}
+          options={[
+            { label: '≥400', score: 0 },
+            { label: '300–399', score: 1 },
+            { label: '200–299', score: 2 },
+            { label: '100–199', score: 3 },
+            { label: '<100', score: 4 },
+          ]}
+        />
+      </Field>
 
-      {/* Coagulation */}
-      <div className={sectionClass}>
-        <div className="flex items-center gap-2">
-          <ScoreDot score={partialScores.plat} />
-          <h3 className="text-sm font-semibold">Coagulation</h3>
-          <ScoreLabel score={partialScores.plat} />
+      <Field label="On mechanical ventilation" hint="Including CPAP">
+        <div className="grid grid-cols-2 rounded-lg overflow-hidden border border-gray-200">
+          {(['No', 'Yes'] as const).map((opt) => {
+            const active = ventilated === (opt === 'Yes');
+            return (
+              <button
+                key={opt}
+                type="button"
+                onClick={() => setVentilated(opt === 'Yes')}
+                className="py-3 text-sm font-semibold transition-colors"
+                style={{ background: active ? TEAL : '#ffffff', color: active ? '#ffffff' : '#1e293b' }}
+              >
+                {opt}
+              </button>
+            );
+          })}
         </div>
-        <NumInput value={platelets} onChange={(v) => { setPlatelets(v); }} suffix="×10³/µL" step="1" min={0} max={1000} />
-      </div>
+      </Field>
 
-      {/* Liver */}
-      <div className={sectionClass}>
-        <h3 className="text-sm font-semibold">Liver — Bilirubin</h3>
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <NumInput value={bilMgStr} onChange={onBilMgChange} suffix="mg/dL" step="0.1" />
-          <OrDivider />
-          <NumInput value={bilUmolStr} onChange={onBilUmolChange} suffix="µmol/L" step="1" />
-        </div>
-      </div>
+      <Field label="Platelets, ×10³/µL">
+        <OptionGroup
+          value={platelets}
+          onChange={setPlatelets}
+          options={[
+            { label: '≥150', score: 0 },
+            { label: '100-149', score: 1 },
+            { label: '50-99', score: 2 },
+            { label: '20-49', score: 3 },
+            { label: '<20', score: 4 },
+          ]}
+        />
+      </Field>
 
-      {/* Cardiovascular */}
-      <div className={sectionClass}>
-        <h3 className="text-sm font-semibold">Cardiovascular</h3>
-        <NumInput value={mapStr} onChange={(v) => { setMapStr(v); }} suffix="MAP mmHg" step="1" min={20} max={200} />
-      </div>
+      <Field label="Glasgow Coma Scale" hint="If on sedatives, estimate assumed GCS off sedatives">
+        <OptionGroup
+          value={gcs}
+          onChange={setGcs}
+          options={[
+            { label: '15', score: 0 },
+            { label: '13-14', score: 1 },
+            { label: '10-12', score: 2 },
+            { label: '6-9', score: 3 },
+            { label: '<6', score: 4 },
+          ]}
+        />
+      </Field>
 
-      {/* Neurological */}
-      <div className={sectionClass}>
-        <div className="flex items-center gap-2">
-          <ScoreDot score={partialScores.neuro} />
-          <h3 className="text-sm font-semibold">Neurological (GCS)</h3>
-          <ScoreLabel score={partialScores.neuro} />
-        </div>
-        <div className="flex items-center gap-3">
-          <input type="range" min={3} max={15} value={gcs} onChange={e => { setGcs(e.target.value); }} className="flex-1 accent-[#0E7490]" />
-          <ResultBox value={gcs} />
-        </div>
-      </div>
+      <Field label="Bilirubin, mg/dL (µmol/L)">
+        <OptionGroup
+          value={bilirubin}
+          onChange={setBilirubin}
+          options={[
+            { label: '<1.2 (<20)', score: 0 },
+            { label: '1.2–1.9 (20-32)', score: 1 },
+            { label: '2.0–5.9 (33-101)', score: 2 },
+            { label: '6.0–11.9 (102-204)', score: 3 },
+            { label: '≥12.0 (>204)', score: 4 },
+          ]}
+        />
+      </Field>
 
-      {/* Renal */}
-      <div className={sectionClass}>
-        <h3 className="text-sm font-semibold">Renal — Creatinine</h3>
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <NumInput value={creatMgStr} onChange={onCreatMgChange} suffix="mg/dL" step="0.01" />
-          <OrDivider />
-          <NumInput value={creatUmolStr} onChange={onCreatUmolChange} suffix="µmol/L" step="1" />
-        </div>
-        <NumInput value={urineOutput} onChange={(v) => { setUrineOutput(v); }} suffix="mL/24h" step="10" min={0} max={10000} placeholder="optional" />
-      </div>
+      <Field label="Mean arterial pressure OR administration of vasoactive agents required" hint="Listed doses are in units of mcg/kg/min">
+        <OptionGroup
+          value={cardio}
+          onChange={setCardio}
+          options={[
+            { label: 'No hypotension', score: 0 },
+            { label: 'MAP <70 mmHg', score: 1 },
+            { label: 'DOPamine ≤5 or DOBUTamine (any dose)', score: 2 },
+            { label: 'DOPamine >5, EPINEPHrine ≤0.1, or norEPINEPHrine ≤0.1', score: 3 },
+            { label: 'DOPamine >15, EPINEPHrine >0.1, or norEPINEPHrine >0.1', score: 4 },
+          ]}
+        />
+      </Field>
 
+      <Field label="Creatinine, mg/dL (µmol/L) (or urine output)">
+        <OptionGroup
+          value={renal}
+          onChange={setRenal}
+          options={[
+            { label: '<1.2 (<110)', score: 0 },
+            { label: '1.2–1.9 (110-170)', score: 1 },
+            { label: '2.0–3.4 (171-299)', score: 2 },
+            { label: '3.5–4.9 (300-440) or UOP <500 mL/day', score: 3 },
+            { label: '≥5.0 (>440) or UOP <200 mL/day', score: 4 },
+          ]}
+        />
+      </Field>
     </div>
   );
 }
