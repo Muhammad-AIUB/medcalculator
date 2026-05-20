@@ -20,6 +20,7 @@ const OriginalAihForm = dynamic(() => import('@/components/calculators/original-
 const FraxForm        = dynamic(() => import('@/components/calculators/frax-form').then(m => ({ default: m.FraxForm })), { ssr: false });
 const CdaiForm        = dynamic(() => import('@/components/calculators/cdai-form').then(m => ({ default: m.CdaiForm })), { ssr: false });
 const SdaiForm        = dynamic(() => import('@/components/calculators/sdai-form').then(m => ({ default: m.SdaiForm })), { ssr: false });
+const BasdaiForm      = dynamic(() => import('@/components/calculators/basdai-form').then(m => ({ default: m.BasdaiForm })), { ssr: false });
 const VasopressorForm = dynamic(() => import('@/components/calculators/vasopressor-form').then(m => ({ default: m.VasopressorForm })), { ssr: false });
 const TsatForm        = dynamic(() => import('@/components/calculators/tsat-form').then(m => ({ default: m.TsatForm })), { ssr: false });
 
@@ -37,6 +38,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   frax:         FraxForm,
   cdai:         CdaiForm,
   sdai:         SdaiForm,
+  basdai:       BasdaiForm,
   vasopressor:  VasopressorForm,
   tsat:         TsatForm,
 };
@@ -53,6 +55,7 @@ const FORMULA_MAP: Record<string, string> = {
   frax:         'Addition of assigned points.',
   cdai:         'CDAI = Tender Joint Count + Swollen Joint Count + Patient Global Activity + Provider Global Activity',
   sdai:         'SDAI = Tender Joint Count + Swollen Joint Count + CRP, mg/dL + Patient Global Activity + Provider Global Activity',
+  basdai:       'BASDAI = ((Q1 + Q2 + Q3 + Q4) + ((Q5 + Q6) / 2)) / 5',
   vasopressor:  'VIS = Dopamine + Dobutamine + (Epinephrine x 100) + (Norepinephrine x 100) + (Vasopressin x 2.5) + (Milrinone x 10) + Phenylephrine',
   tsat:         'TS = (Fe / TIBC) * 100',
   gcs:          'GCS = Eye (1-4) + Verbal (1-5) + Motor (1-6)',

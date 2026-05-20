@@ -12,6 +12,7 @@ import { calculateOriginalAIH } from './original-aih'
 import { calculateFRAX } from './frax'
 import { calculateCDAI } from './cdai'
 import { calculateSDAI } from './sdai'
+import { calculateBASDAI } from './basdai'
 import { calculateVasopressor } from './vasopressor'
 import { calculateTSAT } from './tsat'
 
@@ -311,6 +312,28 @@ export const CALCULATORS: Calculator[] = [
         crpMgDl: Number(inputs.crpMgDl ?? 0),
         patientGlobal: Number(inputs.patientGlobal ?? 0),
         providerGlobal: Number(inputs.providerGlobal ?? 0),
+      }),
+  },
+  {
+    id: 'basdai',
+    title: 'BASDAI Score',
+    shortTitle: 'BASDAI',
+    emoji: 'BASDAI',
+    description: 'Bath Ankylosing Spondylitis Disease Activity Index',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+    tags: ['BASDAI', 'ankylosing spondylitis', 'arthritis', 'disease activity'],
+    inputs: [],
+    calculate: (inputs) =>
+      calculateBASDAI({
+        q1: Number(inputs.q1 ?? 0),
+        q2: Number(inputs.q2 ?? 0),
+        q3: Number(inputs.q3 ?? 0),
+        q4: Number(inputs.q4 ?? 0),
+        q5: Number(inputs.q5 ?? 0),
+        q6: Number(inputs.q6 ?? 0),
       }),
   },
   {
