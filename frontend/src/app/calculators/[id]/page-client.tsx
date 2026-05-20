@@ -1,4 +1,4 @@
-'use client';
+﻿'use client';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useCallback } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
@@ -39,7 +39,7 @@ const FORMULA_MAP: Record<string, string> = {
   sofa:         'SOFA = Coagulation + CNS + Liver + Cardiovascular + Renal (each 0-4 pts)',
   'sofa-2':     'SOFA-2 Score = sum of all component points.',
   vasopressor:  'VIS = Dopamine + Dobutamine + (Epinephrine x 100) + (Norepinephrine x 100) + (Vasopressin x 2.5) + (Milrinone x 10) + Phenylephrine',
-  tsat:         'TSAT (%) = (Serum Iron / TIBC) x 100',
+  tsat:         'TS = (Fe / TIBC) * 100',
   gcs:          'GCS = Eye (1-4) + Verbal (1-5) + Motor (1-6)',
   edd:          "Naegele's Rule: EDD = LMP + 9 months + 7 days\nUltrasound: EDD = Scan Date - GA + 280 days",
 };
