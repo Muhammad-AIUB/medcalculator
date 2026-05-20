@@ -177,6 +177,18 @@ export function CalculatorPageClient({ id }: Props) {
           )}
         </div>
 
+        {/* Interpretation */}
+        {primary?.interpretation?.text ? (
+          <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+              Interpretation
+            </p>
+            <p className="text-sm font-medium text-foreground">
+              {primary.interpretation.text}
+            </p>
+          </div>
+        ) : null}
+
         {/* Formula */}
         <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
