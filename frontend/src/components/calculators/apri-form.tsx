@@ -6,8 +6,6 @@ interface ApriFormProps {
   onResult: (result: any) => void;
 }
 
-type PlateletUnit = '10^9/L' | '10^3/uL';
-
 function NumberRow({
   title,
   unit,
@@ -47,43 +45,55 @@ function NumberRow({
 }
 
 function PlateletRow({
-  value,
-  unit,
-  onValueChange,
-  onUnitChange,
+  platelets109L,
+  platelets103Ul,
+  onPlatelets109LChange,
+  onPlatelets103UlChange,
 }: {
-  value: string;
-  unit: PlateletUnit;
-  onValueChange: (value: string) => void;
-  onUnitChange: (unit: PlateletUnit) => void;
+  platelets109L: string;
+  platelets103Ul: string;
+  onPlatelets109LChange: (value: string) => void;
+  onPlatelets103UlChange: (value: string) => void;
 }) {
-  const nextUnit: PlateletUnit = unit === '10^9/L' ? '10^3/uL' : '10^9/L';
-
   return (
     <div className="grid gap-4 border-t border-border py-4 md:grid-cols-[1fr_1fr] md:gap-8">
-      <label className="text-base font-normal leading-tight text-foreground" htmlFor="Platelet count">
+      <label className="text-base font-normal leading-tight text-foreground" htmlFor="Platelet count 10^9/L">
         Platelet count
       </label>
-      <div className="flex overflow-hidden rounded-lg border border-border bg-background shadow-sm">
-        <input
-          id="Platelet count"
-          type="number"
-          min="0"
-          step="0.1"
-          inputMode="decimal"
-          placeholder="Norm: 150 - 350"
-          value={value}
-          onChange={(event) => onValueChange(event.target.value)}
-          className="min-h-[42px] flex-1 bg-transparent px-3 text-base font-semibold outline-none placeholder:text-muted-foreground"
-        />
-        <button
-          type="button"
-          onClick={() => onUnitChange(nextUnit)}
-          className="flex min-w-[104px] items-center justify-center gap-2 border-l border-border bg-muted px-3 text-sm font-bold text-foreground transition-colors hover:bg-muted/80"
-        >
-          <span>{unit === '10^9/L' ? 'x 10^9/L' : 'x 10^3/uL'}</span>
-          <span className="text-base text-muted-foreground">&lt;-&gt;</span>
-        </button>
+      <div className="grid items-center gap-3 sm:grid-cols-[1fr_auto_1fr]">
+        <div className="flex overflow-hidden rounded-lg border border-border bg-background shadow-sm">
+          <input
+            id="Platelet count 10^9/L"
+            type="number"
+            min="0"
+            step="0.1"
+            inputMode="decimal"
+            placeholder=""
+            value={platelets109L}
+            onChange={(event) => onPlatelets109LChange(event.target.value)}
+            className="min-h-[42px] flex-1 bg-transparent px-3 text-base font-semibold outline-none placeholder:text-muted-foreground"
+          />
+          <span className="flex min-w-[104px] items-center justify-center border-l border-border bg-muted px-3 text-sm font-bold text-foreground">
+            x 10^9/L
+          </span>
+        </div>
+        <span className="text-center text-sm font-semibold text-muted-foreground">OR</span>
+        <div className="flex overflow-hidden rounded-lg border border-border bg-background shadow-sm">
+          <input
+            id="Platelet count 10^3/uL"
+            type="number"
+            min="0"
+            step="0.1"
+            inputMode="decimal"
+            placeholder=""
+            value={platelets103Ul}
+            onChange={(event) => onPlatelets103UlChange(event.target.value)}
+            className="min-h-[42px] flex-1 bg-transparent px-3 text-base font-semibold outline-none placeholder:text-muted-foreground"
+          />
+          <span className="flex min-w-[104px] items-center justify-center border-l border-border bg-muted px-3 text-sm font-bold text-foreground">
+            x 10^3/uL
+          </span>
+        </div>
       </div>
     </div>
   );
@@ -92,17 +102,27 @@ function PlateletRow({
 export function ApriForm({ onResult }: ApriFormProps) {
   const [ast, setAst] = useState('');
   const [astUpperLimit, setAstUpperLimit] = useState('');
-  const [platelets, setPlatelets] = useState('');
-  const [plateletUnit, setPlateletUnit] = useState<PlateletUnit>('10^9/L');
+  const [platelets109L, setPlatelets109L] = useState('');
+  const [platelets103Ul, setPlatelets103Ul] = useState('');
+
+  const handlePlatelets109LChange = (value: string) => {
+    setPlatelets109L(value);
+    setPlatelets103Ul(value);
+  };
+
+  const handlePlatelets103UlChange = (value: string) => {
+    setPlatelets103Ul(value);
+    setPlatelets109L(value);
+  };
 
   const inputs = useMemo(
     () => ({
       ast: Number(ast || 0),
       astUpperLimit: Number(astUpperLimit || 1),
-      platelets: Number(platelets || 1),
-      plateletUnit,
+      platelets: Number(platelets109L || platelets103Ul || 1),
+      plateletUnit: '10^9/L' as const,
     }),
-    [ast, astUpperLimit, plateletUnit, platelets],
+    [ast, astUpperLimit, platelets103Ul, platelets109L],
   );
 
   const liveResult = useMemo(() => calculateAPRI(inputs), [inputs]);
@@ -123,22 +143,27 @@ export function ApriForm({ onResult }: ApriFormProps) {
           interpretation: { text: liveResult.interpretation, severity, classification: liveResult.label },
         },
       ],
-      inputs,
+      inputs: { ...inputs, platelets109L: Number(platelets109L || 0), platelets103Ul: Number(platelets103Ul || 0) },
       formulaUsed: APRI_FORMULA,
     });
-  }, [inputs, liveResult]);
+  }, [inputs, liveResult, platelets103Ul, platelets109L]);
 
   return (
     <div>
-      <NumberRow title="AST" unit="U/L" placeholder="Norm: 15 - 41" value={ast} onChange={setAst} />
+      <NumberRow title="AST" unit="U/L" placeholder="" value={ast} onChange={setAst} />
       <NumberRow
         title="AST upper limit of normal"
         unit="U/L"
-        placeholder="Norm: 15 - 41"
+        placeholder=""
         value={astUpperLimit}
         onChange={setAstUpperLimit}
       />
-      <PlateletRow value={platelets} unit={plateletUnit} onValueChange={setPlatelets} onUnitChange={setPlateletUnit} />
+      <PlateletRow
+        platelets109L={platelets109L}
+        platelets103Ul={platelets103Ul}
+        onPlatelets109LChange={handlePlatelets109LChange}
+        onPlatelets103UlChange={handlePlatelets103UlChange}
+      />
     </div>
   );
 }
