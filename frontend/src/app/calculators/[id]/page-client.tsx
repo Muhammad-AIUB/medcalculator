@@ -41,7 +41,7 @@ const FORMULA_MAP: Record<string, string> = {
   vasopressor:  'VIS = Dopamine + Dobutamine + (Epinephrine x 100) + (Norepinephrine x 100) + (Vasopressin x 2.5) + (Milrinone x 10) + Phenylephrine',
   tsat:         'TS = (Fe / TIBC) * 100',
   gcs:          'GCS = Eye (1-4) + Verbal (1-5) + Motor (1-6)',
-  edd:          "Naegele's Rule: EDD = LMP + 9 months + 7 days\nUltrasound: EDD = Scan Date - GA + 280 days",
+  edd:          'Uses the first day of your Last Menstrual Period (LMP).',
 };
 
 const severityColors: Record<string, string> = {
