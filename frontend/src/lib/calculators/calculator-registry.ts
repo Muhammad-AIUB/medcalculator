@@ -13,6 +13,8 @@ import { calculateFRAX } from './frax'
 import { calculateCDAI } from './cdai'
 import { calculateSDAI } from './sdai'
 import { calculateBASDAI } from './basdai'
+import { calculateSLEDAI } from './sledai'
+import { calculateDAS28ESR } from './das28-esr'
 import { calculateVasopressor } from './vasopressor'
 import { calculateTSAT } from './tsat'
 
@@ -334,6 +336,40 @@ export const CALCULATORS: Calculator[] = [
         q4: Number(inputs.q4 ?? 0),
         q5: Number(inputs.q5 ?? 0),
         q6: Number(inputs.q6 ?? 0),
+      }),
+  },
+  {
+    id: 'sledai',
+    title: 'SLEDAI Score',
+    shortTitle: 'SLEDAI',
+    emoji: 'SLEDAI',
+    description: 'Systemic Lupus Erythematosus Disease Activity Index',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+    tags: ['SLEDAI', 'SLE', 'lupus', 'disease activity'],
+    inputs: [],
+    calculate: (inputs) => calculateSLEDAI(inputs as Record<string, number>),
+  },
+  {
+    id: 'das28-esr',
+    title: 'DAS28-ESR Score',
+    shortTitle: 'DAS28-ESR',
+    emoji: 'DAS28',
+    description: 'Disease Activity Score 28 using erythrocyte sedimentation rate',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+    tags: ['DAS28', 'DAS28-ESR', 'ESR', 'rheumatoid arthritis', 'arthritis'],
+    inputs: [],
+    calculate: (inputs) =>
+      calculateDAS28ESR({
+        tenderJointCount: Number(inputs.tenderJointCount ?? 0),
+        swollenJointCount: Number(inputs.swollenJointCount ?? 0),
+        esr: Number(inputs.esr ?? 1),
+        globalHealth: Number(inputs.globalHealth ?? 0),
       }),
   },
   {

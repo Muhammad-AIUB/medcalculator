@@ -21,6 +21,8 @@ const FraxForm        = dynamic(() => import('@/components/calculators/frax-form
 const CdaiForm        = dynamic(() => import('@/components/calculators/cdai-form').then(m => ({ default: m.CdaiForm })), { ssr: false });
 const SdaiForm        = dynamic(() => import('@/components/calculators/sdai-form').then(m => ({ default: m.SdaiForm })), { ssr: false });
 const BasdaiForm      = dynamic(() => import('@/components/calculators/basdai-form').then(m => ({ default: m.BasdaiForm })), { ssr: false });
+const SledaiForm      = dynamic(() => import('@/components/calculators/sledai-form').then(m => ({ default: m.SledaiForm })), { ssr: false });
+const Das28EsrForm    = dynamic(() => import('@/components/calculators/das28-esr-form').then(m => ({ default: m.Das28EsrForm })), { ssr: false });
 const VasopressorForm = dynamic(() => import('@/components/calculators/vasopressor-form').then(m => ({ default: m.VasopressorForm })), { ssr: false });
 const TsatForm        = dynamic(() => import('@/components/calculators/tsat-form').then(m => ({ default: m.TsatForm })), { ssr: false });
 
@@ -39,6 +41,8 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   cdai:         CdaiForm,
   sdai:         SdaiForm,
   basdai:       BasdaiForm,
+  sledai:       SledaiForm,
+  'das28-esr':  Das28EsrForm,
   vasopressor:  VasopressorForm,
   tsat:         TsatForm,
 };
@@ -56,6 +60,8 @@ const FORMULA_MAP: Record<string, string> = {
   cdai:         'CDAI = Tender Joint Count + Swollen Joint Count + Patient Global Activity + Provider Global Activity',
   sdai:         'SDAI = Tender Joint Count + Swollen Joint Count + CRP, mg/dL + Patient Global Activity + Provider Global Activity',
   basdai:       'BASDAI = ((Q1 + Q2 + Q3 + Q4) + ((Q5 + Q6) / 2)) / 5',
+  sledai:       'SLEDAI Score = sum of all selected item points.',
+  'das28-esr':  'DAS28-ESR= (0.56*sqrt(Tender Joint Count)+0.28*sqrt(Swollen Joint Count)+0.7*ln(ESR)+0.014*(global health))',
   vasopressor:  'VIS = Dopamine + Dobutamine + (Epinephrine x 100) + (Norepinephrine x 100) + (Vasopressin x 2.5) + (Milrinone x 10) + Phenylephrine',
   tsat:         'TS = (Fe / TIBC) * 100',
   gcs:          'GCS = Eye (1-4) + Verbal (1-5) + Motor (1-6)',
