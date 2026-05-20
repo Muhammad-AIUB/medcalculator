@@ -8,6 +8,8 @@ import { calculateSOFA } from './sofa'
 import { calculateSOFA2 } from './sofa-2'
 import { calculateGCS } from './gcs'
 import { calculateAIH } from './aih'
+import { calculateOriginalAIH } from './original-aih'
+import { calculateFRAX } from './frax'
 import { calculateVasopressor } from './vasopressor'
 import { calculateTSAT } from './tsat'
 
@@ -211,6 +213,61 @@ export const CALCULATORS: Calculator[] = [
         igg: Number(inputs.igg ?? 0),
         histology: Number(inputs.histology ?? 1),
         viralHepatitis: Number(inputs.viralHepatitis ?? 0),
+      }),
+  },
+  {
+    id: 'original-aih',
+    title: 'Original AIH Score',
+    shortTitle: 'Original AIH',
+    emoji: 'AIH',
+    description: 'Original Autoimmune Hepatitis Score',
+    category: 'liver',
+    icon: 'ClipboardCheck',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+    tags: ['AIH', 'original AIH', 'autoimmune hepatitis', 'hepatology', 'liver'],
+    inputs: [],
+    calculate: (inputs) =>
+      calculateOriginalAIH({
+        sex: Number(inputs.sex ?? 0),
+        alpAstAltRatio: Number(inputs.alpAstAltRatio ?? 0),
+        serumGlobulinsIgg: Number(inputs.serumGlobulinsIgg ?? 0),
+        antibodies: Number(inputs.antibodies ?? 0),
+        optionalAutoantibodies: Number(inputs.optionalAutoantibodies ?? 0),
+        ama: Number(inputs.ama ?? 0),
+        hepatitisViralMarkers: Number(inputs.hepatitisViralMarkers ?? 3),
+        hepatotoxicDrugs: Number(inputs.hepatotoxicDrugs ?? 1),
+        alcoholIntake: Number(inputs.alcoholIntake ?? 2),
+        interfaceHepatitis: Number(inputs.interfaceHepatitis ?? 0),
+        lymphoplasmacytic: Number(inputs.lymphoplasmacytic ?? 0),
+        rosetting: Number(inputs.rosetting ?? 0),
+        biliaryChanges: Number(inputs.biliaryChanges ?? 0),
+        otherChanges: Number(inputs.otherChanges ?? 0),
+        autoimmuneDisease: Number(inputs.autoimmuneDisease ?? 0),
+        responseTherapy: Number(inputs.responseTherapy ?? 0),
+      }),
+  },
+  {
+    id: 'frax',
+    title: 'FRAX',
+    shortTitle: 'FRAX',
+    emoji: 'FRAX',
+    description: 'Fracture risk assessment point score',
+    category: 'nutrition',
+    icon: 'Bone',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+    tags: ['FRAX', 'fracture', 'osteoporosis', 'bone', 'BMD'],
+    inputs: [],
+    calculate: (inputs) =>
+      calculateFRAX({
+        age: Number(inputs.age ?? 0),
+        fractureHistory: Number(inputs.fractureHistory ?? 0),
+        motherHipFracture: Number(inputs.motherHipFracture ?? 0),
+        weight: Number(inputs.weight ?? 0),
+        smoker: Number(inputs.smoker ?? 0),
+        chairRise: Number(inputs.chairRise ?? 0),
+        bmd: Number(inputs.bmd ?? 0),
       }),
   },
   {
