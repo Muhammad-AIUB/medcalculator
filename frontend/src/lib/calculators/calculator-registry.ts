@@ -10,6 +10,7 @@ import { calculateGCS } from './gcs'
 import { calculateAIH } from './aih'
 import { calculateOriginalAIH } from './original-aih'
 import { calculateFRAX } from './frax'
+import { calculateCDAI } from './cdai'
 import { calculateVasopressor } from './vasopressor'
 import { calculateTSAT } from './tsat'
 
@@ -268,6 +269,26 @@ export const CALCULATORS: Calculator[] = [
         smoker: Number(inputs.smoker ?? 0),
         chairRise: Number(inputs.chairRise ?? 0),
         bmd: Number(inputs.bmd ?? 0),
+      }),
+  },
+  {
+    id: 'cdai',
+    title: 'CDAI',
+    shortTitle: 'CDAI',
+    emoji: 'CDAI',
+    description: 'Clinical Disease Activity Index for rheumatoid arthritis',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+    tags: ['CDAI', 'rheumatoid arthritis', 'arthritis', 'joint count'],
+    inputs: [],
+    calculate: (inputs) =>
+      calculateCDAI({
+        tenderJointCount: Number(inputs.tenderJointCount ?? 0),
+        swollenJointCount: Number(inputs.swollenJointCount ?? 0),
+        patientGlobal: Number(inputs.patientGlobal ?? 0),
+        providerGlobal: Number(inputs.providerGlobal ?? 0),
       }),
   },
   {

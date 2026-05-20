@@ -3,7 +3,7 @@ import { CalculatorPageClient } from './page-client';
 
 // Tell Next.js all possible calculator IDs at build time (required for static export)
 export function generateStaticParams() {
-  const ids = new Set([...CALCULATORS.map((c) => c.id), 'gcs', 'sofa-2', 'aih', 'original-aih', 'frax']);
+  const ids = new Set([...CALCULATORS.map((c) => c.id), 'gcs', 'sofa-2', 'aih', 'original-aih', 'frax', 'cdai']);
   return Array.from(ids).map((id) => ({ id }));
 }
 
