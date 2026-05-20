@@ -16,6 +16,7 @@ import { calculateBASDAI } from './basdai'
 import { calculateSLEDAI } from './sledai'
 import { calculateDAS28ESR } from './das28-esr'
 import { calculateAPRI } from './apri'
+import { calculateFIB4 } from './fib-4'
 import { calculateVasopressor } from './vasopressor'
 import { calculateTSAT } from './tsat'
 
@@ -389,6 +390,27 @@ export const CALCULATORS: Calculator[] = [
       calculateAPRI({
         ast: Number(inputs.ast ?? 0),
         astUpperLimit: Number(inputs.astUpperLimit ?? 1),
+        platelets: Number(inputs.platelets ?? 1),
+        plateletUnit: (inputs.plateletUnit as '10^9/L' | '10^3/uL') ?? '10^9/L',
+      }),
+  },
+  {
+    id: 'fib-4',
+    title: 'FIB-4 Score',
+    shortTitle: 'FIB-4',
+    emoji: 'FIB-4',
+    description: 'Fibrosis-4 index for liver fibrosis assessment',
+    category: 'liver',
+    icon: 'Activity',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+    tags: ['FIB-4', 'fibrosis', 'AST', 'ALT', 'platelets', 'liver'],
+    inputs: [],
+    calculate: (inputs) =>
+      calculateFIB4({
+        age: Number(inputs.age ?? 0),
+        ast: Number(inputs.ast ?? 0),
+        alt: Number(inputs.alt ?? 1),
         platelets: Number(inputs.platelets ?? 1),
         plateletUnit: (inputs.plateletUnit as '10^9/L' | '10^3/uL') ?? '10^9/L',
       }),
