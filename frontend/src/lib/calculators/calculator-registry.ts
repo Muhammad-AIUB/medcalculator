@@ -15,6 +15,7 @@ import { calculateSDAI } from './sdai'
 import { calculateBASDAI } from './basdai'
 import { calculateSLEDAI } from './sledai'
 import { calculateDAS28ESR } from './das28-esr'
+import { calculateAPRI } from './apri'
 import { calculateVasopressor } from './vasopressor'
 import { calculateTSAT } from './tsat'
 
@@ -370,6 +371,26 @@ export const CALCULATORS: Calculator[] = [
         swollenJointCount: Number(inputs.swollenJointCount ?? 0),
         esr: Number(inputs.esr ?? 1),
         globalHealth: Number(inputs.globalHealth ?? 0),
+      }),
+  },
+  {
+    id: 'apri',
+    title: 'APRI Score',
+    shortTitle: 'APRI',
+    emoji: 'APRI',
+    description: 'AST to Platelet Ratio Index',
+    category: 'liver',
+    icon: 'Activity',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+    tags: ['APRI', 'AST', 'platelets', 'fibrosis', 'liver'],
+    inputs: [],
+    calculate: (inputs) =>
+      calculateAPRI({
+        ast: Number(inputs.ast ?? 0),
+        astUpperLimit: Number(inputs.astUpperLimit ?? 1),
+        platelets: Number(inputs.platelets ?? 1),
+        plateletUnit: (inputs.plateletUnit as '10^9/L' | '10^3/uL') ?? '10^9/L',
       }),
   },
   {
