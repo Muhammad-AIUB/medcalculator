@@ -15,6 +15,7 @@ const EddForm         = dynamic(() => import('@/components/calculators/edd-form'
 const SofaForm        = dynamic(() => import('@/components/calculators/sofa-form').then(m => ({ default: m.SofaForm })), { ssr: false });
 const Sofa2Form       = dynamic(() => import('@/components/calculators/sofa-2-form').then(m => ({ default: m.Sofa2Form })), { ssr: false });
 const GcsForm         = dynamic(() => import('@/components/calculators/gcs-form').then(m => ({ default: m.GcsForm })), { ssr: false });
+const AihForm         = dynamic(() => import('@/components/calculators/aih-form').then(m => ({ default: m.AihForm })), { ssr: false });
 const VasopressorForm = dynamic(() => import('@/components/calculators/vasopressor-form').then(m => ({ default: m.VasopressorForm })), { ssr: false });
 const TsatForm        = dynamic(() => import('@/components/calculators/tsat-form').then(m => ({ default: m.TsatForm })), { ssr: false });
 
@@ -27,6 +28,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   sofa:         SofaForm,
   'sofa-2':     Sofa2Form,
   gcs:          GcsForm,
+  aih:          AihForm,
   vasopressor:  VasopressorForm,
   tsat:         TsatForm,
 };
@@ -38,6 +40,7 @@ const FORMULA_MAP: Record<string, string> = {
   'child-pugh': 'Addition of assigned points.',
   sofa:         'SOFA = Coagulation + CNS + Liver + Cardiovascular + Renal (each 0-4 pts)',
   'sofa-2':     'SOFA-2 Score = sum of all component points.',
+  aih:          'Addition of assigned points.',
   vasopressor:  'VIS = Dopamine + Dobutamine + (Epinephrine x 100) + (Norepinephrine x 100) + (Vasopressin x 2.5) + (Milrinone x 10) + Phenylephrine',
   tsat:         'TS = (Fe / TIBC) * 100',
   gcs:          'GCS = Eye (1-4) + Verbal (1-5) + Motor (1-6)',

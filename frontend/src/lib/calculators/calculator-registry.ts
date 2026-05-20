@@ -7,6 +7,7 @@ import { calculateEDD } from './edd'
 import { calculateSOFA } from './sofa'
 import { calculateSOFA2 } from './sofa-2'
 import { calculateGCS } from './gcs'
+import { calculateAIH } from './aih'
 import { calculateVasopressor } from './vasopressor'
 import { calculateTSAT } from './tsat'
 
@@ -188,6 +189,28 @@ export const CALCULATORS: Calculator[] = [
         creatinineUnit: String(inputs.creatinineUnit ?? 'mg/dL'),
         sodium: Number(inputs.sodium),
         onDialysis: Boolean(inputs.onDialysis),
+      }),
+  },
+  {
+    id: 'aih',
+    title: 'AIH Score',
+    shortTitle: 'AIH',
+    emoji: 'AIH',
+    description: 'Autoimmune Hepatitis Score',
+    category: 'liver',
+    icon: 'ClipboardCheck',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50 dark:bg-emerald-950',
+    tags: ['AIH', 'autoimmune hepatitis', 'hepatology', 'liver'],
+    inputs: [],
+    calculate: (inputs) =>
+      calculateAIH({
+        anaSma: Number(inputs.anaSma ?? 1),
+        lkm1: Number(inputs.lkm1 ?? 0),
+        sla: Number(inputs.sla ?? 0),
+        igg: Number(inputs.igg ?? 0),
+        histology: Number(inputs.histology ?? 1),
+        viralHepatitis: Number(inputs.viralHepatitis ?? 0),
       }),
   },
   {
