@@ -46,6 +46,7 @@ const QtcForm               = dynamic(() => import('@/components/calculators/qtc
 const MapForm               = dynamic(() => import('@/components/calculators/map-form').then(m => ({ default: m.MapForm })), { ssr: false });
 const CardiacOutputForm     = dynamic(() => import('@/components/calculators/cardiac-output-form').then(m => ({ default: m.CardiacOutputForm })), { ssr: false });
 const LdlForm               = dynamic(() => import('@/components/calculators/ldl-form').then(m => ({ default: m.LdlForm })), { ssr: false });
+const WellsPeForm           = dynamic(() => import('@/components/calculators/wells-pe-form').then(m => ({ default: m.WellsPeForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -87,6 +88,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   map:                 MapForm,
   'cardiac-output':    CardiacOutputForm,
   ldl:                 LdlForm,
+  'wells-pe':          WellsPeForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -127,6 +129,7 @@ const FORMULA_MAP: Record<string, string> = {
   map:                 'MAP = 1/3 x SBP + 2/3 x DBP',
   'cardiac-output':    'BSA = sqrt((Height cm x Weight kg) / 3600)\nVO2 = 125 x BSA  (or 110 x BSA if age >= 70)\n\nCO (L/min) = VO2 / [(SaO2 - SvO2) x Hb x 13.4]\nCI (L/min/m2) = CO / BSA\nSV (mL/beat) = CO / HR x 1000\n\nSaO2 and SvO2 as decimals (auto-converted from %)',
   ldl:                 'LDL (mg/dL) = Total Cholesterol (mg/dL) - HDL (mg/dL) - Triglycerides (mg/dL) / 5\n\nNote: Friedewald equation — not valid when Triglycerides > 400 mg/dL',
+  'wells-pe':          'Addition of selected points:\n\nClinical signs/symptoms of DVT: +3\nPE is #1 diagnosis or equally likely: +3\nHeart rate > 100: +1.5\nImmobilization >=3 days or surgery in past 4 weeks: +1.5\nPrevious objectively diagnosed PE or DVT: +1.5\nHemoptysis: +1\nMalignancy (treatment within 6 months or palliative): +1\n\nThree-Tier: 0-1 Low | 2-6 Moderate | >6 High\nTwo-Tier: <=4 PE Unlikely (D-dimer) | >=5 PE Likely (CTPA)',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
 };

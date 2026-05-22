@@ -38,6 +38,7 @@ import { calculateQTc } from './qtc'
 import { calculateMAP } from './map'
 import { calculateCardiacOutput } from './cardiac-output'
 import { calculateLDL } from './ldl'
+import { calculateWellsPE } from './wells-pe'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -902,6 +903,38 @@ export const CALCULATORS: Calculator[] = [
         unit: '',
         severity: result.severity,
         label: 'Kt/V',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'wells-pe',
+    title: "Wells' Criteria for Pulmonary Embolism",
+    shortTitle: "Wells' PE",
+    emoji: '🫁',
+    description: 'Stratifies PE probability using clinical criteria; guides D-dimer or CTPA decision',
+    category: 'critical-care',
+    icon: 'Wind',
+    color: 'text-sky-600',
+    bgColor: 'bg-sky-50',
+    tags: ["Wells", 'pulmonary embolism', 'PE', 'DVT', 'D-dimer', 'CTPA', 'thrombosis'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateWellsPE({
+        dvtSigns:       Number(inputs.dvtSigns)       as 0|3,
+        pe1stDiagnosis: Number(inputs.pe1st)          as 0|3,
+        heartRate100:   Number(inputs.heartRate)      as 0|1.5,
+        immobilization: Number(inputs.immobilization) as 0|1.5,
+        previousPeDvt:  Number(inputs.previousPeDvt)  as 0|1.5,
+        hemoptysis:     Number(inputs.hemoptysis)     as 0|1,
+        malignancy:     Number(inputs.malignancy)     as 0|1,
+      });
+      return {
+        calculatorId: 'wells-pe',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: "Wells' PE Score",
         interpretation: result.interpretation,
       };
     },
