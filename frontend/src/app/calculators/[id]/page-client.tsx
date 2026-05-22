@@ -61,6 +61,7 @@ const IpssRForm                    = dynamic(() => import('@/components/calculat
 const IpssForm                     = dynamic(() => import('@/components/calculators/ipss-form').then(m => ({ default: m.IpssForm })), { ssr: false });
 const BloodVolumeForm              = dynamic(() => import('@/components/calculators/blood-volume-form').then(m => ({ default: m.BloodVolumeForm })), { ssr: false });
 const CciForm                      = dynamic(() => import('@/components/calculators/cci-form').then(m => ({ default: m.CciForm })), { ssr: false });
+const PlasmaDosageForm             = dynamic(() => import('@/components/calculators/plasma-dosage-form').then(m => ({ default: m.PlasmaDosageForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -117,6 +118,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   ipss:                       IpssForm,
   'blood-volume':             BloodVolumeForm,
   cci:                        CciForm,
+  'plasma-dosage':            PlasmaDosageForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -167,6 +169,7 @@ const FORMULA_MAP: Record<string, string> = {
   'calcium-correction':   'Corrected Calcium (mg/dL) = (0.8 × (Normal Albumin − Patient Albumin)) + Serum Ca\n\nNote: formula uses albumin in g/dL and calcium in mg/dL\nNormal albumin reference: 4 g/dL (40 g/L)\n\n< 8.5 mg/dL:  Hypocalcaemia\n8.5–10.5:     Normal\n> 10.5 mg/dL: Hypercalcaemia',
   flipi:                  'Addition of the selected points (each +1):\n\nAge >60 years\n>4 nodal sites\nLDH elevated\nHemoglobin <120 g/L (12 g/dL)\nStage III–IV\n\n0–1: Low Risk (~71% 10-yr OS)\n2:   Intermediate Risk (~51% 10-yr OS)\n3–5: High Risk (~36% 10-yr OS)',
   cci:                    'CCI = Count Increment (×10⁹/L) × BSA (m²) / Unit Content (×10¹¹) × 1000\n\nBSA (Mosteller) = √(Height cm × Weight kg / 3600)\n\n1-hour CCI ≥ 7,500:  Adequate response\n1-hour CCI < 7,500:  Poor response\n20-hour CCI ≥ 4,500: Adequate response\n20-hour CCI < 4,500: Poor response (platelet refractoriness)',
+  'plasma-dosage':        'Total plasma dosage (mL) = Desired dosage (mL/kg) × Weight (kg)\n\nUnits needed = ⌈Total mL / Unit volume mL⌉\n\nStandard dose: 10 mL/kg\nRange: 10–20 mL/kg\nExpected effect: ~20% increase in coagulation factors immediately after infusion',
   'blood-volume':         'Adults / Children ≥25 kg (Nadler formula):\nMale:   TBV (L) = 0.3669 × H(m)³ + 0.03219 × W(kg) + 0.6041\nFemale: TBV (L) = 0.3561 × H(m)³ + 0.03308 × W(kg) + 0.1833\n\nNeonates / Children <25 kg:\nPreterm neonate: 100 mL/kg\nTerm neonate:    85 mL/kg\nInfant 1-4 mo:   75 mL/kg\nChild <25 kg:    70 mL/kg\n\nRBC Volume (mL)   = TBV × Hct / 100\nPlasma Volume (mL) = TBV × (1 − Hct / 100)',
   'ipss-r':               'Addition of the selected points:\n\nCytogenetic group: Very good 0 | Good +1 | Intermediate +2 | Poor +3 | Very poor +4\nMedullary blasts %: ≤2→0, >2 to <5→+1, 5–10→+2, >10→+3\nHemoglobin (g/dL): ≥10→0, 8–<10→+1, <8→+1.5\nPlatelets (×10³/µL): ≥100→0, 50–<100→+0.5, <50→+1\nANC (×10³/µL): ≥0.8→0, <0.8→+0.5\n\n≤1.5: Very Low | >1.5–3: Low | >3–4.5: Intermediate | >4.5–6: High | >6: Very High',
   ipss:                   'Addition of the selected points:\n\nKaryotype: Good→0, Intermediate→+0.5, Poor→+1\nMarrow blasts %: <5→0, 5–10→+0.5, 11–20→+1.5, 21–30→+2\nNumber of cytopenias: 0–1→0, 2–3→+0.5\n\n0: Low | 0.5–1.0: INT-1 | 1.5–2.0: INT-2 | ≥2.5: High',

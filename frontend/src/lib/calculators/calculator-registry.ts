@@ -53,6 +53,7 @@ import { calculateIpssR } from './ipss-r'
 import { calculateIPSS } from './ipss'
 import { calculateBloodVolume } from './blood-volume'
 import { calculateCCI } from './cci'
+import { calculatePlasmaDosage } from './plasma-dosage'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1255,6 +1256,38 @@ export const CALCULATORS: Calculator[] = [
         unit: 'mg/g',
         severity: result.severity,
         label: 'ACR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'plasma-dosage',
+    title: 'Plasma Dosage (FFP)',
+    shortTitle: 'Plasma Dosage',
+    emoji: '🩸',
+    description: 'Calculates total FFP volume and number of units required based on patient weight and desired dosage',
+    category: 'hematology',
+    icon: 'Droplets',
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50',
+    tags: ['FFP', 'fresh frozen plasma', 'plasma dosage', 'transfusion', 'coagulation', 'hematology'],
+    inputs: [
+      { id: 'weightKg',     label: 'Patient weight (kg)',         type: 'number', required: true, min: 1,  max: 300 },
+      { id: 'dosageMlKg',   label: 'Desired plasma dosage (mL/kg)', type: 'number', required: true, min: 1, max: 30  },
+      { id: 'unitVolumeMl', label: 'Unit volume (mL)',            type: 'number', required: true, min: 50, max: 500 },
+    ],
+    calculate: (inputs) => {
+      const result = calculatePlasmaDosage({
+        weightKg:     Number(inputs.weightKg),
+        dosageMlKg:   Number(inputs.dosageMlKg),
+        unitVolumeMl: Number(inputs.unitVolumeMl),
+      });
+      return {
+        calculatorId: 'plasma-dosage',
+        score: result.totalMl,
+        unit: 'mL',
+        severity: result.severity,
+        label: 'Total Plasma Dosage',
         interpretation: result.interpretation,
       };
     },
