@@ -52,6 +52,7 @@ import { calculateCllIpi } from './cll-ipi'
 import { calculateIpssR } from './ipss-r'
 import { calculateIPSS } from './ipss'
 import { calculateBloodVolume } from './blood-volume'
+import { calculateCCI } from './cci'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1254,6 +1255,37 @@ export const CALCULATORS: Calculator[] = [
         unit: 'mg/g',
         severity: result.severity,
         label: 'ACR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'cci',
+    title: 'Corrected Count Increment (CCI)',
+    shortTitle: 'CCI',
+    emoji: '🩸',
+    description: 'Assesses platelet transfusion response using corrected count increment to detect refractoriness',
+    category: 'hematology',
+    icon: 'Droplets',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['CCI', 'platelet', 'transfusion', 'refractoriness', 'BSA', 'hematology', 'oncology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateCCI({
+        prePlt:      Number(inputs.prePlt),
+        postPlt:     Number(inputs.postPlt),
+        timeHour:    Number(inputs.timeHour) as 1|20,
+        heightCm:    Number(inputs.heightCm),
+        weightKg:    Number(inputs.weightKg),
+        unitContent: Number(inputs.unitContent),
+      });
+      return {
+        calculatorId: 'cci',
+        score: result.cci,
+        unit: '',
+        severity: result.severity,
+        label: 'CCI',
         interpretation: result.interpretation,
       };
     },
