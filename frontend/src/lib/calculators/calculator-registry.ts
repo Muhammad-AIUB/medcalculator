@@ -35,6 +35,7 @@ import { calculateHasBled } from './has-bled'
 import { calculateTimiUaNstemi } from './timi-ua-nstemi'
 import { calculateGrace } from './grace'
 import { calculateQTc } from './qtc'
+import { calculateMAP } from './map'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -905,6 +906,33 @@ export const CALCULATORS: Calculator[] = [
   },
 ]
 
+  {
+    id: 'map',
+    title: 'Mean Arterial Pressure (MAP)',
+    shortTitle: 'MAP',
+    emoji: '🩺',
+    description: 'Calculates mean arterial pressure from systolic and diastolic blood pressure',
+    category: 'critical-care',
+    icon: 'HeartPulse',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['MAP', 'mean arterial pressure', 'blood pressure', 'hemodynamics', 'critical care'],
+    inputs: [
+      { id: 'sbp', label: 'Systolic BP (mm Hg)',  type: 'number', required: true, min: 40,  max: 300 },
+      { id: 'dbp', label: 'Diastolic BP (mm Hg)', type: 'number', required: true, min: 20,  max: 200 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateMAP({ sbp: Number(inputs.sbp), dbp: Number(inputs.dbp) });
+      return {
+        calculatorId: 'map',
+        score: result.map,
+        unit: 'mm Hg',
+        severity: result.severity,
+        label: 'MAP',
+        interpretation: result.interpretation,
+      };
+    },
+  },
   {
     id: 'qtc',
     title: 'Corrected QT Interval (QTc)',

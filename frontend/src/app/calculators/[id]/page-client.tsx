@@ -43,6 +43,7 @@ const HasBledForm           = dynamic(() => import('@/components/calculators/has
 const TimiUaNstemiForm      = dynamic(() => import('@/components/calculators/timi-ua-nstemi-form').then(m => ({ default: m.TimiUaNstemiForm })), { ssr: false });
 const GraceForm             = dynamic(() => import('@/components/calculators/grace-form').then(m => ({ default: m.GraceForm })), { ssr: false });
 const QtcForm               = dynamic(() => import('@/components/calculators/qtc-form').then(m => ({ default: m.QtcForm })), { ssr: false });
+const MapForm               = dynamic(() => import('@/components/calculators/map-form').then(m => ({ default: m.MapForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -81,6 +82,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   'timi-ua-nstemi':    TimiUaNstemiForm,
   grace:               GraceForm,
   qtc:                 QtcForm,
+  map:                 MapForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -118,6 +120,7 @@ const FORMULA_MAP: Record<string, string> = {
   'timi-ua-nstemi':    'Addition of the selected points (each +1):\n\nAge >=65\n>=3 CAD risk factors (hypertension, hypercholesterolemia, diabetes, family history of CAD, or current smoker)\nKnown CAD (stenosis >=50%)\nASA use in past 7 days\nSevere angina (>=2 episodes in 24 hrs)\nEKG ST changes >=0.5mm\nPositive cardiac marker',
   grace:               'Nomogram (Fox Model) — point-based sum:\nAge + Heart rate + Systolic BP + Creatinine + Killip class + Cardiac arrest + ST deviation + Abnormal enzymes\n\nScore  | 6-month mortality\n0-87   | 0-2%\n88-128 | 3-10%\n129-149| 10-20%\n150-173| 20-30%\n174-182| 40%\n183-190| 50%\n191-199| 60%\n200-207| 70%\n208-218| 80%\n219-284| 90%\n>=285  | 99%',
   qtc:                 'RR interval = 60 / HR\n\nBazett:     QTc = QT / sqrt(RR)\nFridericia: QTc = QT / RR^(1/3)\nFramingham: QTc = QT + 154 x (1 - RR)\nHodges:     QTc = QT + 1.75 x (HR - 60)\nRautaharju: QTc = QT x (120 + HR) / 180\n\nQT and RR in seconds for Bazett/Fridericia; QT in ms for others',
+  map:                 'MAP = 1/3 x SBP + 2/3 x DBP',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
 };
