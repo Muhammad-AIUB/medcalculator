@@ -54,6 +54,7 @@ const CorrectedReticulocyteForm    = dynamic(() => import('@/components/calculat
 const AncForm                      = dynamic(() => import('@/components/calculators/anc-form').then(m => ({ default: m.AncForm })), { ssr: false });
 const MentzerIndexForm             = dynamic(() => import('@/components/calculators/mentzer-index-form').then(m => ({ default: m.MentzerIndexForm })), { ssr: false });
 const CalciumCorrectionForm        = dynamic(() => import('@/components/calculators/calcium-correction-form').then(m => ({ default: m.CalciumCorrectionForm })), { ssr: false });
+const WellsDvtForm                 = dynamic(() => import('@/components/calculators/wells-dvt-form').then(m => ({ default: m.WellsDvtForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -103,6 +104,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   anc:                        AncForm,
   'mentzer-index':            MentzerIndexForm,
   'calcium-correction':       CalciumCorrectionForm,
+  'wells-dvt':                WellsDvtForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -151,6 +153,7 @@ const FORMULA_MAP: Record<string, string> = {
   anc:                 'ANC = 10 × WBC count (×10³/µL) × (% PMNs + % bands)\n\nANC ≥ 1500 cells/µL: Normal\nANC 1000–1499:       Mild neutropenia\nANC 500–999:         Moderate neutropenia\nANC < 500:           Severe neutropenia',
   'mentzer-index':        'Mentzer Index = MCV (fL) / RBC count (10⁶/µL)\n\n< 13: Thalassaemia trait likely\n= 13: Indeterminate\n> 13: Iron deficiency anaemia likely',
   'calcium-correction':   'Corrected Calcium (mg/dL) = (0.8 × (Normal Albumin − Patient Albumin)) + Serum Ca\n\nNote: formula uses albumin in g/dL and calcium in mg/dL\nNormal albumin reference: 4 g/dL (40 g/L)\n\n< 8.5 mg/dL:  Hypocalcaemia\n8.5–10.5:     Normal\n> 10.5 mg/dL: Hypercalcaemia',
+  'wells-dvt':            'Addition of the selected points:\n\nActive cancer (treatment/palliation within 6 months): +1\nBedridden >3 days or major surgery within 12 weeks: +1\nCalf swelling >3 cm vs other leg: +1\nCollateral (nonvaricose) superficial veins: +1\nEntire leg swollen: +1\nLocalized tenderness along deep venous system: +1\nPitting edema, confined to symptomatic leg: +1\nParalysis, paresis, or recent plaster immobilization: +1\nPreviously documented DVT: +1\nAlternative diagnosis as likely or more likely: -2\n\n≤ 0: Low probability\n1–2: Moderate probability\n≥ 3: High probability',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
 };

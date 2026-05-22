@@ -46,6 +46,7 @@ import { calculateCorrectedReticulocyte } from './corrected-reticulocyte'
 import { calculateANC } from './anc'
 import { calculateMentzerIndex } from './mentzer-index'
 import { calculateCalciumCorrection } from './calcium-correction'
+import { calculateWellsDvt } from './wells-dvt'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1248,6 +1249,41 @@ export const CALCULATORS: Calculator[] = [
         unit: 'mg/g',
         severity: result.severity,
         label: 'ACR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'wells-dvt',
+    title: "Wells' Criteria for DVT",
+    shortTitle: "Wells' DVT",
+    emoji: '🩺',
+    description: 'Stratifies pre-test probability of deep vein thrombosis using 10 clinical criteria',
+    category: 'critical-care',
+    icon: 'HeartPulse',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ["Wells", 'DVT', 'deep vein thrombosis', 'thrombosis', 'D-dimer', 'ultrasound', 'hematology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateWellsDvt({
+        activeCancer:     Number(inputs.activeCancer)    as 0|1,
+        bedridden:        Number(inputs.bedridden)       as 0|1,
+        calfSwelling:     Number(inputs.calfSwelling)    as 0|1,
+        collateralVeins:  Number(inputs.collateralVeins) as 0|1,
+        entireLegSwollen: Number(inputs.entireLeg)       as 0|1,
+        localTenderness:  Number(inputs.localTenderness) as 0|1,
+        pittingEdema:     Number(inputs.pittingEdema)    as 0|1,
+        paralysis:        Number(inputs.paralysis)       as 0|1,
+        priorDvt:         Number(inputs.priorDvt)        as 0|1,
+        altDiagnosis:     Number(inputs.altDiagnosis)    as 0|-2,
+      });
+      return {
+        calculatorId: 'wells-dvt',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: "Wells' DVT Score",
         interpretation: result.interpretation,
       };
     },
