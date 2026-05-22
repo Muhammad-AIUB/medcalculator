@@ -41,6 +41,9 @@ import { calculateLDL } from './ldl'
 import { calculateWellsPE } from './wells-pe'
 import { calculateShockIndex } from './shock-index'
 import { calculatePreciseDapt } from './precise-dapt'
+import { calculateDapt } from './dapt'
+import { calculateCorrectedReticulocyte } from './corrected-reticulocyte'
+import { calculateANC } from './anc'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1243,6 +1246,106 @@ export const CALCULATORS: Calculator[] = [
         unit: 'mg/g',
         severity: result.severity,
         label: 'ACR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'anc',
+    title: 'Absolute Neutrophil Count (ANC)',
+    shortTitle: 'ANC',
+    emoji: '🧪',
+    description: 'Calculates ANC from WBC count and differential to assess neutropenia severity',
+    category: 'hematology',
+    icon: 'FlaskConical',
+    color: 'text-violet-600',
+    bgColor: 'bg-violet-50',
+    tags: ['ANC', 'neutrophil', 'neutropenia', 'WBC', 'differential', 'hematology', 'CBC'],
+    inputs: [
+      { id: 'neutrophilsPct', label: '% neutrophils',     type: 'number', required: true, min: 0, max: 100 },
+      { id: 'bandsPct',       label: '% bands',           type: 'number', required: true, min: 0, max: 100 },
+      { id: 'wbcCount',       label: 'WBC count (×10³/µL)', type: 'number', required: true, min: 0, max: 100 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateANC({
+        neutrophilsPct: Number(inputs.neutrophilsPct),
+        bandsPct:       Number(inputs.bandsPct),
+        wbcCount:       Number(inputs.wbcCount),
+      });
+      return {
+        calculatorId: 'anc',
+        score: result.anc,
+        unit: 'cells/µL',
+        severity: result.severity,
+        label: 'ANC',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'corrected-reticulocyte',
+    title: 'Corrected Reticulocyte Percentage',
+    shortTitle: 'Corrected Retic',
+    emoji: '🩸',
+    description: 'Calculates corrected reticulocyte %, absolute reticulocyte count, and reticulocyte production index (RPI)',
+    category: 'hematology',
+    icon: 'Droplets',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['reticulocyte', 'corrected reticulocyte', 'RPI', 'ARC', 'anemia', 'hematology', 'hematocrit'],
+    inputs: [
+      { id: 'reticulocytePct', label: '% reticulocytes',        type: 'number', required: true, min: 0, max: 100 },
+      { id: 'rbcCount',        label: 'RBC count (×10⁶ cells/µL)', type: 'number', required: true, min: 0, max: 10 },
+      { id: 'measuredHct',     label: 'Measured hematocrit (%)', type: 'number', required: true, min: 0, max: 70 },
+      { id: 'normalHct',       label: 'Normal hematocrit (%)',   type: 'number', required: true, min: 0, max: 70 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateCorrectedReticulocyte({
+        reticulocytePct: Number(inputs.reticulocytePct),
+        rbcCount:        Number(inputs.rbcCount),
+        measuredHct:     Number(inputs.measuredHct),
+        normalHct:       Number(inputs.normalHct),
+      });
+      return {
+        calculatorId: 'corrected-reticulocyte',
+        score: result.correctedRetic,
+        unit: '%',
+        severity: result.severity,
+        label: 'Corrected Reticulocyte %',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'dapt',
+    title: 'DAPT Score',
+    shortTitle: 'DAPT',
+    emoji: '❤️',
+    description: 'Predicts net benefit of prolonged dual antiplatelet therapy after coronary stent implantation',
+    category: 'critical-care',
+    icon: 'HeartPulse',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['DAPT', 'dual antiplatelet', 'stent', 'PCI', 'ischemia', 'bleeding', 'cardiology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateDapt({
+        age:             Number(inputs.age)            as -2|-1|0,
+        smoking:         Number(inputs.smoking)         as 0|1,
+        diabetes:        Number(inputs.diabetes)        as 0|1,
+        miPresentation:  Number(inputs.miPresentation)  as 0|1,
+        priorPciMi:      Number(inputs.priorPciMi)      as 0|1,
+        paclitaxelStent: Number(inputs.paclitaxel)      as 0|1,
+        stentDiameter:   Number(inputs.stentDiam)       as 0|1,
+        chfLvef:         Number(inputs.chfLvef)         as 0|2,
+        veinGraft:       Number(inputs.veinGraft)       as 0|2,
+      });
+      return {
+        calculatorId: 'dapt',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'DAPT Score',
         interpretation: result.interpretation,
       };
     },
