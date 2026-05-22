@@ -57,6 +57,8 @@ const CalciumCorrectionForm        = dynamic(() => import('@/components/calculat
 const WellsDvtForm                 = dynamic(() => import('@/components/calculators/wells-dvt-form').then(m => ({ default: m.WellsDvtForm })), { ssr: false });
 const FlipIForm                    = dynamic(() => import('@/components/calculators/flipi-form').then(m => ({ default: m.FlipIForm })), { ssr: false });
 const CllIpiForm                   = dynamic(() => import('@/components/calculators/cll-ipi-form').then(m => ({ default: m.CllIpiForm })), { ssr: false });
+const IpssRForm                    = dynamic(() => import('@/components/calculators/ipss-r-form').then(m => ({ default: m.IpssRForm })), { ssr: false });
+const IpssForm                     = dynamic(() => import('@/components/calculators/ipss-form').then(m => ({ default: m.IpssForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -109,6 +111,8 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   'wells-dvt':                WellsDvtForm,
   flipi:                      FlipIForm,
   'cll-ipi':                  CllIpiForm,
+  'ipss-r':                   IpssRForm,
+  ipss:                       IpssForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -158,6 +162,8 @@ const FORMULA_MAP: Record<string, string> = {
   'mentzer-index':        'Mentzer Index = MCV (fL) / RBC count (10⁶/µL)\n\n< 13: Thalassaemia trait likely\n= 13: Indeterminate\n> 13: Iron deficiency anaemia likely',
   'calcium-correction':   'Corrected Calcium (mg/dL) = (0.8 × (Normal Albumin − Patient Albumin)) + Serum Ca\n\nNote: formula uses albumin in g/dL and calcium in mg/dL\nNormal albumin reference: 4 g/dL (40 g/L)\n\n< 8.5 mg/dL:  Hypocalcaemia\n8.5–10.5:     Normal\n> 10.5 mg/dL: Hypercalcaemia',
   flipi:                  'Addition of the selected points (each +1):\n\nAge >60 years\n>4 nodal sites\nLDH elevated\nHemoglobin <120 g/L (12 g/dL)\nStage III–IV\n\n0–1: Low Risk (~71% 10-yr OS)\n2:   Intermediate Risk (~51% 10-yr OS)\n3–5: High Risk (~36% 10-yr OS)',
+  'ipss-r':               'Addition of the selected points:\n\nCytogenetic group: Very good 0 | Good +1 | Intermediate +2 | Poor +3 | Very poor +4\nMedullary blasts %: ≤2→0, >2 to <5→+1, 5–10→+2, >10→+3\nHemoglobin (g/dL): ≥10→0, 8–<10→+1, <8→+1.5\nPlatelets (×10³/µL): ≥100→0, 50–<100→+0.5, <50→+1\nANC (×10³/µL): ≥0.8→0, <0.8→+0.5\n\n≤1.5: Very Low | >1.5–3: Low | >3–4.5: Intermediate | >4.5–6: High | >6: Very High',
+  ipss:                   'Addition of the selected points:\n\nKaryotype: Good→0, Intermediate→+0.5, Poor→+1\nMarrow blasts %: <5→0, 5–10→+0.5, 11–20→+1.5, 21–30→+2\nNumber of cytopenias: 0–1→0, 2–3→+0.5\n\n0: Low | 0.5–1.0: INT-1 | 1.5–2.0: INT-2 | ≥2.5: High',
   'cll-ipi':              'Addition of the selected criteria:\n\nAge >65 years: +1\nBinet B-C or Rai I-IV: +1\nSerum β2-microglobulin >3.5 mg/L: +2\nIGHV unmutated: +2\nDeletion 17p and/or TP53 mutation: +4\n\n0–1: Low (~93% 5-yr OS)\n2–3: Intermediate (~79% 5-yr OS)\n4–6: High (~64% 5-yr OS)\n7–10: Very High (~23% 5-yr OS)',
   'wells-dvt':            'Addition of the selected points:\n\nActive cancer (treatment/palliation within 6 months): +1\nBedridden >3 days or major surgery within 12 weeks: +1\nCalf swelling >3 cm vs other leg: +1\nCollateral (nonvaricose) superficial veins: +1\nEntire leg swollen: +1\nLocalized tenderness along deep venous system: +1\nPitting edema, confined to symptomatic leg: +1\nParalysis, paresis, or recent plaster immobilization: +1\nPreviously documented DVT: +1\nAlternative diagnosis as likely or more likely: -2\n\n≤ 0: Low probability\n1–2: Moderate probability\n≥ 3: High probability',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',

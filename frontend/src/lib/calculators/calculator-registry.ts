@@ -49,6 +49,8 @@ import { calculateCalciumCorrection } from './calcium-correction'
 import { calculateWellsDvt } from './wells-dvt'
 import { calculateFLIPI } from './flipi'
 import { calculateCllIpi } from './cll-ipi'
+import { calculateIpssR } from './ipss-r'
+import { calculateIPSS } from './ipss'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1251,6 +1253,64 @@ export const CALCULATORS: Calculator[] = [
         unit: 'mg/g',
         severity: result.severity,
         label: 'ACR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'ipss-r',
+    title: 'IPSS-R for MDS',
+    shortTitle: 'IPSS-R',
+    emoji: '🩸',
+    description: 'Revised International Prognostic Scoring System for myelodysplastic syndromes — 5 weighted criteria',
+    category: 'hematology',
+    icon: 'FlaskConical',
+    color: 'text-violet-600',
+    bgColor: 'bg-violet-50',
+    tags: ['IPSS-R', 'MDS', 'myelodysplastic', 'prognosis', 'cytogenetics', 'hematology', 'oncology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateIpssR({
+        cytogenetics: Number(inputs.cytogenetics) as 0|1|2|3|4,
+        blasts:       Number(inputs.blasts)       as 0|1|2|3,
+        hemoglobin:   Number(inputs.hemoglobin)   as 0|1|1.5,
+        platelets:    Number(inputs.platelets)    as 0|0.5|1,
+        anc:          Number(inputs.anc)          as 0|0.5,
+      });
+      return {
+        calculatorId: 'ipss-r',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'IPSS-R Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'ipss',
+    title: 'IPSS for MDS (Original)',
+    shortTitle: 'IPSS',
+    emoji: '🩸',
+    description: 'Original International Prognostic Scoring System for myelodysplastic syndromes — karyotype, blasts, cytopenias',
+    category: 'hematology',
+    icon: 'FlaskConical',
+    color: 'text-violet-600',
+    bgColor: 'bg-violet-50',
+    tags: ['IPSS', 'MDS', 'myelodysplastic', 'prognosis', 'karyotype', 'hematology', 'oncology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateIPSS({
+        karyotype:  Number(inputs.karyotype)  as 0|0.5|1,
+        blasts:     Number(inputs.blasts)     as 0|0.5|1.5|2,
+        cytopenias: Number(inputs.cytopenias) as 0|0.5,
+      });
+      return {
+        calculatorId: 'ipss',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'IPSS Score',
         interpretation: result.interpretation,
       };
     },
