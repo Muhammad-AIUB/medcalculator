@@ -28,6 +28,7 @@ import { calculateFENa } from './fena'
 import { calculateAnionGap } from './anion-gap'
 import { calculateWintersFormula } from './winters-formula'
 import { calculateKtV } from './ktv'
+import { calculateURR } from './urr'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -892,6 +893,35 @@ export const CALCULATORS: Calculator[] = [
         unit: '',
         severity: result.severity,
         label: 'Kt/V',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+]
+
+  {
+    id: 'urr',
+    title: 'Urea Reduction Ratio (URR)',
+    shortTitle: 'URR',
+    emoji: '🩺',
+    description: 'Calculates URR to assess hemodialysis adequacy from pre- and post-dialysis urea levels',
+    category: 'renal',
+    icon: 'Droplets',
+    color: 'text-teal-600',
+    bgColor: 'bg-teal-50',
+    tags: ['URR', 'urea reduction ratio', 'dialysis', 'hemodialysis', 'adequacy', 'KDOQI'],
+    inputs: [
+      { id: 'upre',  label: 'Pre-dialysis Urea (mg/dL)',  type: 'number', required: true, min: 1, max: 500 },
+      { id: 'upost', label: 'Post-dialysis Urea (mg/dL)', type: 'number', required: true, min: 1, max: 500 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateURR({ upre: Number(inputs.upre), upost: Number(inputs.upost) });
+      return {
+        calculatorId: 'urr',
+        score: result.urr,
+        unit: '%',
+        severity: result.severity,
+        label: 'URR',
         interpretation: result.interpretation,
       };
     },
