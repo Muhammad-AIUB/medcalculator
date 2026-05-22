@@ -744,17 +744,16 @@ export const CALCULATORS: Calculator[] = [
     bgColor: 'bg-cyan-50',
     tags: ['osmolar gap', 'toxic alcohol', 'methanol', 'ethylene glycol', 'toxicology'],
     inputs: [
-      { id: 'measuredOsm', label: 'Measured Osmolality', type: 'number', required: true, min: 200, max: 400 },
-      { id: 'sodium', label: 'Sodium', type: 'number', required: true, min: 100, max: 200 },
-      { id: 'bun', label: 'BUN', type: 'number', required: true, min: 1, max: 300 },
-      { id: 'glucose', label: 'Glucose', type: 'number', required: true, min: 1, max: 2000 },
+      { id: 'measuredOsm', label: 'Measured Stool Osmolality (mOsm/kg)', type: 'number', required: false, min: 100, max: 400 },
+      { id: 'sodium',      label: 'Stool Sodium (mEq/L)',                 type: 'number', required: true,  min: 0,   max: 200 },
+      { id: 'potassium',   label: 'Stool Potassium (mEq/L)',              type: 'number', required: true,  min: 0,   max: 200 },
     ],
     calculate: (inputs) =>
       calculateOsmolarGap({
-        measuredOsm: Number(inputs.measuredOsm),
-        sodium: Number(inputs.sodium),
-        bun: Number(inputs.bun),
-        glucose: Number(inputs.glucose),
+        method:      inputs.measuredOsm ? 'measured' : 'assumed',
+        measuredOsm: inputs.measuredOsm ? Number(inputs.measuredOsm) : undefined,
+        sodium:      Number(inputs.sodium),
+        potassium:   Number(inputs.potassium),
       }),
   },
   {
