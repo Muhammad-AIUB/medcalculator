@@ -37,6 +37,7 @@ import { calculateGrace } from './grace'
 import { calculateQTc } from './qtc'
 import { calculateMAP } from './map'
 import { calculateCardiacOutput } from './cardiac-output'
+import { calculateLDL } from './ldl'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -901,6 +902,38 @@ export const CALCULATORS: Calculator[] = [
         unit: '',
         severity: result.severity,
         label: 'Kt/V',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'ldl',
+    title: 'LDL Cholesterol (Friedewald)',
+    shortTitle: 'LDL',
+    emoji: '🩸',
+    description: 'Calculates LDL cholesterol from total cholesterol, HDL, and triglycerides using Friedewald equation',
+    category: 'nutrition',
+    icon: 'TestTube',
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50',
+    tags: ['LDL', 'cholesterol', 'HDL', 'triglycerides', 'Friedewald', 'lipids', 'cardiovascular'],
+    inputs: [
+      { id: 'tcMgDl',  label: 'Total Cholesterol (mg/dL)', type: 'number', required: true, min: 0, max: 800  },
+      { id: 'hdlMgDl', label: 'HDL Cholesterol (mg/dL)',   type: 'number', required: true, min: 0, max: 200  },
+      { id: 'tgMgDl',  label: 'Triglycerides (mg/dL)',     type: 'number', required: true, min: 0, max: 4500 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateLDL({
+        tcMgDl:  Number(inputs.tcMgDl),
+        hdlMgDl: Number(inputs.hdlMgDl),
+        tgMgDl:  Number(inputs.tgMgDl),
+      });
+      return {
+        calculatorId: 'ldl',
+        score: result.ldlMgDl,
+        unit: 'mg/dL',
+        severity: result.severity,
+        label: 'LDL Cholesterol',
         interpretation: result.interpretation,
       };
     },
