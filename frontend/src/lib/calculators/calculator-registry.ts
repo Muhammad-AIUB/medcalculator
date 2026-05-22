@@ -32,6 +32,7 @@ import { calculateURR } from './urr'
 import { calculateACR } from './acr'
 import { calculateCha2ds2Vasc } from './cha2ds2-vasc'
 import { calculateHasBled } from './has-bled'
+import { calculateTimiUaNstemi } from './timi-ua-nstemi'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -902,6 +903,38 @@ export const CALCULATORS: Calculator[] = [
   },
 ]
 
+  {
+    id: 'timi-ua-nstemi',
+    title: 'TIMI Risk Score for UA/NSTEMI',
+    shortTitle: 'TIMI UA/NSTEMI',
+    emoji: '❤️',
+    description: 'Predicts 14-day risk of adverse cardiac events in unstable angina and NSTEMI',
+    category: 'critical-care',
+    icon: 'HeartPulse',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['TIMI', 'UA', 'NSTEMI', 'ACS', 'chest pain', 'cardiology', 'risk score'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateTimiUaNstemi({
+        age65:          Number(inputs.age65)          as 0|1,
+        cadRiskFactors: Number(inputs.cadRiskFactors) as 0|1,
+        knownCAD:       Number(inputs.knownCAD)       as 0|1,
+        asaUse:         Number(inputs.asaUse)         as 0|1,
+        severeAngina:   Number(inputs.severeAngina)   as 0|1,
+        stChanges:      Number(inputs.stChanges)      as 0|1,
+        cardiacMarker:  Number(inputs.cardiacMarker)  as 0|1,
+      });
+      return {
+        calculatorId: 'timi-ua-nstemi',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'TIMI Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
   {
     id: 'has-bled',
     title: 'HAS-BLED Score for Major Bleeding Risk',

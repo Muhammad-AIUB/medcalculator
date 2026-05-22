@@ -40,6 +40,7 @@ const UrrForm               = dynamic(() => import('@/components/calculators/urr
 const AcrForm               = dynamic(() => import('@/components/calculators/acr-form').then(m => ({ default: m.AcrForm })), { ssr: false });
 const Cha2ds2VascForm       = dynamic(() => import('@/components/calculators/cha2ds2-vasc-form').then(m => ({ default: m.Cha2ds2VascForm })), { ssr: false });
 const HasBledForm           = dynamic(() => import('@/components/calculators/has-bled-form').then(m => ({ default: m.HasBledForm })), { ssr: false });
+const TimiUaNstemiForm      = dynamic(() => import('@/components/calculators/timi-ua-nstemi-form').then(m => ({ default: m.TimiUaNstemiForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -75,6 +76,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   acr:                 AcrForm,
   'cha2ds2-vasc':      Cha2ds2VascForm,
   'has-bled':          HasBledForm,
+  'timi-ua-nstemi':    TimiUaNstemiForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -109,6 +111,7 @@ const FORMULA_MAP: Record<string, string> = {
   acr:                 'ACR (mg/g) = Albumin (mg/dL) / Creatinine (g/dL)',
   'cha2ds2-vasc':      'Addition of the selected points:\n\nAge <65: 0 | 65-74: +1 | >=75: +2\nSex female: +1\nCHF history: +1\nHypertension history: +1\nStroke/TIA/thromboembolism history: +2\nVascular disease history: +1\nDiabetes history: +1',
   'has-bled':          'Addition of the selected points (each +1):\n\nH - Hypertension (uncontrolled, >160 mmHg systolic)\nA - Abnormal renal function (dialysis, transplant, Cr >2.26 mg/dL)\nA - Abnormal liver function (cirrhosis or bilirubin >2x normal)\nS - Stroke history\nB - Bleeding history or predisposition\nL - Labile INR (time in therapeutic range <60%)\nE - Elderly (age >65)\nD - Drugs predisposing to bleeding (aspirin, clopidogrel, NSAIDs)\nD - Alcohol use (>=8 drinks/week)',
+  'timi-ua-nstemi':    'Addition of the selected points (each +1):\n\nAge >=65\n>=3 CAD risk factors (hypertension, hypercholesterolemia, diabetes, family history of CAD, or current smoker)\nKnown CAD (stenosis >=50%)\nASA use in past 7 days\nSevere angina (>=2 episodes in 24 hrs)\nEKG ST changes >=0.5mm\nPositive cardiac marker',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
 };
