@@ -47,6 +47,8 @@ import { calculateANC } from './anc'
 import { calculateMentzerIndex } from './mentzer-index'
 import { calculateCalciumCorrection } from './calcium-correction'
 import { calculateWellsDvt } from './wells-dvt'
+import { calculateFLIPI } from './flipi'
+import { calculateCllIpi } from './cll-ipi'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1249,6 +1251,66 @@ export const CALCULATORS: Calculator[] = [
         unit: 'mg/g',
         severity: result.severity,
         label: 'ACR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'flipi',
+    title: 'FLIPI Score for Follicular Lymphoma',
+    shortTitle: 'FLIPI',
+    emoji: '🩸',
+    description: 'Estimates prognosis in follicular lymphoma using 5 clinical factors',
+    category: 'hematology',
+    icon: 'FlaskConical',
+    color: 'text-violet-600',
+    bgColor: 'bg-violet-50',
+    tags: ['FLIPI', 'follicular lymphoma', 'lymphoma', 'prognosis', 'hematology', 'oncology', 'LDH'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateFLIPI({
+        age60:       Number(inputs.age60)      as 0|1,
+        nodalSites:  Number(inputs.nodalSites) as 0|1,
+        ldhElevated: Number(inputs.ldh)        as 0|1,
+        hemoglobin:  Number(inputs.hemoglobin) as 0|1,
+        stageIIIIV:  Number(inputs.stageIIIIV) as 0|1,
+      });
+      return {
+        calculatorId: 'flipi',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'FLIPI Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'cll-ipi',
+    title: 'CLL-IPI',
+    shortTitle: 'CLL-IPI',
+    emoji: '🩸',
+    description: 'International Prognostic Index for chronic lymphocytic leukaemia using 5 weighted criteria',
+    category: 'hematology',
+    icon: 'FlaskConical',
+    color: 'text-violet-600',
+    bgColor: 'bg-violet-50',
+    tags: ['CLL', 'CLL-IPI', 'chronic lymphocytic leukaemia', 'IGHV', 'TP53', 'β2-microglobulin', 'prognosis'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateCllIpi({
+        age:           Number(inputs.age)           as 0|1,
+        clinicalStage: Number(inputs.clinicalStage) as 0|1,
+        b2m:           Number(inputs.b2m)           as 0|2,
+        ighv:          Number(inputs.ighv)          as 0|2,
+        tp53:          Number(inputs.tp53)          as 0|4,
+      });
+      return {
+        calculatorId: 'cll-ipi',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'CLL-IPI Score',
         interpretation: result.interpretation,
       };
     },
