@@ -39,6 +39,7 @@ import { calculateMAP } from './map'
 import { calculateCardiacOutput } from './cardiac-output'
 import { calculateLDL } from './ldl'
 import { calculateWellsPE } from './wells-pe'
+import { calculateShockIndex } from './shock-index'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -903,6 +904,33 @@ export const CALCULATORS: Calculator[] = [
         unit: '',
         severity: result.severity,
         label: 'Kt/V',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'shock-index',
+    title: 'Shock Index',
+    shortTitle: 'Shock Index',
+    emoji: '🩺',
+    description: 'Calculates shock index (HR/SBP) to assess hemodynamic instability and shock severity',
+    category: 'critical-care',
+    icon: 'HeartPulse',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['shock index', 'hemodynamics', 'shock', 'HR', 'SBP', 'trauma', 'ICU'],
+    inputs: [
+      { id: 'heartRate', label: 'Heart Rate (beats/min)', type: 'number', required: true, min: 20,  max: 300 },
+      { id: 'sbp',       label: 'Systolic BP (mm Hg)',   type: 'number', required: true, min: 40,  max: 300 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateShockIndex({ heartRate: Number(inputs.heartRate), sbp: Number(inputs.sbp) });
+      return {
+        calculatorId: 'shock-index',
+        score: result.shockIndex,
+        unit: '',
+        severity: result.severity,
+        label: 'Shock Index',
         interpretation: result.interpretation,
       };
     },
