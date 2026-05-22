@@ -44,6 +44,7 @@ import { calculatePreciseDapt } from './precise-dapt'
 import { calculateDapt } from './dapt'
 import { calculateCorrectedReticulocyte } from './corrected-reticulocyte'
 import { calculateANC } from './anc'
+import { calculateMentzerIndex } from './mentzer-index'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1246,6 +1247,36 @@ export const CALCULATORS: Calculator[] = [
         unit: 'mg/g',
         severity: result.severity,
         label: 'ACR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'mentzer-index',
+    title: 'Mentzer Index',
+    shortTitle: 'Mentzer Index',
+    emoji: '🩸',
+    description: 'Differentiates iron deficiency anaemia from thalassaemia trait using MCV and RBC count',
+    category: 'hematology',
+    icon: 'Droplets',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['Mentzer', 'MCV', 'RBC', 'thalassaemia', 'iron deficiency', 'anaemia', 'hematology'],
+    inputs: [
+      { id: 'mcv',      label: 'MCV (fL)',                   type: 'number', required: true, min: 0, max: 150 },
+      { id: 'rbcCount', label: 'RBC count (×10⁶ cells/µL)', type: 'number', required: true, min: 0, max: 10  },
+    ],
+    calculate: (inputs) => {
+      const result = calculateMentzerIndex({
+        mcv:      Number(inputs.mcv),
+        rbcCount: Number(inputs.rbcCount),
+      });
+      return {
+        calculatorId: 'mentzer-index',
+        score: result.index,
+        unit: '',
+        severity: result.severity,
+        label: 'Mentzer Index',
         interpretation: result.interpretation,
       };
     },
