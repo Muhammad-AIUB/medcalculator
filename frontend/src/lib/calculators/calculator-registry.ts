@@ -25,6 +25,7 @@ import { calculateCPP } from './cpp'
 import { calculateSodiumCorrection } from './sodium-correction'
 import { calculateCockcroftGault } from './cockcroft-gault'
 import { calculateFENa } from './fena'
+import { calculateAnionGap } from './anion-gap'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -817,6 +818,31 @@ export const CALCULATORS: Calculator[] = [
         serumCreatinine: Number(inputs.serumCreatinine),
         urineSodium:     Number(inputs.urineSodium),
         urineCreatinine: Number(inputs.urineCreatinine),
+      }),
+  },
+  {
+    id: 'anion-gap',
+    title: 'Serum Anion Gap',
+    shortTitle: 'Anion Gap',
+    emoji: '⚗️',
+    description: 'Calculates anion gap, delta gap, delta ratio and albumin-corrected values',
+    category: 'renal',
+    icon: 'FlaskConical',
+    color: 'text-indigo-600',
+    bgColor: 'bg-indigo-50',
+    tags: ['anion gap', 'metabolic acidosis', 'delta gap', 'albumin', 'electrolytes', 'MUDPILES'],
+    inputs: [
+      { id: 'sodium',      label: 'Sodium',      type: 'number', required: true },
+      { id: 'chloride',    label: 'Chloride',    type: 'number', required: true },
+      { id: 'bicarbonate', label: 'Bicarbonate', type: 'number', required: true },
+      { id: 'albumin',     label: 'Albumin',     type: 'number', required: false },
+    ],
+    calculate: (inputs) =>
+      calculateAnionGap({
+        sodium:      Number(inputs.sodium),
+        chloride:    Number(inputs.chloride),
+        bicarbonate: Number(inputs.bicarbonate),
+        albumin:     inputs.albumin ? Number(inputs.albumin) : undefined,
       }),
   },
 ]
