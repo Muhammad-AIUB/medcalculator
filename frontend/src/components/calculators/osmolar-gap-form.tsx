@@ -74,14 +74,6 @@ export function OsmolarGapForm({ onResult }: Props) {
 
   return (
     <div className="space-y-6">
-      <FieldRow label="Stool Osm">
-        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <NumInput value={osmMosmStr} onChange={onOsmMosmChange} suffix="mOsm/kg" step="1" min={50} max={600} />
-          <OrDivider />
-          <NumInput value={osmMmolStr} onChange={onOsmMmolChange} suffix="mmol/kg" step="1" min={50} max={600} />
-        </div>
-      </FieldRow>
-
       <FieldRow label="Stool Sodium (Na)">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput value={naMeqStr}  onChange={onNaMeqChange}  suffix="mEq/L"  step="1" min={0} max={200} />
@@ -95,6 +87,14 @@ export function OsmolarGapForm({ onResult }: Props) {
           <NumInput value={kMeqStr}  onChange={onKMeqChange}  suffix="mEq/L"  step="1" min={0} max={150} />
           <OrDivider />
           <NumInput value={kMmolStr} onChange={onKMmolChange} suffix="mmol/L" step="1" min={0} max={150} />
+        </div>
+      </FieldRow>
+
+      <FieldRow label="Stool Osm">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+          <NumInput value={osmMosmStr} onChange={onOsmMosmChange} suffix="mOsm/kg" step="1" min={50} max={600} />
+          <OrDivider />
+          <NumInput value={osmMmolStr} onChange={onOsmMmolChange} suffix="mmol/kg" step="1" min={50} max={600} />
         </div>
       </FieldRow>
     </div>
