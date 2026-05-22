@@ -55,6 +55,7 @@ import { calculateBloodVolume } from './blood-volume'
 import { calculateCCI } from './cci'
 import { calculatePlasmaDosage } from './plasma-dosage'
 import { calculateIronDeficit } from './iron-deficit'
+import { calculateNIHSS } from './nihss'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1695,6 +1696,38 @@ export const CALCULATORS: Calculator[] = [
         unit: '',
         severity: result.severity,
         label: 'PRECISE-DAPT Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'nihss',
+    title: 'NIH Stroke Scale (NIHSS)',
+    shortTitle: 'NIHSS',
+    emoji: '🧠',
+    description: 'Quantifies stroke severity across 15 neurological domains to guide treatment and predict outcomes',
+    category: 'critical-care',
+    icon: 'Brain',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    tags: ['NIHSS', 'stroke', 'NIH', 'neurological', 'tPA', 'thrombolysis', 'neurology', 'cerebral infarction'],
+    inputs: [],
+    calculate: (inputs) => {
+      const total =
+        Number(inputs.loc ?? 0) + Number(inputs.locQ ?? 0) + Number(inputs.locC ?? 0) +
+        Number(inputs.gaze ?? 0) + Number(inputs.visual ?? 0) + Number(inputs.facial ?? 0) +
+        Number(inputs.leftArm ?? 0) + Number(inputs.rightArm ?? 0) +
+        Number(inputs.leftLeg ?? 0) + Number(inputs.rightLeg ?? 0) +
+        Number(inputs.ataxia ?? 0) + Number(inputs.sensation ?? 0) +
+        Number(inputs.language ?? 0) + Number(inputs.dysarthria ?? 0) +
+        Number(inputs.extinction ?? 0);
+      const result = calculateNIHSS(total);
+      return {
+        calculatorId: 'nihss',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'NIHSS Score',
         interpretation: result.interpretation,
       };
     },

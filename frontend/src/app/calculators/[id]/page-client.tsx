@@ -63,6 +63,7 @@ const BloodVolumeForm              = dynamic(() => import('@/components/calculat
 const CciForm                      = dynamic(() => import('@/components/calculators/cci-form').then(m => ({ default: m.CciForm })), { ssr: false });
 const PlasmaDosageForm             = dynamic(() => import('@/components/calculators/plasma-dosage-form').then(m => ({ default: m.PlasmaDosageForm })), { ssr: false });
 const IronDeficitForm              = dynamic(() => import('@/components/calculators/iron-deficit-form').then(m => ({ default: m.IronDeficitForm })), { ssr: false });
+const NihssForm                    = dynamic(() => import('@/components/calculators/nihss-form').then(m => ({ default: m.NihssForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -121,6 +122,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   cci:                        CciForm,
   'plasma-dosage':            PlasmaDosageForm,
   'iron-deficit':             IronDeficitForm,
+  nihss:                      NihssForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -180,6 +182,7 @@ const FORMULA_MAP: Record<string, string> = {
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
   'iron-deficit': 'Total iron deficit (mg) = Weight (kg) × (Target Hb − Actual Hb) g/dL × 2.4 + Iron stores (mg)\n\nNote: Iron stores = 500 mg for adults / patients ≥35 kg; 15 mg/kg for patients <35 kg\n\n≤ 0 mg:    No deficit\n1–500 mg:  Mild deficit\n501–1500:  Moderate deficit\n> 1500 mg: Severe deficit — IV iron therapy likely needed',
+  nihss: 'Addition of the selected points across 15 neurological items:\n\n1A: LOC (0–3) | 1B: LOC Questions (0–2) | 1C: LOC Commands (0–2)\n2: Gaze (0–2) | 3: Visual fields (0–3) | 4: Facial palsy (0–3)\n5A: Left arm (0–4) | 5B: Right arm (0–4)\n6A: Left leg (0–4)  | 6B: Right leg (0–4)\n7: Limb ataxia (0–2) | 8: Sensation (0–2)\n9: Language/aphasia (0–3) | 10: Dysarthria (0–2) | 11: Extinction (0–2)\n\nMax score: 42\n\n0:     No stroke symptoms\n1–4:   Minor stroke\n5–15:  Moderate stroke\n16–20: Moderate to severe stroke\n21–42: Severe stroke',
 };
 
 const severityColors: Record<string, string> = {
