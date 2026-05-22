@@ -33,6 +33,7 @@ import { calculateACR } from './acr'
 import { calculateCha2ds2Vasc } from './cha2ds2-vasc'
 import { calculateHasBled } from './has-bled'
 import { calculateTimiUaNstemi } from './timi-ua-nstemi'
+import { calculateGrace } from './grace'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -903,6 +904,39 @@ export const CALCULATORS: Calculator[] = [
   },
 ]
 
+  {
+    id: 'grace',
+    title: 'GRACE ACS Risk Score',
+    shortTitle: 'GRACE',
+    emoji: '❤️',
+    description: 'Predicts in-hospital and 6-month mortality after acute coronary syndrome using the Fox nomogram',
+    category: 'critical-care',
+    icon: 'HeartPulse',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['GRACE', 'ACS', 'NSTEMI', 'STEMI', 'mortality', 'cardiology', 'risk score'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateGrace({
+        age:             Number(inputs.age),
+        heartRate:       Number(inputs.heartRate),
+        systolicBP:      Number(inputs.systolicBP),
+        creatinineMgDl:  Number(inputs.creatinineMgDl),
+        cardiacArrest:   Number(inputs.cardiacArrest)   as 0|1,
+        stDeviation:     Number(inputs.stDeviation)     as 0|1,
+        abnormalEnzymes: Number(inputs.abnormalEnzymes) as 0|1,
+        killipClass:     Number(inputs.killip)          as 1|2|3|4,
+      });
+      return {
+        calculatorId: 'grace',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'GRACE Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
   {
     id: 'timi-ua-nstemi',
     title: 'TIMI Risk Score for UA/NSTEMI',
