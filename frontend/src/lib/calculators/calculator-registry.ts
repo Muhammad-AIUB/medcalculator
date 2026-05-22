@@ -30,6 +30,7 @@ import { calculateWintersFormula } from './winters-formula'
 import { calculateKtV } from './ktv'
 import { calculateURR } from './urr'
 import { calculateACR } from './acr'
+import { calculateCha2ds2Vasc } from './cha2ds2-vasc'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -900,6 +901,38 @@ export const CALCULATORS: Calculator[] = [
   },
 ]
 
+  {
+    id: 'cha2ds2-vasc',
+    title: 'CHA₂DS₂-VASc Score',
+    shortTitle: 'CHA₂DS₂-VASc',
+    emoji: '❤️',
+    description: 'Estimates stroke risk in atrial fibrillation to guide anticoagulation therapy',
+    category: 'critical-care',
+    icon: 'HeartPulse',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['CHA2DS2-VASc', 'atrial fibrillation', 'AF', 'stroke', 'anticoagulation', 'cardiology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateCha2ds2Vasc({
+        age:          Number(inputs.age)          as 0|1|2,
+        sex:          Number(inputs.sex)          as 0|1,
+        chf:          Number(inputs.chf)          as 0|1,
+        hypertension: Number(inputs.hypertension) as 0|1,
+        stroke:       Number(inputs.stroke)       as 0|2,
+        vascular:     Number(inputs.vascular)     as 0|1,
+        diabetes:     Number(inputs.diabetes)     as 0|1,
+      });
+      return {
+        calculatorId: 'cha2ds2-vasc',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'CHA₂DS₂-VASc Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
   {
     id: 'acr',
     title: 'Albumin-Creatinine Ratio (ACR)',

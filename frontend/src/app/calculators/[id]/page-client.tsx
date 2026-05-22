@@ -38,6 +38,7 @@ const WintersFormulaForm    = dynamic(() => import('@/components/calculators/win
 const KtvForm               = dynamic(() => import('@/components/calculators/ktv-form').then(m => ({ default: m.KtvForm })), { ssr: false });
 const UrrForm               = dynamic(() => import('@/components/calculators/urr-form').then(m => ({ default: m.UrrForm })), { ssr: false });
 const AcrForm               = dynamic(() => import('@/components/calculators/acr-form').then(m => ({ default: m.AcrForm })), { ssr: false });
+const Cha2ds2VascForm       = dynamic(() => import('@/components/calculators/cha2ds2-vasc-form').then(m => ({ default: m.Cha2ds2VascForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -71,6 +72,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   'ktv':               KtvForm,
   urr:                 UrrForm,
   acr:                 AcrForm,
+  'cha2ds2-vasc':      Cha2ds2VascForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -103,6 +105,7 @@ const FORMULA_MAP: Record<string, string> = {
   ktv:                 'Kt/V, where\nK = dialyzer clearance of urea\nt = dialysis time\nV = volume of distribution of urea ~ patient total body water\n\nKt/V = (K x t) / V',
   urr:                 'URR = (Upre - Upost) / Upre x 100\n    = (1 - Upost / Upre) x 100',
   acr:                 'ACR (mg/g) = Albumin (mg/dL) / Creatinine (g/dL)',
+  'cha2ds2-vasc':      'Addition of the selected points:\n\nAge <65: 0 | 65-74: +1 | >=75: +2\nSex female: +1\nCHF history: +1\nHypertension history: +1\nStroke/TIA/thromboembolism history: +2\nVascular disease history: +1\nDiabetes history: +1',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
 };
