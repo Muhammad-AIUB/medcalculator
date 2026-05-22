@@ -69,17 +69,17 @@ export function SodiumCorrectionForm({ onResult }: Props) {
     <div className="space-y-6">
       <FieldRow label="Sodium">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <NumInput value={naMeqStr}  onChange={onNaMeqChange}  suffix="mEq/L"  step="1" min={100} max={180} />
-          <OrDivider />
           <NumInput value={naMmolStr} onChange={onNaMmolChange} suffix="mmol/L" step="1" min={100} max={180} />
+          <OrDivider />
+          <NumInput value={naMeqStr}  onChange={onNaMeqChange}  suffix="mEq/L"  step="1" min={100} max={180} />
         </div>
       </FieldRow>
 
       <FieldRow label="Serum Glucose">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
-          <NumInput value={glcMgStr} onChange={onGlcMgChange} suffix="mg/dL"  step="1"   min={100} max={2000} />
-          <OrDivider />
           <NumInput value={glcMmStr} onChange={onGlcMmChange} suffix="mmol/L" step="0.1" min={5.6} max={111}  />
+          <OrDivider />
+          <NumInput value={glcMgStr} onChange={onGlcMgChange} suffix="mg/dL"  step="1"   min={100} max={2000} />
         </div>
       </FieldRow>
     </div>

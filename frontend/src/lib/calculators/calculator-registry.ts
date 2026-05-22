@@ -27,6 +27,7 @@ import { calculateCockcroftGault } from './cockcroft-gault'
 import { calculateFENa } from './fena'
 import { calculateAnionGap } from './anion-gap'
 import { calculateWintersFormula } from './winters-formula'
+import { calculateKtV } from './ktv'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -862,6 +863,38 @@ export const CALCULATORS: Calculator[] = [
     ],
     calculate: (inputs) =>
       calculateWintersFormula({ bicarbonate: Number(inputs.bicarbonate) }),
+  },
+  {
+    id: 'ktv',
+    title: 'Kt/V for Dialysis Adequacy',
+    shortTitle: 'Kt/V',
+    emoji: '🩺',
+    description: 'Calculates Kt/V to assess adequacy of hemodialysis using clearance, time, and patient weight',
+    category: 'renal',
+    icon: 'Droplets',
+    color: 'text-teal-600',
+    bgColor: 'bg-teal-50',
+    tags: ['Kt/V', 'dialysis', 'hemodialysis', 'adequacy', 'KDOQI', 'urea clearance'],
+    inputs: [
+      { id: 'clearance', label: 'Dialyzer Clearance of Urea (mL/min)', type: 'number', required: true, min: 0, max: 500 },
+      { id: 'timeHours', label: 'Dialysis Time (hours)',                type: 'number', required: true, min: 0, max: 12  },
+      { id: 'weightKg',  label: 'Weight (kg)',                          type: 'number', required: true, min: 1, max: 300 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateKtV({
+        clearance: Number(inputs.clearance),
+        timeHours: Number(inputs.timeHours),
+        weightKg:  Number(inputs.weightKg),
+      });
+      return {
+        calculatorId: 'ktv',
+        score: result.ktv,
+        unit: '',
+        severity: result.severity,
+        label: 'Kt/V',
+        interpretation: result.interpretation,
+      };
+    },
   },
 ]
 
