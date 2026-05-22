@@ -29,6 +29,7 @@ import { calculateAnionGap } from './anion-gap'
 import { calculateWintersFormula } from './winters-formula'
 import { calculateKtV } from './ktv'
 import { calculateURR } from './urr'
+import { calculateACR } from './acr'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -899,6 +900,36 @@ export const CALCULATORS: Calculator[] = [
   },
 ]
 
+  {
+    id: 'acr',
+    title: 'Albumin-Creatinine Ratio (ACR)',
+    shortTitle: 'ACR',
+    emoji: '🧪',
+    description: 'Calculates urine albumin-to-creatinine ratio for CKD staging and proteinuria classification',
+    category: 'renal',
+    icon: 'FlaskConical',
+    color: 'text-cyan-600',
+    bgColor: 'bg-cyan-50',
+    tags: ['ACR', 'albumin', 'creatinine', 'proteinuria', 'microalbuminuria', 'CKD', 'KDIGO'],
+    inputs: [
+      { id: 'albumin',    label: 'Urine Albumin (mg/dL)',    type: 'number', required: true, min: 0, max: 500  },
+      { id: 'creatinine', label: 'Urine Creatinine (g/dL)',  type: 'number', required: true, min: 0, max: 5    },
+    ],
+    calculate: (inputs) => {
+      const result = calculateACR({
+        albuminMgDl:   Number(inputs.albumin),
+        creatinineGDl: Number(inputs.creatinine),
+      });
+      return {
+        calculatorId: 'acr',
+        score: result.acr,
+        unit: 'mg/g',
+        severity: result.severity,
+        label: 'ACR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
   {
     id: 'urr',
     title: 'Urea Reduction Ratio (URR)',
