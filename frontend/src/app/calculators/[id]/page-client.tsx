@@ -25,8 +25,10 @@ const SledaiForm      = dynamic(() => import('@/components/calculators/sledai-fo
 const Das28EsrForm    = dynamic(() => import('@/components/calculators/das28-esr-form').then(m => ({ default: m.Das28EsrForm })), { ssr: false });
 const ApriForm        = dynamic(() => import('@/components/calculators/apri-form').then(m => ({ default: m.ApriForm })), { ssr: false });
 const Fib4Form        = dynamic(() => import('@/components/calculators/fib-4-form').then(m => ({ default: m.Fib4Form })), { ssr: false });
-const VasopressorForm = dynamic(() => import('@/components/calculators/vasopressor-form').then(m => ({ default: m.VasopressorForm })), { ssr: false });
-const TsatForm        = dynamic(() => import('@/components/calculators/tsat-form').then(m => ({ default: m.TsatForm })), { ssr: false });
+const VasopressorForm  = dynamic(() => import('@/components/calculators/vasopressor-form').then(m => ({ default: m.VasopressorForm })), { ssr: false });
+const TsatForm         = dynamic(() => import('@/components/calculators/tsat-form').then(m => ({ default: m.TsatForm })), { ssr: false });
+const OsmolalityForm   = dynamic(() => import('@/components/calculators/osmolality-form').then(m => ({ default: m.OsmolalityForm })), { ssr: false });
+const OsmolarGapForm   = dynamic(() => import('@/components/calculators/osmolar-gap-form').then(m => ({ default: m.OsmolarGapForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -47,8 +49,10 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   'das28-esr':  Das28EsrForm,
   apri:         ApriForm,
   'fib-4':      Fib4Form,
-  vasopressor:  VasopressorForm,
-  tsat:         TsatForm,
+  vasopressor:    VasopressorForm,
+  tsat:           TsatForm,
+  osmolality:     OsmolalityForm,
+  'osmolar-gap':  OsmolarGapForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -70,8 +74,10 @@ const FORMULA_MAP: Record<string, string> = {
   'fib-4':      'FIB-4 Score = (Age x AST) / (Platelets x sqrt(ALT))',
   vasopressor:  'VIS = Dopamine + Dobutamine + (Epinephrine x 100) + (Norepinephrine x 100) + (Vasopressin x 2.5) + (Milrinone x 10) + Phenylephrine',
   tsat:         'TS = (Fe / TIBC) * 100',
-  gcs:          'GCS = Eye (1-4) + Verbal (1-5) + Motor (1-6)',
-  edd:          'Uses the first day of your Last Menstrual Period (LMP).',
+  gcs:            'GCS = Eye (1-4) + Verbal (1-5) + Motor (1-6)',
+  edd:            'Uses the first day of your Last Menstrual Period (LMP).',
+  osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
+  'osmolar-gap':  'Osmolar Gap = Measured Osmolality - (2 x Na + BUN/2.8 + Glucose/18)',
 };
 
 const severityColors: Record<string, string> = {

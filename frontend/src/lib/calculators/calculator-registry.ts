@@ -19,6 +19,8 @@ import { calculateAPRI } from './apri'
 import { calculateFIB4 } from './fib-4'
 import { calculateVasopressor } from './vasopressor'
 import { calculateTSAT } from './tsat'
+import { calculateOsmolality } from './osmolality'
+import { calculateOsmolarGap } from './osmolar-gap'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -666,6 +668,54 @@ export const CALCULATORS: Calculator[] = [
         tibcValue: Number(inputs.tibcValue),
         tibcUnit: String(inputs.tibcUnit ?? 'µg/dL'),
         ferritin: inputs.ferritin ? Number(inputs.ferritin) : undefined,
+      }),
+  },
+  {
+    id: 'osmolality',
+    title: 'Serum Osmolality',
+    shortTitle: 'Osmolality',
+    emoji: '🧪',
+    description: 'Calculate serum osmolality from sodium, BUN, and glucose using the standard formula',
+    category: 'renal',
+    icon: 'FlaskConical',
+    color: 'text-cyan-600',
+    bgColor: 'bg-cyan-50',
+    tags: ['osmolality', 'sodium', 'BUN', 'glucose', 'hyponatremia', 'renal'],
+    inputs: [
+      { id: 'sodium', label: 'Sodium', type: 'number', required: true, min: 100, max: 200 },
+      { id: 'bun', label: 'BUN', type: 'number', required: true, min: 1, max: 300 },
+      { id: 'glucose', label: 'Glucose', type: 'number', required: true, min: 1, max: 2000 },
+    ],
+    calculate: (inputs) =>
+      calculateOsmolality({
+        sodium: Number(inputs.sodium),
+        bun: Number(inputs.bun),
+        glucose: Number(inputs.glucose),
+      }),
+  },
+  {
+    id: 'osmolar-gap',
+    title: 'Osmolar Gap',
+    shortTitle: 'Osm Gap',
+    emoji: '🔬',
+    description: 'Calculate osmolar gap to screen for toxic alcohol ingestion or unmeasured osmoles',
+    category: 'renal',
+    icon: 'FlaskConical',
+    color: 'text-cyan-600',
+    bgColor: 'bg-cyan-50',
+    tags: ['osmolar gap', 'toxic alcohol', 'methanol', 'ethylene glycol', 'toxicology'],
+    inputs: [
+      { id: 'measuredOsm', label: 'Measured Osmolality', type: 'number', required: true, min: 200, max: 400 },
+      { id: 'sodium', label: 'Sodium', type: 'number', required: true, min: 100, max: 200 },
+      { id: 'bun', label: 'BUN', type: 'number', required: true, min: 1, max: 300 },
+      { id: 'glucose', label: 'Glucose', type: 'number', required: true, min: 1, max: 2000 },
+    ],
+    calculate: (inputs) =>
+      calculateOsmolarGap({
+        measuredOsm: Number(inputs.measuredOsm),
+        sodium: Number(inputs.sodium),
+        bun: Number(inputs.bun),
+        glucose: Number(inputs.glucose),
       }),
   },
 ]
