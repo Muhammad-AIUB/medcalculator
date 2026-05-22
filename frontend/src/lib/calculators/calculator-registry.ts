@@ -54,6 +54,7 @@ import { calculateIPSS } from './ipss'
 import { calculateBloodVolume } from './blood-volume'
 import { calculateCCI } from './cci'
 import { calculatePlasmaDosage } from './plasma-dosage'
+import { calculateIronDeficit } from './iron-deficit'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1694,6 +1695,40 @@ export const CALCULATORS: Calculator[] = [
         unit: '',
         severity: result.severity,
         label: 'PRECISE-DAPT Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'iron-deficit',
+    title: 'Iron Deficit Calculation (Ganzoni)',
+    shortTitle: 'Iron Deficit',
+    emoji: '🩸',
+    description: 'Calculates total iron deficit using the Ganzoni formula from weight, target and actual hemoglobin, and iron stores',
+    category: 'hematology',
+    icon: 'Droplets',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['iron deficit', 'Ganzoni', 'anemia', 'hemoglobin', 'iron therapy', 'hematology'],
+    inputs: [
+      { id: 'weightKg',     label: 'Weight (kg)',            type: 'number', required: true, min: 0, max: 300  },
+      { id: 'targetHbGdl',  label: 'Target Hb (g/dL)',      type: 'number', required: true, min: 0, max: 25   },
+      { id: 'actualHbGdl',  label: 'Actual Hb (g/dL)',      type: 'number', required: true, min: 0, max: 25   },
+      { id: 'ironStoresMg', label: 'Iron stores (mg)',       type: 'number', required: true, min: 0, max: 2000 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateIronDeficit({
+        weightKg:     Number(inputs.weightKg),
+        targetHbGdl:  Number(inputs.targetHbGdl),
+        actualHbGdl:  Number(inputs.actualHbGdl),
+        ironStoresMg: Number(inputs.ironStoresMg),
+      });
+      return {
+        calculatorId: 'iron-deficit',
+        score: result.ironDeficitMg,
+        unit: 'mg',
+        severity: result.severity,
+        label: 'Total Iron Deficit',
         interpretation: result.interpretation,
       };
     },

@@ -62,6 +62,7 @@ const IpssForm                     = dynamic(() => import('@/components/calculat
 const BloodVolumeForm              = dynamic(() => import('@/components/calculators/blood-volume-form').then(m => ({ default: m.BloodVolumeForm })), { ssr: false });
 const CciForm                      = dynamic(() => import('@/components/calculators/cci-form').then(m => ({ default: m.CciForm })), { ssr: false });
 const PlasmaDosageForm             = dynamic(() => import('@/components/calculators/plasma-dosage-form').then(m => ({ default: m.PlasmaDosageForm })), { ssr: false });
+const IronDeficitForm              = dynamic(() => import('@/components/calculators/iron-deficit-form').then(m => ({ default: m.IronDeficitForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -119,6 +120,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   'blood-volume':             BloodVolumeForm,
   cci:                        CciForm,
   'plasma-dosage':            PlasmaDosageForm,
+  'iron-deficit':             IronDeficitForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -177,6 +179,7 @@ const FORMULA_MAP: Record<string, string> = {
   'wells-dvt':            'Addition of the selected points:\n\nActive cancer (treatment/palliation within 6 months): +1\nBedridden >3 days or major surgery within 12 weeks: +1\nCalf swelling >3 cm vs other leg: +1\nCollateral (nonvaricose) superficial veins: +1\nEntire leg swollen: +1\nLocalized tenderness along deep venous system: +1\nPitting edema, confined to symptomatic leg: +1\nParalysis, paresis, or recent plaster immobilization: +1\nPreviously documented DVT: +1\nAlternative diagnosis as likely or more likely: -2\n\n≤ 0: Low probability\n1–2: Moderate probability\n≥ 3: High probability',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
+  'iron-deficit': 'Total iron deficit (mg) = Weight (kg) × (Target Hb − Actual Hb) g/dL × 2.4 + Iron stores (mg)\n\nNote: Iron stores = 500 mg for adults / patients ≥35 kg; 15 mg/kg for patients <35 kg\n\n≤ 0 mg:    No deficit\n1–500 mg:  Mild deficit\n501–1500:  Moderate deficit\n> 1500 mg: Severe deficit — IV iron therapy likely needed',
 };
 
 const severityColors: Record<string, string> = {
