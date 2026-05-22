@@ -32,6 +32,7 @@ const OsmolarGapForm   = dynamic(() => import('@/components/calculators/osmolar-
 const CppForm              = dynamic(() => import('@/components/calculators/cpp-form').then(m => ({ default: m.CppForm })), { ssr: false });
 const SodiumCorrectionForm  = dynamic(() => import('@/components/calculators/sodium-correction-form').then(m => ({ default: m.SodiumCorrectionForm })), { ssr: false });
 const CockcroftGaultForm    = dynamic(() => import('@/components/calculators/cockcroft-gault-form').then(m => ({ default: m.CockcroftGaultForm })), { ssr: false });
+const FenaForm              = dynamic(() => import('@/components/calculators/fena-form').then(m => ({ default: m.FenaForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -59,6 +60,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   cpp:                CppForm,
   'sodium-correction':  SodiumCorrectionForm,
   'cockcroft-gault':    CockcroftGaultForm,
+  fena:                 FenaForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -85,6 +87,7 @@ const FORMULA_MAP: Record<string, string> = {
   cpp:                 'CPP = MAP - ICP',
   'sodium-correction':  'Corrected Na (Katz, 1973) = Measured Na + 0.016 x (Serum glucose - 100)\nCorrected Na (Hillier, 1999) = Measured Na + 0.024 x (Serum glucose - 100)\n\nNote: Serum glucose must be in mg/dL',
   'cockcroft-gault':    'CrCl = (140 - Age) x Weight(kg) x (0.85 if Female) / (72 x Cr mg/dL)\nIBW male = 50 + 2.3 x (Height inches - 60)\nIBW female = 45.5 + 2.3 x (Height inches - 60)\nABW = IBW + 0.4 x (Actual weight - IBW)',
+  fena:                 'FENa (%) = 100 x (SCr x UNa) / (SNa x UCr)\n\nSCr = serum creatinine, UNa = urine sodium\nSNa = serum sodium, UCr = urine creatinine',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
 };

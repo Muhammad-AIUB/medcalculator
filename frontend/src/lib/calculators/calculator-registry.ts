@@ -24,6 +24,7 @@ import { calculateOsmolarGap } from './osmolar-gap'
 import { calculateCPP } from './cpp'
 import { calculateSodiumCorrection } from './sodium-correction'
 import { calculateCockcroftGault } from './cockcroft-gault'
+import { calculateFENa } from './fena'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -791,6 +792,31 @@ export const CALCULATORS: Calculator[] = [
         weightKg: Number(inputs.weight),
         creatinineMgDl: Number(inputs.creatinine),
         heightCm: inputs.height ? Number(inputs.height) : undefined,
+      }),
+  },
+  {
+    id: 'fena',
+    title: 'Fractional Excretion of Sodium (FENa)',
+    shortTitle: 'FENa',
+    emoji: '🧪',
+    description: 'Calculates FENa to differentiate prerenal azotemia from intrinsic renal disease',
+    category: 'renal',
+    icon: 'FlaskConical',
+    color: 'text-cyan-600',
+    bgColor: 'bg-cyan-50',
+    tags: ['FENa', 'sodium', 'acute kidney injury', 'AKI', 'ATN', 'prerenal', 'renal'],
+    inputs: [
+      { id: 'serumSodium',     label: 'Serum Sodium',      type: 'number', required: true },
+      { id: 'serumCreatinine', label: 'Serum Creatinine',  type: 'number', required: true },
+      { id: 'urineSodium',     label: 'Urine Sodium',      type: 'number', required: true },
+      { id: 'urineCreatinine', label: 'Urine Creatinine',  type: 'number', required: true },
+    ],
+    calculate: (inputs) =>
+      calculateFENa({
+        serumSodium:     Number(inputs.serumSodium),
+        serumCreatinine: Number(inputs.serumCreatinine),
+        urineSodium:     Number(inputs.urineSodium),
+        urineCreatinine: Number(inputs.urineCreatinine),
       }),
   },
 ]
