@@ -30,7 +30,8 @@ const TsatForm         = dynamic(() => import('@/components/calculators/tsat-for
 const OsmolalityForm   = dynamic(() => import('@/components/calculators/osmolality-form').then(m => ({ default: m.OsmolalityForm })), { ssr: false });
 const OsmolarGapForm   = dynamic(() => import('@/components/calculators/osmolar-gap-form').then(m => ({ default: m.OsmolarGapForm })), { ssr: false });
 const CppForm              = dynamic(() => import('@/components/calculators/cpp-form').then(m => ({ default: m.CppForm })), { ssr: false });
-const SodiumCorrectionForm = dynamic(() => import('@/components/calculators/sodium-correction-form').then(m => ({ default: m.SodiumCorrectionForm })), { ssr: false });
+const SodiumCorrectionForm  = dynamic(() => import('@/components/calculators/sodium-correction-form').then(m => ({ default: m.SodiumCorrectionForm })), { ssr: false });
+const CockcroftGaultForm    = dynamic(() => import('@/components/calculators/cockcroft-gault-form').then(m => ({ default: m.CockcroftGaultForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -56,7 +57,8 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   osmolality:     OsmolalityForm,
   'osmolar-gap':  OsmolarGapForm,
   cpp:                CppForm,
-  'sodium-correction': SodiumCorrectionForm,
+  'sodium-correction':  SodiumCorrectionForm,
+  'cockcroft-gault':    CockcroftGaultForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -81,7 +83,8 @@ const FORMULA_MAP: Record<string, string> = {
   gcs:            'GCS = Eye (1-4) + Verbal (1-5) + Motor (1-6)',
   edd:            'Uses the first day of your Last Menstrual Period (LMP).',
   cpp:                 'CPP = MAP - ICP',
-  'sodium-correction': 'Corrected Na (Katz, 1973) = Measured Na + 0.016 x (Serum glucose - 100)\nCorrected Na (Hillier, 1999) = Measured Na + 0.024 x (Serum glucose - 100)\n\nNote: Serum glucose must be in mg/dL',
+  'sodium-correction':  'Corrected Na (Katz, 1973) = Measured Na + 0.016 x (Serum glucose - 100)\nCorrected Na (Hillier, 1999) = Measured Na + 0.024 x (Serum glucose - 100)\n\nNote: Serum glucose must be in mg/dL',
+  'cockcroft-gault':    'CrCl = (140 - Age) x Weight(kg) x (0.85 if Female) / (72 x Cr mg/dL)\nIBW male = 50 + 2.3 x (Height inches - 60)\nIBW female = 45.5 + 2.3 x (Height inches - 60)\nABW = IBW + 0.4 x (Actual weight - IBW)',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
 };

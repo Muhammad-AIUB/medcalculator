@@ -23,6 +23,7 @@ import { calculateOsmolality } from './osmolality'
 import { calculateOsmolarGap } from './osmolar-gap'
 import { calculateCPP } from './cpp'
 import { calculateSodiumCorrection } from './sodium-correction'
+import { calculateCockcroftGault } from './cockcroft-gault'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -764,6 +765,33 @@ export const CALCULATORS: Calculator[] = [
         interpretation: `Katz: ${result.katz} mEq/L | Hillier: ${result.hillier} mEq/L`,
       };
     },
+  },
+  {
+    id: 'cockcroft-gault',
+    title: 'Creatinine Clearance (Cockcroft-Gault)',
+    shortTitle: 'CrCl',
+    emoji: '🫘',
+    description: 'Estimates creatinine clearance using Cockcroft-Gault equation with IBW and ABW adjustments',
+    category: 'renal',
+    icon: 'Droplets',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50',
+    tags: ['creatinine clearance', 'CrCl', 'Cockcroft-Gault', 'renal function', 'IBW', 'ABW'],
+    inputs: [
+      { id: 'sex',        label: 'Sex',         type: 'radio',  required: true  },
+      { id: 'age',        label: 'Age',         type: 'number', required: true,  min: 1, max: 120 },
+      { id: 'weight',     label: 'Weight (kg)', type: 'number', required: true,  min: 1, max: 300 },
+      { id: 'creatinine', label: 'Creatinine',  type: 'number', required: true,  min: 0.1, max: 30 },
+      { id: 'height',     label: 'Height (cm)', type: 'number', required: false, min: 100, max: 250 },
+    ],
+    calculate: (inputs) =>
+      calculateCockcroftGault({
+        sex: inputs.sex as 'male' | 'female',
+        age: Number(inputs.age),
+        weightKg: Number(inputs.weight),
+        creatinineMgDl: Number(inputs.creatinine),
+        heightCm: inputs.height ? Number(inputs.height) : undefined,
+      }),
   },
 ]
 
