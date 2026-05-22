@@ -26,6 +26,7 @@ import { calculateSodiumCorrection } from './sodium-correction'
 import { calculateCockcroftGault } from './cockcroft-gault'
 import { calculateFENa } from './fena'
 import { calculateAnionGap } from './anion-gap'
+import { calculateWintersFormula } from './winters-formula'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -844,6 +845,23 @@ export const CALCULATORS: Calculator[] = [
         bicarbonate: Number(inputs.bicarbonate),
         albumin:     inputs.albumin ? Number(inputs.albumin) : undefined,
       }),
+  },
+  {
+    id: 'winters-formula',
+    title: "Winters' Formula for Metabolic Acidosis Compensation",
+    shortTitle: "Winters' Formula",
+    emoji: '🫁',
+    description: 'Calculates expected pCO2 compensation in metabolic acidosis using bicarbonate',
+    category: 'critical-care',
+    icon: 'Wind',
+    color: 'text-sky-600',
+    bgColor: 'bg-sky-50',
+    tags: ["Winters", 'metabolic acidosis', 'pCO2', 'bicarbonate', 'compensation', 'ABG'],
+    inputs: [
+      { id: 'bicarbonate', label: 'Bicarbonate', type: 'number', required: true, min: 1, max: 45 },
+    ],
+    calculate: (inputs) =>
+      calculateWintersFormula({ bicarbonate: Number(inputs.bicarbonate) }),
   },
 ]
 
