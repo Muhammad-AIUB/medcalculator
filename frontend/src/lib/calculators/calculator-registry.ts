@@ -31,6 +31,7 @@ import { calculateKtV } from './ktv'
 import { calculateURR } from './urr'
 import { calculateACR } from './acr'
 import { calculateCha2ds2Vasc } from './cha2ds2-vasc'
+import { calculateHasBled } from './has-bled'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -901,6 +902,40 @@ export const CALCULATORS: Calculator[] = [
   },
 ]
 
+  {
+    id: 'has-bled',
+    title: 'HAS-BLED Score for Major Bleeding Risk',
+    shortTitle: 'HAS-BLED',
+    emoji: '🩸',
+    description: 'Estimates risk of major bleeding in patients on anticoagulation for atrial fibrillation',
+    category: 'critical-care',
+    icon: 'HeartPulse',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['HAS-BLED', 'bleeding risk', 'anticoagulation', 'atrial fibrillation', 'AF', 'warfarin'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateHasBled({
+        hypertension:  Number(inputs.hypertension)  as 0|1,
+        renalDisease:  Number(inputs.renalDisease)  as 0|1,
+        liverDisease:  Number(inputs.liverDisease)  as 0|1,
+        strokeHistory: Number(inputs.stroke)        as 0|1,
+        priorBleeding: Number(inputs.bleeding)      as 0|1,
+        labileINR:     Number(inputs.labileINR)     as 0|1,
+        elderly:       Number(inputs.elderly)       as 0|1,
+        medications:   Number(inputs.medications)   as 0|1,
+        alcoholUse:    Number(inputs.alcohol)       as 0|1,
+      });
+      return {
+        calculatorId: 'has-bled',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'HAS-BLED Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
   {
     id: 'cha2ds2-vasc',
     title: 'CHA₂DS₂-VASc Score',
