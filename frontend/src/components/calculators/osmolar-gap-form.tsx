@@ -1,6 +1,5 @@
 'use client';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
-import { calculateOsmolarGap } from '@/lib/calculators/osmolar-gap';
 import { FieldRow, NumInput, OrDivider } from './shared-ui';
 
 interface Props { onResult: (result: any) => void; }
@@ -25,30 +24,26 @@ export function OsmolarGapForm({ onResult }: Props) {
   const onKMeqChange    = (v: string) => { setKMeqStr(v);    setKMmolStr(v);  };
   const onKMmolChange   = (v: string) => { setKMmolStr(v);   setKMeqStr(v);   };
 
-  const measured = parseFloat(osmMosmStr) || 0;
-  const na       = parseFloat(naMeqStr)   || 0;
-  const k        = parseFloat(kMeqStr)    || 0;
+  const osm = parseFloat(osmMosmStr) || 0;
+  const na  = parseFloat(naMeqStr)   || 0;
+  const k   = parseFloat(kMeqStr)    || 0;
 
   const liveResult = useMemo(() => {
-    if (na <= 0) return null;
-    try {
-      // Always calculate formula 2 (290 assumed)
-      const gap290 = 290 - 2 * (na + k);
-      // Formula 1 only if measured Osm provided
-      const gapMeasured = measured > 0 ? measured - 2 * (na + k) : null;
+    if (osm <= 0 || na <= 0) return null;
+    const gap1 = osm - 2 * (na + k);           // formula 1: measured
+    const gap2 = 290 - 2 * (na + k);           // formula 2: assumed 290
+    const score1 = Math.round(gap1 * 10) / 10;
+    const score2 = Math.round(gap2 * 10) / 10;
 
-      const primaryGap   = gapMeasured !== null ? gapMeasured : gap290;
-      const primaryScore = Math.round(primaryGap * 10) / 10;
+    const getSeverity = (gap: number) => {
+      if (gap < 50)       return { severity: 'info'    as const, text: 'Secretory diarrhea likely (gap <50 mOsm/kg)' };
+      if (gap <= 125)     return { severity: 'warning' as const, text: 'Indeterminate / mixed (gap 50–125 mOsm/kg)' };
+      return               { severity: 'danger'  as const, text: 'Osmotic diarrhea likely (gap >125 mOsm/kg)' };
+    };
 
-      let severity: 'success' | 'warning' | 'danger' | 'info';
-      let interpretation: string;
-      if (primaryScore < 50)       { severity = 'info';    interpretation = 'Secretory diarrhea likely (gap <50 mOsm/kg)'; }
-      else if (primaryScore <= 125) { severity = 'warning'; interpretation = 'Indeterminate / mixed (gap 50–125 mOsm/kg)'; }
-      else                          { severity = 'danger';  interpretation = 'Osmotic diarrhea likely (gap >125 mOsm/kg)'; }
-
-      return { primaryScore, gap290: Math.round(gap290 * 10) / 10, gapMeasured: gapMeasured !== null ? Math.round(gapMeasured * 10) / 10 : null, severity, interpretation };
-    } catch { return null; }
-  }, [na, k, measured]);
+    const s1 = getSeverity(gap1);
+    return { score1, score2, s1, s2: getSeverity(gap2) };
+  }, [osm, na, k]);
 
   const onResultRef = useRef(onResult);
   useEffect(() => { onResultRef.current = onResult; });
@@ -57,31 +52,29 @@ export function OsmolarGapForm({ onResult }: Props) {
     if (!liveResult) return;
     onResultRef.current({
       outputs: [
-        ...(liveResult.gapMeasured !== null ? [{
+        {
           id: 'gap-measured',
           label: 'Stool Osmolal Gap (Measured)',
-          value: liveResult.gapMeasured,
+          value: liveResult.score1,
           unit: 'mOsm/kg',
-          interpretation: { text: liveResult.interpretation, severity: liveResult.severity },
-        }] : []),
+          interpretation: { text: liveResult.s1.text, severity: liveResult.s1.severity },
+        },
         {
           id: 'gap-290',
           label: 'Stool Osmolal Gap (290 assumed)',
-          value: liveResult.gap290,
+          value: liveResult.score2,
           unit: 'mOsm/kg',
-          interpretation: { text: liveResult.interpretation, severity: liveResult.severity },
+          interpretation: { text: liveResult.s2.text, severity: liveResult.s2.severity },
         },
       ],
-      inputs: { measuredOsm: measured, sodium: na, potassium: k },
-      formulaUsed: liveResult.gapMeasured !== null
-        ? 'Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nStool Osmolal Gap = 290 - (2 x (Na + K))'
-        : 'Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
+      inputs: { stoolOsm: osm, sodium: na, potassium: k },
+      formulaUsed: 'Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nStool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
     });
   }, [liveResult]);
 
   return (
     <div className="space-y-6">
-      <FieldRow label="Stool Osmolality" hint="optional">
+      <FieldRow label="Stool Osm">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput value={osmMosmStr} onChange={onOsmMosmChange} suffix="mOsm/kg" step="1" min={50} max={600} />
           <OrDivider />
