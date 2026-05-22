@@ -51,6 +51,7 @@ import { calculateFLIPI } from './flipi'
 import { calculateCllIpi } from './cll-ipi'
 import { calculateIpssR } from './ipss-r'
 import { calculateIPSS } from './ipss'
+import { calculateBloodVolume } from './blood-volume'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1253,6 +1254,36 @@ export const CALCULATORS: Calculator[] = [
         unit: 'mg/g',
         severity: result.severity,
         label: 'ACR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'blood-volume',
+    title: 'Blood Volume Calculation',
+    shortTitle: 'Blood Volume',
+    emoji: '🩸',
+    description: 'Calculates total blood volume, RBC volume, and plasma volume for adults, children, and neonates',
+    category: 'hematology',
+    icon: 'Droplets',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['blood volume', 'TBV', 'RBC volume', 'plasma volume', 'Nadler', 'hematocrit', 'hematology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateBloodVolume({
+        patientType: inputs.patientType as any,
+        sex:         inputs.sex as any,
+        heightCm:    Number(inputs.heightCm)  || undefined,
+        weightKg:    Number(inputs.weightKg),
+        hematocrit:  Number(inputs.hematocrit) || undefined,
+      });
+      return {
+        calculatorId: 'blood-volume',
+        score: result.tbvMl,
+        unit: 'mL',
+        severity: result.severity,
+        label: 'Total Blood Volume',
         interpretation: result.interpretation,
       };
     },
