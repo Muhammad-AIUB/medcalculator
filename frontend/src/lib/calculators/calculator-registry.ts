@@ -21,6 +21,7 @@ import { calculateVasopressor } from './vasopressor'
 import { calculateTSAT } from './tsat'
 import { calculateOsmolality } from './osmolality'
 import { calculateOsmolarGap } from './osmolar-gap'
+import { calculateCPP } from './cpp'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -717,6 +718,24 @@ export const CALCULATORS: Calculator[] = [
         bun: Number(inputs.bun),
         glucose: Number(inputs.glucose),
       }),
+  },
+  {
+    id: 'cpp',
+    title: 'Cerebral Perfusion Pressure (CPP)',
+    shortTitle: 'CPP',
+    emoji: '🧠',
+    description: 'Calculate cerebral perfusion pressure from MAP and intracranial pressure',
+    category: 'critical-care',
+    icon: 'Brain',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    tags: ['CPP', 'MAP', 'ICP', 'intracranial pressure', 'neurocritical care'],
+    inputs: [
+      { id: 'map', label: 'MAP', type: 'number', required: true, min: 0, max: 200 },
+      { id: 'icp', label: 'ICP', type: 'number', required: true, min: 0, max: 100 },
+    ],
+    calculate: (inputs) =>
+      calculateCPP({ map: Number(inputs.map), icp: Number(inputs.icp) }),
   },
 ]
 
