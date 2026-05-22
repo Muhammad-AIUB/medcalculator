@@ -40,6 +40,7 @@ import { calculateCardiacOutput } from './cardiac-output'
 import { calculateLDL } from './ldl'
 import { calculateWellsPE } from './wells-pe'
 import { calculateShockIndex } from './shock-index'
+import { calculatePreciseDapt } from './precise-dapt'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1242,6 +1243,36 @@ export const CALCULATORS: Calculator[] = [
         unit: 'mg/g',
         severity: result.severity,
         label: 'ACR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'precise-dapt',
+    title: 'PRECISE-DAPT Score',
+    shortTitle: 'PRECISE-DAPT',
+    emoji: '🩸',
+    description: 'Predicts 12-month bleeding risk to guide DAPT duration after coronary stent implantation',
+    category: 'critical-care',
+    icon: 'HeartPulse',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['PRECISE-DAPT', 'DAPT', 'bleeding', 'coronary', 'stent', 'antiplatelet', 'cardiology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculatePreciseDapt({
+        age:           Number(inputs.age),
+        hemoglobin:    Number(inputs.hemoglobin),
+        wbc:           Number(inputs.wbc),
+        crCl:          Number(inputs.crCl),
+        priorBleeding: Boolean(inputs.priorBleeding),
+      });
+      return {
+        calculatorId: 'precise-dapt',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'PRECISE-DAPT Score',
         interpretation: result.interpretation,
       };
     },
