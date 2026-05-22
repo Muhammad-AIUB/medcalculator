@@ -905,8 +905,6 @@ export const CALCULATORS: Calculator[] = [
       };
     },
   },
-]
-
   {
     id: 'cardiac-output',
     title: 'Cardiac Output (Fick Principle)',
