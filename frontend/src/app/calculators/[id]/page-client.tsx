@@ -77,7 +77,7 @@ const FORMULA_MAP: Record<string, string> = {
   gcs:            'GCS = Eye (1-4) + Verbal (1-5) + Motor (1-6)',
   edd:            'Uses the first day of your Last Menstrual Period (LMP).',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
-  'osmolar-gap':  'Osmolar Gap = Measured Osmolality - (2 x Na + BUN/2.8 + Glucose/18)',
+  'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
 };
 
 const severityColors: Record<string, string> = {
