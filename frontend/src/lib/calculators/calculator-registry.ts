@@ -36,6 +36,7 @@ import { calculateTimiUaNstemi } from './timi-ua-nstemi'
 import { calculateGrace } from './grace'
 import { calculateQTc } from './qtc'
 import { calculateMAP } from './map'
+import { calculateCardiacOutput } from './cardiac-output'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -906,6 +907,38 @@ export const CALCULATORS: Calculator[] = [
   },
 ]
 
+  {
+    id: 'cardiac-output',
+    title: 'Cardiac Output (Fick Principle)',
+    shortTitle: 'Cardiac Output',
+    emoji: '🫀',
+    description: 'Calculates cardiac output, cardiac index, and stroke volume using the Fick equation',
+    category: 'critical-care',
+    icon: 'HeartPulse',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['cardiac output', 'Fick', 'cardiac index', 'stroke volume', 'hemodynamics', 'BSA', 'ICU'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateCardiacOutput({
+        weightKg:  Number(inputs.weightKg),
+        heightCm:  Number(inputs.heightCm),
+        sao2Pct:   Number(inputs.sao2Pct),
+        svo2Pct:   Number(inputs.svo2Pct),
+        hbGdl:     Number(inputs.hbGdl),
+        heartRate: Number(inputs.heartRate),
+        age70plus: Boolean(inputs.age70plus),
+      });
+      return {
+        calculatorId: 'cardiac-output',
+        score: result.co,
+        unit: 'L/min',
+        severity: result.co >= 4 && result.co <= 8 ? 'success' as const : result.co < 4 ? 'danger' as const : 'warning' as const,
+        label: 'Cardiac Output',
+        interpretation: `CO: ${result.co} L/min | CI: ${result.ci} L/min/m² | SV: ${result.sv} mL/beat`,
+      };
+    },
+  },
   {
     id: 'map',
     title: 'Mean Arterial Pressure (MAP)',
