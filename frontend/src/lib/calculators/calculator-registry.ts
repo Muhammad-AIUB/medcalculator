@@ -34,6 +34,7 @@ import { calculateCha2ds2Vasc } from './cha2ds2-vasc'
 import { calculateHasBled } from './has-bled'
 import { calculateTimiUaNstemi } from './timi-ua-nstemi'
 import { calculateGrace } from './grace'
+import { calculateQTc } from './qtc'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -904,6 +905,33 @@ export const CALCULATORS: Calculator[] = [
   },
 ]
 
+  {
+    id: 'qtc',
+    title: 'Corrected QT Interval (QTc)',
+    shortTitle: 'QTc',
+    emoji: '❤️',
+    description: 'Calculates corrected QT interval using Bazett, Fridericia, Framingham, Hodges, and Rautaharju formulas',
+    category: 'critical-care',
+    icon: 'HeartPulse',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['QTc', 'QT interval', 'Bazett', 'Fridericia', 'EKG', 'arrhythmia', 'TdP', 'cardiology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateQTc({ qtMs: Number(inputs.qtMs), heartRate: Number(inputs.heartRate) });
+      const formula = (inputs.formula as string) ?? 'bazett';
+      const qtcValue = result.results[formula as keyof typeof result.results];
+      const interp   = result.interpretation(qtcValue);
+      return {
+        calculatorId: 'qtc',
+        score: qtcValue,
+        unit: 'ms',
+        severity: interp.severity,
+        label: `QTc (${formula})`,
+        interpretation: interp.text,
+      };
+    },
+  },
   {
     id: 'grace',
     title: 'GRACE ACS Risk Score',
