@@ -56,6 +56,10 @@ import { calculateCCI } from './cci'
 import { calculatePlasmaDosage } from './plasma-dosage'
 import { calculateIronDeficit } from './iron-deficit'
 import { calculateNIHSS } from './nihss'
+import { calculateABCD2 } from './abcd2'
+import { calculateICH } from './ich'
+import { calculateMRS } from './mrs'
+import { calculateHuntHess } from './hunt-hess'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1698,6 +1702,86 @@ export const CALCULATORS: Calculator[] = [
         label: 'PRECISE-DAPT Score',
         interpretation: result.interpretation,
       };
+    },
+  },
+  {
+    id: 'abcd2',
+    title: 'ABCD² Score for TIA',
+    shortTitle: 'ABCD²',
+    emoji: '🧠',
+    description: 'Stratifies 2-day stroke risk after TIA using age, blood pressure, clinical features, duration, and diabetes',
+    category: 'critical-care',
+    icon: 'Brain',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    tags: ['ABCD2', 'TIA', 'transient ischemic attack', 'stroke risk', 'neurology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateABCD2({
+        age60:    Number(inputs.age60)    as 0|1,
+        bp:       Number(inputs.bp)       as 0|1,
+        clinical: Number(inputs.clinical) as 0|1|2,
+        duration: Number(inputs.duration) as 0|1|2,
+        diabetes: Number(inputs.diabetes) as 0|1,
+      });
+      return { calculatorId: 'abcd2', score: result.score, unit: '', severity: result.severity, label: 'ABCD² Score', interpretation: result.interpretation };
+    },
+  },
+  {
+    id: 'ich',
+    title: 'Intracerebral Hemorrhage (ICH) Score',
+    shortTitle: 'ICH Score',
+    emoji: '🧠',
+    description: 'Predicts 30-day mortality after intracerebral hemorrhage using GCS, age, volume, IVH, and location',
+    category: 'critical-care',
+    icon: 'Brain',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    tags: ['ICH', 'intracerebral hemorrhage', 'stroke', 'mortality', 'GCS', 'neurology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateICH({
+        gcs:            Number(inputs.gcs)            as 0|1|2,
+        age80:          Number(inputs.age80)          as 0|1,
+        ichVolume:      Number(inputs.ichVolume)      as 0|1,
+        ivh:            Number(inputs.ivh)            as 0|1,
+        infratentorial: Number(inputs.infratentorial) as 0|1,
+      });
+      return { calculatorId: 'ich', score: result.score, unit: '', severity: result.severity, label: 'ICH Score', interpretation: result.interpretation };
+    },
+  },
+  {
+    id: 'mrs',
+    title: 'Modified Rankin Scale (mRS)',
+    shortTitle: 'mRS',
+    emoji: '🧠',
+    description: 'Measures degree of disability or dependence after stroke on a 0–6 scale',
+    category: 'critical-care',
+    icon: 'Brain',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    tags: ['mRS', 'modified Rankin scale', 'disability', 'stroke outcome', 'neurology', 'function'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateMRS(Number(inputs.score ?? 0));
+      return { calculatorId: 'mrs', score: result.score, unit: '', severity: result.severity, label: 'mRS Score', interpretation: result.interpretation };
+    },
+  },
+  {
+    id: 'hunt-hess',
+    title: 'Hunt and Hess Scale',
+    shortTitle: 'Hunt-Hess',
+    emoji: '🧠',
+    description: 'Grades subarachnoid hemorrhage clinical severity to predict surgical risk and outcome (Grade I–V)',
+    category: 'critical-care',
+    icon: 'Brain',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    tags: ['Hunt-Hess', 'subarachnoid hemorrhage', 'SAH', 'aneurysm', 'neurology', 'grading'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateHuntHess(Number(inputs.grade ?? 1));
+      return { calculatorId: 'hunt-hess', score: result.score, unit: '', severity: result.severity, label: 'Hunt-Hess Grade', interpretation: result.interpretation };
     },
   },
   {

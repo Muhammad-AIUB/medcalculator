@@ -64,6 +64,10 @@ const CciForm                      = dynamic(() => import('@/components/calculat
 const PlasmaDosageForm             = dynamic(() => import('@/components/calculators/plasma-dosage-form').then(m => ({ default: m.PlasmaDosageForm })), { ssr: false });
 const IronDeficitForm              = dynamic(() => import('@/components/calculators/iron-deficit-form').then(m => ({ default: m.IronDeficitForm })), { ssr: false });
 const NihssForm                    = dynamic(() => import('@/components/calculators/nihss-form').then(m => ({ default: m.NihssForm })), { ssr: false });
+const Abcd2Form                    = dynamic(() => import('@/components/calculators/abcd2-form').then(m => ({ default: m.Abcd2Form })), { ssr: false });
+const IchForm                      = dynamic(() => import('@/components/calculators/ich-form').then(m => ({ default: m.IchForm })), { ssr: false });
+const MrsForm                      = dynamic(() => import('@/components/calculators/mrs-form').then(m => ({ default: m.MrsForm })), { ssr: false });
+const HuntHessForm                 = dynamic(() => import('@/components/calculators/hunt-hess-form').then(m => ({ default: m.HuntHessForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -123,6 +127,10 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   'plasma-dosage':            PlasmaDosageForm,
   'iron-deficit':             IronDeficitForm,
   nihss:                      NihssForm,
+  abcd2:                      Abcd2Form,
+  ich:                        IchForm,
+  mrs:                        MrsForm,
+  'hunt-hess':                HuntHessForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -183,6 +191,10 @@ const FORMULA_MAP: Record<string, string> = {
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
   'iron-deficit': 'Total iron deficit (mg) = Weight (kg) × (Target Hb − Actual Hb) g/dL × 2.4 + Iron stores (mg)\n\nNote: Iron stores = 500 mg for adults / patients ≥35 kg; 15 mg/kg for patients <35 kg\n\n≤ 0 mg:    No deficit\n1–500 mg:  Mild deficit\n501–1500:  Moderate deficit\n> 1500 mg: Severe deficit — IV iron therapy likely needed',
   nihss: 'Addition of the selected points across 15 neurological items:\n\n1A: LOC (0–3) | 1B: LOC Questions (0–2) | 1C: LOC Commands (0–2)\n2: Gaze (0–2) | 3: Visual fields (0–3) | 4: Facial palsy (0–3)\n5A: Left arm (0–4) | 5B: Right arm (0–4)\n6A: Left leg (0–4)  | 6B: Right leg (0–4)\n7: Limb ataxia (0–2) | 8: Sensation (0–2)\n9: Language/aphasia (0–3) | 10: Dysarthria (0–2) | 11: Extinction (0–2)\n\nMax score: 42\n\n0:     No stroke symptoms\n1–4:   Minor stroke\n5–15:  Moderate stroke\n16–20: Moderate to severe stroke\n21–42: Severe stroke',
+  abcd2: 'ABCD² = Age(≥60) + BP(≥140/90) + Clinical + Duration + Diabetes\n\nAge ≥60 years: +1\nBP ≥140/90 mmHg: +1\nClinical features: Unilateral weakness +2 | Speech disturbance +1 | Other 0\nDuration: <10 min 0 | 10-59 min +1 | ≥60 min +2\nHistory of diabetes: +1\n\nMax score: 7\n\n0–3: Low risk (~1% 2-day stroke risk)\n4–5: Moderate risk (~4% 2-day stroke risk)\n6–7: High risk (~8% 2-day stroke risk)',
+  ich: 'ICH Score = GCS + Age(≥80) + ICH Volume(≥30mL) + IVH + Infratentorial\n\nGCS 13-15: 0 | 5-12: +1 | 3-4: +2\nAge ≥80: +1\nICH volume ≥30 mL: +1\nIntraventricular hemorrhage: +1\nInfratentorial origin: +1\n\nMax score: 6\n\nScore | 30-day Mortality\n0     | 0%\n1     | 13%\n2     | 26%\n3     | 72%\n4     | 97%\n5–6   | 100%',
+  mrs: 'Assignation of points based on severity of disability:\n\n0: No symptoms at all\n1: No significant disability despite symptoms\n2: Slight disability\n3: Moderate disability (some help, walks unaided)\n4: Moderately severe disability (cannot walk/self-care unaided)\n5: Severe disability (bedridden, incontinent)\n6: Dead',
+  'hunt-hess': 'Selection of group of symptoms, assigned point value:\n\nGrade 1: Mild headache, alert, minimal nuchal rigidity (~70% survival)\nGrade 2: Full nuchal rigidity, moderate-severe headache, no neuro deficit (~60% survival)\nGrade 3: Lethargy/confusion, mild focal deficit (~50% survival)\nGrade 4: Stuporous, more severe focal deficit (~20% survival)\nGrade 5: Comatose, severe neurological impairment (~10% survival)',
 };
 
 const severityColors: Record<string, string> = {
