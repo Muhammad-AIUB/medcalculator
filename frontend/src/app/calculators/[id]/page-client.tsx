@@ -53,6 +53,7 @@ const DaptForm                     = dynamic(() => import('@/components/calculat
 const CorrectedReticulocyteForm    = dynamic(() => import('@/components/calculators/corrected-reticulocyte-form').then(m => ({ default: m.CorrectedReticulocyteForm })), { ssr: false });
 const AncForm                      = dynamic(() => import('@/components/calculators/anc-form').then(m => ({ default: m.AncForm })), { ssr: false });
 const MentzerIndexForm             = dynamic(() => import('@/components/calculators/mentzer-index-form').then(m => ({ default: m.MentzerIndexForm })), { ssr: false });
+const CalciumCorrectionForm        = dynamic(() => import('@/components/calculators/calcium-correction-form').then(m => ({ default: m.CalciumCorrectionForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -101,6 +102,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   'corrected-reticulocyte':   CorrectedReticulocyteForm,
   anc:                        AncForm,
   'mentzer-index':            MentzerIndexForm,
+  'calcium-correction':       CalciumCorrectionForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -147,7 +149,8 @@ const FORMULA_MAP: Record<string, string> = {
   dapt:                'Addition of the selected points:\n\nAge ≥75: -2 | 65-74: -1 | <65: 0\nCigarette smoking (within 1 year): +1\nDiabetes mellitus: +1\nMI at presentation: +1\nPrior PCI or prior MI: +1\nPaclitaxel-eluting stent: +1\nStent diameter <3 mm: +1\nCHF or LVEF <30%: +2\nVein graft stent: +2\n\nScore ≥ 2: Prolonged DAPT (>12 months) reasonable\nScore < 2: Standard DAPT (≤12 months) recommended',
   'corrected-reticulocyte': 'ARC (cells/µL) = (Reticulocyte % / 100) × RBC (cells/µL)\n\nCorrected Reticulocyte % = Reticulocyte % × (Measured Hct / Normal Hct)\n\nRPI = Corrected Reticulocyte % / Maturation Factor\n\nMaturation Factor:\n≥35%: 1.0 | 25–<35%: 1.5 | 20–<25%: 2.0 | <20%: 2.5\n\nRPI ≥ 3: Hyperproliferative\nRPI 2–3: Borderline\nRPI < 2: Hypoproliferative',
   anc:                 'ANC = 10 × WBC count (×10³/µL) × (% PMNs + % bands)\n\nANC ≥ 1500 cells/µL: Normal\nANC 1000–1499:       Mild neutropenia\nANC 500–999:         Moderate neutropenia\nANC < 500:           Severe neutropenia',
-  'mentzer-index':     'Mentzer Index = MCV (fL) / RBC count (10⁶/µL)\n\n< 13: Thalassaemia trait likely\n= 13: Indeterminate\n> 13: Iron deficiency anaemia likely',
+  'mentzer-index':        'Mentzer Index = MCV (fL) / RBC count (10⁶/µL)\n\n< 13: Thalassaemia trait likely\n= 13: Indeterminate\n> 13: Iron deficiency anaemia likely',
+  'calcium-correction':   'Corrected Calcium (mg/dL) = (0.8 × (Normal Albumin − Patient Albumin)) + Serum Ca\n\nNote: formula uses albumin in g/dL and calcium in mg/dL\nNormal albumin reference: 4 g/dL (40 g/L)\n\n< 8.5 mg/dL:  Hypocalcaemia\n8.5–10.5:     Normal\n> 10.5 mg/dL: Hypercalcaemia',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
 };

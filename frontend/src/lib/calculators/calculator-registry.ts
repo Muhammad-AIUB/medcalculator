@@ -45,6 +45,7 @@ import { calculateDapt } from './dapt'
 import { calculateCorrectedReticulocyte } from './corrected-reticulocyte'
 import { calculateANC } from './anc'
 import { calculateMentzerIndex } from './mentzer-index'
+import { calculateCalciumCorrection } from './calcium-correction'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1247,6 +1248,38 @@ export const CALCULATORS: Calculator[] = [
         unit: 'mg/g',
         severity: result.severity,
         label: 'ACR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'calcium-correction',
+    title: 'Calcium Correction for Hypoalbuminaemia',
+    shortTitle: 'Calcium Correction',
+    emoji: '🧪',
+    description: 'Corrects total serum calcium for low albumin levels to estimate physiologically active calcium',
+    category: 'renal',
+    icon: 'FlaskConical',
+    color: 'text-cyan-600',
+    bgColor: 'bg-cyan-50',
+    tags: ['calcium', 'albumin', 'hypoalbuminaemia', 'corrected calcium', 'hypocalcaemia', 'hypercalcaemia'],
+    inputs: [
+      { id: 'calciumMgDl',      label: 'Calcium (mg/dL)',        type: 'number', required: true, min: 0, max: 20 },
+      { id: 'albuminGdl',       label: 'Albumin (g/dL)',         type: 'number', required: true, min: 0, max: 6  },
+      { id: 'normalAlbuminGdl', label: 'Normal Albumin (g/dL)',  type: 'number', required: true, min: 0, max: 6  },
+    ],
+    calculate: (inputs) => {
+      const result = calculateCalciumCorrection({
+        calciumMgDl:      Number(inputs.calciumMgDl),
+        albuminGdl:       Number(inputs.albuminGdl),
+        normalAlbuminGdl: Number(inputs.normalAlbuminGdl),
+      });
+      return {
+        calculatorId: 'calcium-correction',
+        score: result.correctedCaMgDl,
+        unit: 'mg/dL',
+        severity: result.severity,
+        label: 'Corrected Calcium',
         interpretation: result.interpretation,
       };
     },
