@@ -22,6 +22,7 @@ import { calculateTSAT } from './tsat'
 import { calculateOsmolality } from './osmolality'
 import { calculateOsmolarGap } from './osmolar-gap'
 import { calculateCPP } from './cpp'
+import { calculateSodiumCorrection } from './sodium-correction'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -736,6 +737,33 @@ export const CALCULATORS: Calculator[] = [
     ],
     calculate: (inputs) =>
       calculateCPP({ map: Number(inputs.map), icp: Number(inputs.icp) }),
+  },
+  {
+    id: 'sodium-correction',
+    title: 'Sodium Correction for Hyperglycemia',
+    shortTitle: 'Na Correction',
+    emoji: '🧂',
+    description: 'Corrects measured sodium for hyperglycemia using Katz (1973) and Hillier (1999) formulas',
+    category: 'renal',
+    icon: 'FlaskConical',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50',
+    tags: ['sodium', 'hyperglycemia', 'correction', 'Katz', 'Hillier', 'electrolytes'],
+    inputs: [
+      { id: 'sodium',  label: 'Sodium',        type: 'number', required: true, min: 100, max: 180 },
+      { id: 'glucose', label: 'Serum Glucose',  type: 'number', required: true, min: 100, max: 2000 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateSodiumCorrection({ sodium: Number(inputs.sodium), glucose: Number(inputs.glucose) });
+      return {
+        calculatorId: 'sodium-correction',
+        score: result.katz,
+        unit: 'mEq/L',
+        severity: 'neutral' as const,
+        label: 'Corrected Sodium',
+        interpretation: `Katz: ${result.katz} mEq/L | Hillier: ${result.hillier} mEq/L`,
+      };
+    },
   },
 ]
 

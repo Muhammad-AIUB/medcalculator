@@ -29,7 +29,8 @@ const VasopressorForm  = dynamic(() => import('@/components/calculators/vasopres
 const TsatForm         = dynamic(() => import('@/components/calculators/tsat-form').then(m => ({ default: m.TsatForm })), { ssr: false });
 const OsmolalityForm   = dynamic(() => import('@/components/calculators/osmolality-form').then(m => ({ default: m.OsmolalityForm })), { ssr: false });
 const OsmolarGapForm   = dynamic(() => import('@/components/calculators/osmolar-gap-form').then(m => ({ default: m.OsmolarGapForm })), { ssr: false });
-const CppForm          = dynamic(() => import('@/components/calculators/cpp-form').then(m => ({ default: m.CppForm })), { ssr: false });
+const CppForm              = dynamic(() => import('@/components/calculators/cpp-form').then(m => ({ default: m.CppForm })), { ssr: false });
+const SodiumCorrectionForm = dynamic(() => import('@/components/calculators/sodium-correction-form').then(m => ({ default: m.SodiumCorrectionForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -54,7 +55,8 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   tsat:           TsatForm,
   osmolality:     OsmolalityForm,
   'osmolar-gap':  OsmolarGapForm,
-  cpp:            CppForm,
+  cpp:                CppForm,
+  'sodium-correction': SodiumCorrectionForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -78,7 +80,8 @@ const FORMULA_MAP: Record<string, string> = {
   tsat:         'TS = (Fe / TIBC) * 100',
   gcs:            'GCS = Eye (1-4) + Verbal (1-5) + Motor (1-6)',
   edd:            'Uses the first day of your Last Menstrual Period (LMP).',
-  cpp:            'CPP = MAP - ICP',
+  cpp:                 'CPP = MAP - ICP',
+  'sodium-correction': 'Corrected Na (Katz, 1973) = Measured Na + 0.016 x (Serum glucose - 100)\nCorrected Na (Hillier, 1999) = Measured Na + 0.024 x (Serum glucose - 100)\n\nNote: Serum glucose must be in mg/dL',
   osmolality:     'Osmolality = 2 x Na + BUN/2.8 + Glucose/18',
   'osmolar-gap':  'Method 1: Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nMethod 2: Stool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
 };
