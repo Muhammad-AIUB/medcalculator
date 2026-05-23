@@ -60,6 +60,7 @@ import { calculateABCD2 } from './abcd2'
 import { calculateICH } from './ich'
 import { calculateMRS } from './mrs'
 import { calculateHuntHess } from './hunt-hess'
+import { calculateEDSS } from './edss'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1701,6 +1702,35 @@ export const CALCULATORS: Calculator[] = [
         label: 'PRECISE-DAPT Score',
         interpretation: result.interpretation,
       };
+    },
+  },
+  {
+    id: 'edss',
+    title: 'Expanded Disability Status Scale (EDSS)',
+    shortTitle: 'EDSS',
+    emoji: '🧠',
+    description: 'Quantifies MS disability from 0–10 using ambulation and 8 functional systems (pyramidal, cerebellar, brainstem, sensory, bowel/bladder, visual, cerebral, other)',
+    category: 'critical-care',
+    icon: 'Brain',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    tags: ['EDSS', 'multiple sclerosis', 'MS', 'disability', 'FSS', 'Kurtzke', 'neurology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateEDSS({
+        ambulation: Number(inputs.ambulation ?? 0),
+        fss: {
+          pyramidal:    Number(inputs.pyramidal    ?? 0),
+          cerebellar:   Number(inputs.cerebellar   ?? 0),
+          brainstem:    Number(inputs.brainstem    ?? 0),
+          sensory:      Number(inputs.sensory      ?? 0),
+          bowelBladder: Number(inputs.bowelBladder ?? 0),
+          visual:       Number(inputs.visual       ?? 0),
+          cerebral:     Number(inputs.cerebral     ?? 0),
+          other:        Number(inputs.other        ?? 0),
+        },
+      });
+      return { calculatorId: 'edss', score: result.score, unit: '', severity: result.severity, label: 'EDSS Score', interpretation: result.interpretation };
     },
   },
   {

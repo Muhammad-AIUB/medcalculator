@@ -68,6 +68,7 @@ const Abcd2Form                    = dynamic(() => import('@/components/calculat
 const IchForm                      = dynamic(() => import('@/components/calculators/ich-form').then(m => ({ default: m.IchForm })), { ssr: false });
 const MrsForm                      = dynamic(() => import('@/components/calculators/mrs-form').then(m => ({ default: m.MrsForm })), { ssr: false });
 const HuntHessForm                 = dynamic(() => import('@/components/calculators/hunt-hess-form').then(m => ({ default: m.HuntHessForm })), { ssr: false });
+const EdssForm                     = dynamic(() => import('@/components/calculators/edss-form').then(m => ({ default: m.EdssForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -131,6 +132,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   ich:                        IchForm,
   mrs:                        MrsForm,
   'hunt-hess':                HuntHessForm,
+  edss:                       EdssForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -195,6 +197,7 @@ const FORMULA_MAP: Record<string, string> = {
   ich: 'ICH Score = GCS + Age(≥80) + ICH Volume(≥30mL) + IVH + Infratentorial\n\nGCS 13-15: 0 | 5-12: +1 | 3-4: +2\nAge ≥80: +1\nICH volume ≥30 mL: +1\nIntraventricular hemorrhage: +1\nInfratentorial origin: +1\n\nMax score: 6\n\nScore | 30-day Mortality\n0     | 0%\n1     | 13%\n2     | 26%\n3     | 72%\n4     | 97%\n5–6   | 100%',
   mrs: 'Assignation of points based on severity of disability:\n\n0: No symptoms at all\n1: No significant disability despite symptoms\n2: Slight disability\n3: Moderate disability (some help, walks unaided)\n4: Moderately severe disability (cannot walk/self-care unaided)\n5: Severe disability (bedridden, incontinent)\n6: Dead',
   'hunt-hess': 'Selection of group of symptoms, assigned point value:\n\nGrade 1: Mild headache, alert, minimal nuchal rigidity (~70% survival)\nGrade 2: Full nuchal rigidity, moderate-severe headache, no neuro deficit (~60% survival)\nGrade 3: Lethargy/confusion, mild focal deficit (~50% survival)\nGrade 4: Stuporous, more severe focal deficit (~20% survival)\nGrade 5: Comatose, severe neurological impairment (~10% survival)',
+  edss: 'EDSS: Points assigned based on level of disability.\nFSS: Addition of selected points within each body system.\n\nAmbulation score (4.0–10.0) takes precedence when ambulatory function is impaired.\nWhen fully ambulatory, EDSS is derived from FSS subscores (0–3.5):\n\n0:   Normal\n1.0: One FS grade 1\n1.5: >1 FS grade 1\n2.0: One FS grade 2\n2.5: Two FS grade 2\n3.0: One FS grade 3\n3.5: ≥2 FS grade 3, or more complex impairment\n\nFunctional Systems (FSS): Pyramidal (0-6), Cerebellar (0-5), Brainstem (0-5),\nSensory (0-6), Bowel/Bladder (0-6), Visual (0-6), Cerebral (0-5), Other (0-1)',
 };
 
 const severityColors: Record<string, string> = {
