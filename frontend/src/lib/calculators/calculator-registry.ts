@@ -67,6 +67,7 @@ import { calculateMoCA } from './moca'
 import { calculateCURB65 } from './curb65'
 import { calculateBODE } from './bode'
 import { calculateGOLD } from './gold-copd'
+import { calculatePERC } from './perc'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -2091,6 +2092,48 @@ export const CALCULATORS: Calculator[] = [
         severity: result.groupSeverity,
         label: `GOLD ${result.grade} / Group ${result.group}`,
         interpretation: `${result.gradeInterpretation}; ${result.groupInterpretation}`,
+      };
+    },
+  },
+  {
+    id: 'perc',
+    title: 'PERC Rule for Pulmonary Embolism',
+    shortTitle: 'PERC Rule',
+    emoji: '🫀',
+    description: 'Rules out PE without further testing in low pre-test probability patients when all 8 criteria are absent',
+    category: 'cardiovascular',
+    icon: 'Activity',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50 dark:bg-red-950',
+    tags: ['PERC', 'pulmonary embolism', 'PE', 'rule-out', 'DVT', 'thrombosis'],
+    inputs: [
+      { id: 'age50',       label: 'Age ≥50',            type: 'number', required: true },
+      { id: 'hr100',       label: 'HR ≥100',             type: 'number', required: true },
+      { id: 'o2sat',       label: 'O₂ sat <95%',         type: 'number', required: true },
+      { id: 'legSwelling', label: 'Leg swelling',         type: 'number', required: true },
+      { id: 'hemoptysis',  label: 'Hemoptysis',           type: 'number', required: true },
+      { id: 'surgery',     label: 'Recent surgery/trauma', type: 'number', required: true },
+      { id: 'priorPeDvt',  label: 'Prior PE or DVT',      type: 'number', required: true },
+      { id: 'hormones',    label: 'Hormone use',           type: 'number', required: true },
+    ],
+    calculate: (inputs) => {
+      const result = calculatePERC({
+        age50:       Number(inputs.age50)       as 0 | 1,
+        hr100:       Number(inputs.hr100)       as 0 | 1,
+        o2sat:       Number(inputs.o2sat)       as 0 | 1,
+        legSwelling: Number(inputs.legSwelling) as 0 | 1,
+        hemoptysis:  Number(inputs.hemoptysis)  as 0 | 1,
+        surgery:     Number(inputs.surgery)     as 0 | 1,
+        priorPeDvt:  Number(inputs.priorPeDvt)  as 0 | 1,
+        hormones:    Number(inputs.hormones)    as 0 | 1,
+      });
+      return {
+        calculatorId: 'perc',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'PERC Score',
+        interpretation: result.interpretation,
       };
     },
   },
