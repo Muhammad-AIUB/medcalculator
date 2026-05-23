@@ -64,6 +64,7 @@ import { calculateEDSS } from './edss'
 import { calculateASPECTS } from './aspects'
 import { calculateApache2 } from './apache2'
 import { calculateMoCA } from './moca'
+import { calculateCURB65 } from './curb65'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1989,6 +1990,42 @@ export const CALCULATORS: Calculator[] = [
         unit: '/ 30',
         severity: result.severity,
         label: 'MoCA Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'curb65',
+    title: 'CURB-65 Score',
+    shortTitle: 'CURB-65',
+    emoji: '🫁',
+    description: 'Predicts 30-day mortality in community-acquired pneumonia to guide inpatient vs outpatient management',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-blue-600',
+    bgColor: 'bg-blue-50 dark:bg-blue-950',
+    tags: ['CURB-65', 'pneumonia', 'CAP', 'severity', 'mortality', 'pulmonary'],
+    inputs: [
+      { id: 'confusion', label: 'Confusion',        type: 'number', required: true },
+      { id: 'bun',       label: 'BUN >19 mg/dL',    type: 'number', required: true },
+      { id: 'rr',        label: 'Resp Rate ≥30',     type: 'number', required: true },
+      { id: 'bp',        label: 'Low BP',            type: 'number', required: true },
+      { id: 'age65',     label: 'Age ≥65',           type: 'number', required: true },
+    ],
+    calculate: (inputs) => {
+      const result = calculateCURB65({
+        confusion: Number(inputs.confusion) as 0 | 1,
+        bun:       Number(inputs.bun)       as 0 | 1,
+        rr:        Number(inputs.rr)        as 0 | 1,
+        bp:        Number(inputs.bp)        as 0 | 1,
+        age65:     Number(inputs.age65)     as 0 | 1,
+      });
+      return {
+        calculatorId: 'curb65',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'CURB-65 Score',
         interpretation: result.interpretation,
       };
     },
