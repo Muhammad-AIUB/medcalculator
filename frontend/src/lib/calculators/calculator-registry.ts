@@ -68,6 +68,8 @@ import { calculateCURB65 } from './curb65'
 import { calculateBODE } from './bode'
 import { calculateGOLD } from './gold-copd'
 import { calculatePERC } from './perc'
+import { calculateStopBang } from './stop-bang'
+import { calculateMMRC } from './mmrc'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -2133,6 +2135,74 @@ export const CALCULATORS: Calculator[] = [
         unit: '',
         severity: result.severity,
         label: 'PERC Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'stop-bang',
+    title: 'STOP-BANG Score for Sleep Apnea',
+    shortTitle: 'STOP-BANG',
+    emoji: '😴',
+    description: 'Screens for obstructive sleep apnea risk using 8 clinical criteria across subjective symptoms and objective measures',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-indigo-600',
+    bgColor: 'bg-indigo-50 dark:bg-indigo-950',
+    tags: ['STOP-BANG', 'sleep apnea', 'OSA', 'snoring', 'sleep', 'screening'],
+    inputs: [
+      { id: 'snore',    label: 'Snore loudly',   type: 'number', required: true },
+      { id: 'tired',    label: 'Daytime tired',   type: 'number', required: true },
+      { id: 'observed', label: 'Observed apnea',  type: 'number', required: true },
+      { id: 'pressure', label: 'High BP',         type: 'number', required: true },
+      { id: 'bmi',      label: 'BMI >35',         type: 'number', required: true },
+      { id: 'age',      label: 'Age >50',         type: 'number', required: true },
+      { id: 'neck',     label: 'Neck >40 cm',     type: 'number', required: true },
+      { id: 'gender',   label: 'Gender male',     type: 'number', required: true },
+    ],
+    calculate: (inputs) => {
+      const result = calculateStopBang({
+        snore:    Number(inputs.snore)    as 0|1,
+        tired:    Number(inputs.tired)    as 0|1,
+        observed: Number(inputs.observed) as 0|1,
+        pressure: Number(inputs.pressure) as 0|1,
+        bmi:      Number(inputs.bmi)      as 0|1,
+        age:      Number(inputs.age)      as 0|1,
+        neck:     Number(inputs.neck)     as 0|1,
+        gender:   Number(inputs.gender)   as 0|1,
+      });
+      return {
+        calculatorId: 'stop-bang',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'STOP-BANG Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'mmrc',
+    title: 'mMRC Dyspnea Scale',
+    shortTitle: 'mMRC',
+    emoji: '🫁',
+    description: 'Classifies dyspnea severity using the Modified Medical Research Council scale (Grade 0–4)',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-sky-600',
+    bgColor: 'bg-sky-50 dark:bg-sky-950',
+    tags: ['mMRC', 'dyspnea', 'COPD', 'breathlessness', 'MRC', 'pulmonary'],
+    inputs: [
+      { id: 'grade', label: 'mMRC Grade', type: 'number', required: true },
+    ],
+    calculate: (inputs) => {
+      const result = calculateMMRC(Number(inputs.grade));
+      return {
+        calculatorId: 'mmrc',
+        score: result.grade,
+        unit: '',
+        severity: result.severity,
+        label: 'mMRC Grade',
         interpretation: result.interpretation,
       };
     },
