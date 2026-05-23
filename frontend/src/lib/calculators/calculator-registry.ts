@@ -65,6 +65,7 @@ import { calculateASPECTS } from './aspects'
 import { calculateApache2 } from './apache2'
 import { calculateMoCA } from './moca'
 import { calculateCURB65 } from './curb65'
+import { calculateBODE } from './bode'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -2026,6 +2027,36 @@ export const CALCULATORS: Calculator[] = [
         unit: '',
         severity: result.severity,
         label: 'CURB-65 Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'bode',
+    title: 'BODE Index for COPD Survival',
+    shortTitle: 'BODE Index',
+    emoji: '🫁',
+    description: 'Predicts COPD survival using Body-mass index, airflow Obstruction, Dyspnea, and Exercise capacity',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-sky-600',
+    bgColor: 'bg-sky-50 dark:bg-sky-950',
+    tags: ['BODE', 'COPD', 'survival', 'spirometry', 'FEV1', 'dyspnea', 'pulmonary'],
+    inputs: [
+      { id: 'fev1', label: 'FEV₁ (% predicted)', type: 'number', required: true },
+      { id: 'mwd',  label: '6MWD (m)',            type: 'number', required: true },
+      { id: 'mmrc', label: 'mMRC',                type: 'number', required: true },
+      { id: 'bmi',  label: 'BMI',                 type: 'number', required: true },
+    ],
+    calculate: (inputs) => {
+      const score = Number(inputs.fev1) + Number(inputs.mwd) + Number(inputs.mmrc) + Number(inputs.bmi);
+      const result = calculateBODE(score);
+      return {
+        calculatorId: 'bode',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'BODE Index',
         interpretation: result.interpretation,
       };
     },
