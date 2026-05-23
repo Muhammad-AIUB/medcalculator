@@ -63,6 +63,7 @@ import { calculateHuntHess } from './hunt-hess'
 import { calculateEDSS } from './edss'
 import { calculateASPECTS } from './aspects'
 import { calculateApache2 } from './apache2'
+import { calculateMoCA } from './moca'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1962,6 +1963,32 @@ export const CALCULATORS: Calculator[] = [
         unit: '',
         severity: result.severity,
         label: 'APACHE II Score',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'moca',
+    title: 'Montreal Cognitive Assessment (MoCA)',
+    shortTitle: 'MoCA',
+    emoji: '🧠',
+    description: 'Screen for mild cognitive impairment across visuospatial, naming, attention, language, abstraction, recall, and orientation domains',
+    category: 'critical-care',
+    icon: 'Brain',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50 dark:bg-purple-950',
+    tags: ['MoCA', 'cognitive', 'dementia', 'MCI', 'neurology', 'Montreal'],
+    inputs: [
+      { id: 'score', label: 'MoCA Score', type: 'number', required: true },
+    ],
+    calculate: (inputs) => {
+      const result = calculateMoCA(Number(inputs.score));
+      return {
+        calculatorId: 'moca',
+        score: result.score,
+        unit: '/ 30',
+        severity: result.severity,
+        label: 'MoCA Score',
         interpretation: result.interpretation,
       };
     },
