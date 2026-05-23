@@ -62,6 +62,7 @@ import { calculateMRS } from './mrs'
 import { calculateHuntHess } from './hunt-hess'
 import { calculateEDSS } from './edss'
 import { calculateASPECTS } from './aspects'
+import { calculateApache2 } from './apache2'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1904,6 +1905,63 @@ export const CALCULATORS: Calculator[] = [
         unit: 'mg',
         severity: result.severity,
         label: 'Total Iron Deficit',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'apache2',
+    title: 'APACHE II Score',
+    shortTitle: 'APACHE II',
+    emoji: '🏥',
+    description: 'Acute Physiology and Chronic Health Evaluation II — ICU severity of illness and predicted hospital mortality',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50 dark:bg-red-950',
+    tags: ['APACHE II', 'ICU', 'critical care', 'severity', 'mortality', 'APS'],
+    inputs: [
+      { id: 'chronicHealth',    label: 'Chronic health',     type: 'number', required: true },
+      { id: 'age',              label: 'Age',                type: 'number', required: true },
+      { id: 'tempC',            label: 'Temperature (°C)',   type: 'number', required: true },
+      { id: 'map',              label: 'MAP (mmHg)',         type: 'number', required: true },
+      { id: 'ph',               label: 'Arterial pH',        type: 'number', required: true },
+      { id: 'hr',               label: 'Heart rate',         type: 'number', required: true },
+      { id: 'rr',               label: 'Respiratory rate',   type: 'number', required: true },
+      { id: 'sodium',           label: 'Sodium (mmol/L)',    type: 'number', required: true },
+      { id: 'potassium',        label: 'Potassium (mmol/L)', type: 'number', required: true },
+      { id: 'creatinine',       label: 'Creatinine (mg/dL)', type: 'number', required: true },
+      { id: 'acuteRenalFailure',label: 'Acute renal failure',type: 'number', required: true },
+      { id: 'hematocrit',       label: 'Hematocrit (%)',     type: 'number', required: true },
+      { id: 'wbc',              label: 'WBC (×10³/µL)',      type: 'number', required: true },
+      { id: 'gcs',              label: 'GCS',                type: 'number', required: true },
+    ],
+    calculate: (inputs) => {
+      const result = calculateApache2({
+        chronicHealth:    Number(inputs.chronicHealth) as 0 | 1,
+        age:              Number(inputs.age),
+        tempC:            Number(inputs.tempC),
+        map:              Number(inputs.map),
+        ph:               Number(inputs.ph),
+        hr:               Number(inputs.hr),
+        rr:               Number(inputs.rr),
+        sodium:           Number(inputs.sodium),
+        potassium:        Number(inputs.potassium),
+        creatinine:       Number(inputs.creatinine),
+        acuteRenalFailure: Number(inputs.acuteRenalFailure) as 0 | 1,
+        hematocrit:       Number(inputs.hematocrit),
+        wbc:              Number(inputs.wbc),
+        gcs:              Number(inputs.gcs),
+        fio2High:         Boolean(inputs.fio2High),
+        pao2:             inputs.pao2 ? Number(inputs.pao2) : undefined,
+        aado2:            inputs.aado2 ? Number(inputs.aado2) : undefined,
+      });
+      return {
+        calculatorId: 'apache2',
+        score: result.score,
+        unit: '',
+        severity: result.severity,
+        label: 'APACHE II Score',
         interpretation: result.interpretation,
       };
     },

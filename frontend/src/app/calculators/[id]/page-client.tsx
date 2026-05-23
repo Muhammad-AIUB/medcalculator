@@ -70,6 +70,7 @@ const MrsForm                      = dynamic(() => import('@/components/calculat
 const HuntHessForm                 = dynamic(() => import('@/components/calculators/hunt-hess-form').then(m => ({ default: m.HuntHessForm })), { ssr: false });
 const EdssForm                     = dynamic(() => import('@/components/calculators/edss-form').then(m => ({ default: m.EdssForm })), { ssr: false });
 const AspectsForm                  = dynamic(() => import('@/components/calculators/aspects-form').then(m => ({ default: m.AspectsForm })), { ssr: false });
+const Apache2Form                  = dynamic(() => import('@/components/calculators/apache2-form').then(m => ({ default: m.Apache2Form })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -135,6 +136,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   'hunt-hess':                HuntHessForm,
   edss:                       EdssForm,
   aspects:                    AspectsForm,
+  apache2:                    Apache2Form,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -200,6 +202,7 @@ const FORMULA_MAP: Record<string, string> = {
   mrs: 'Assignation of points based on severity of disability:\n\n0: No symptoms at all\n1: No significant disability despite symptoms\n2: Slight disability\n3: Moderate disability (some help, walks unaided)\n4: Moderately severe disability (cannot walk/self-care unaided)\n5: Severe disability (bedridden, incontinent)\n6: Dead',
   'hunt-hess': 'Selection of group of symptoms, assigned point value:\n\nGrade 1: Mild headache, alert, minimal nuchal rigidity (~70% survival)\nGrade 2: Full nuchal rigidity, moderate-severe headache, no neuro deficit (~60% survival)\nGrade 3: Lethargy/confusion, mild focal deficit (~50% survival)\nGrade 4: Stuporous, more severe focal deficit (~20% survival)\nGrade 5: Comatose, severe neurological impairment (~10% survival)',
   aspects: 'ASPECTS = 10 − (1 point for each region with early ischemic change)\n\nSubcortical Structures (3 pts): C (Caudate), IC (Internal Capsule), L (Lentiform nucleus)\nMCA Cortex (7 pts): I (Insular ribbon), M1 (Anterior MCA cortex), M2 (Lateral to insular ribbon),\nM3 (Posterior MCA cortex), M4 (Rostral to M1), M5 (Rostral to M3), M6 (Posterior rostral to M3)\n\n10:  Normal CT scan\n8–9: Minimal ischemic change\n≤7:  Highly correlates with negative functional outcome (mRS)\n0:   Diffuse involvement throughout MCA territory',
+  apache2: 'APACHE II = APS + Age Points + Chronic Health Points\n\nAPS (Acute Physiology Score, 0–60): sum of 12 physiological variables\n  Temperature | MAP | Heart rate | Respiratory rate | Oxygenation\n  Arterial pH | Sodium | Potassium | Creatinine (×2 if ARF)\n  Hematocrit | WBC | (15 − GCS)\n\nAge Points: <44→0, 45-54→+2, 55-64→+3, 65-74→+5, ≥75→+6\nChronic Health: +5 if severe organ failure/immunocompromise\n\nMax score: 71\n\nScore  | Predicted Hospital Mortality\n0–4    | ~4%\n5–9    | ~8%\n10–14  | ~15%\n15–19  | ~25%\n20–24  | ~40%\n25–29  | ~55%\n30–34  | ~75%\n≥35    | ~85%',
   edss: 'EDSS: Points assigned based on level of disability.\nFSS: Addition of selected points within each body system.\n\nAmbulation score (4.0–10.0) takes precedence when ambulatory function is impaired.\nWhen fully ambulatory, EDSS is derived from FSS subscores (0–3.5):\n\n0:   Normal\n1.0: One FS grade 1\n1.5: >1 FS grade 1\n2.0: One FS grade 2\n2.5: Two FS grade 2\n3.0: One FS grade 3\n3.5: ≥2 FS grade 3, or more complex impairment\n\nFunctional Systems (FSS): Pyramidal (0-6), Cerebellar (0-5), Brainstem (0-5),\nSensory (0-6), Bowel/Bladder (0-6), Visual (0-6), Cerebral (0-5), Other (0-1)',
 };
 
