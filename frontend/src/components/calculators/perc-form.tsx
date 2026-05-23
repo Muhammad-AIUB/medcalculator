@@ -47,7 +47,7 @@ export function PercForm({ onResult }: Props) {
       inputs: vals,
       formulaUsed:
         `PERC = sum of positive criteria (0–8)\n` +
-        `     = ${Object.values(vals).reduce((a, b) => a + b, 0)}\n\n` +
+        `     = ${liveResult.score}\n\n` +
         `0 (PERC Negative): PE can be ruled out in low pre-test probability\n` +
         `≥1 (PERC Positive): Cannot rule out PE — further workup required`,
       references: liveResult.references,
