@@ -61,6 +61,7 @@ import { calculateICH } from './ich'
 import { calculateMRS } from './mrs'
 import { calculateHuntHess } from './hunt-hess'
 import { calculateEDSS } from './edss'
+import { calculateASPECTS } from './aspects'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -1702,6 +1703,34 @@ export const CALCULATORS: Calculator[] = [
         label: 'PRECISE-DAPT Score',
         interpretation: result.interpretation,
       };
+    },
+  },
+  {
+    id: 'aspects',
+    title: 'ASPECTS Score',
+    shortTitle: 'ASPECTS',
+    emoji: '🧠',
+    description: 'Alberta Stroke Program Early CT Score — quantifies early ischemic change in MCA territory (10 regions, score 0–10)',
+    category: 'critical-care',
+    icon: 'Brain',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    tags: ['ASPECTS', 'stroke', 'CT', 'MCA', 'ischemia', 'thrombolysis', 'tPA', 'neurology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateASPECTS({
+        caudate:         Number(inputs.caudate         ?? 0) as 0|-1,
+        internalCapsule: Number(inputs.internalCapsule ?? 0) as 0|-1,
+        lentiform:       Number(inputs.lentiform       ?? 0) as 0|-1,
+        insularRibbon:   Number(inputs.insularRibbon   ?? 0) as 0|-1,
+        m1:              Number(inputs.m1              ?? 0) as 0|-1,
+        m2:              Number(inputs.m2              ?? 0) as 0|-1,
+        m3:              Number(inputs.m3              ?? 0) as 0|-1,
+        m4:              Number(inputs.m4              ?? 0) as 0|-1,
+        m5:              Number(inputs.m5              ?? 0) as 0|-1,
+        m6:              Number(inputs.m6              ?? 0) as 0|-1,
+      });
+      return { calculatorId: 'aspects', score: result.score, unit: '', severity: result.severity, label: 'ASPECTS Score', interpretation: result.interpretation };
     },
   },
   {
