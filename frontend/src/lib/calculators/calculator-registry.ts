@@ -66,6 +66,7 @@ import { calculateApache2 } from './apache2'
 import { calculateMoCA } from './moca'
 import { calculateCURB65 } from './curb65'
 import { calculateBODE } from './bode'
+import { calculateGOLD } from './gold-copd'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -2058,6 +2059,38 @@ export const CALCULATORS: Calculator[] = [
         severity: result.severity,
         label: 'BODE Index',
         interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'gold-copd',
+    title: 'GOLD COPD Assessment',
+    shortTitle: 'GOLD COPD',
+    emoji: '🫁',
+    description: 'Classifies COPD severity (Grade 1–4) and guides treatment (Group A/B/E) based on FEV₁, symptoms, and exacerbation history (GOLD 2024)',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50 dark:bg-amber-950',
+    tags: ['GOLD', 'COPD', 'FEV1', 'spirometry', 'dyspnea', 'exacerbation', 'pulmonary'],
+    inputs: [
+      { id: 'symptoms',       label: 'Symptom burden',      type: 'number', required: true },
+      { id: 'exacerbation',   label: 'Exacerbation history', type: 'number', required: true },
+      { id: 'fev1',           label: 'FEV₁ % predicted',    type: 'number', required: true },
+    ],
+    calculate: (inputs) => {
+      const result = calculateGOLD({
+        symptoms:        Number(inputs.symptoms) === 0 ? 'lower' : 'higher',
+        exacerbationIdx: Number(inputs.exacerbation) as 0 | 1 | 2 | 3,
+        fev1Idx:         Number(inputs.fev1) as 0 | 1 | 2 | 3,
+      });
+      return {
+        calculatorId: 'gold-copd',
+        score: result.grade,
+        unit: '',
+        severity: result.groupSeverity,
+        label: `GOLD ${result.grade} / Group ${result.group}`,
+        interpretation: `${result.gradeInterpretation}; ${result.groupInterpretation}`,
       };
     },
   },
