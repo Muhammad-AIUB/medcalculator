@@ -18,14 +18,17 @@ export function calculateAPRI(input: APRIInput): CalculationResult {
   const score = ast / astUpperLimit / platelets109L
   const roundedScore = Number(score.toFixed(4))
 
-  let label = 'Lower likelihood of significant fibrosis'
+  let label = 'Significant fibrosis unlikely'
   let severity: 'success' | 'warning' | 'danger' = 'success'
 
-  if (score > 1.5) {
-    label = 'Higher likelihood of significant fibrosis'
+  if (score > 2.0) {
+    label = 'Suggests cirrhosis'
+    severity = 'danger'
+  } else if (score > 1.5) {
+    label = 'Suggests significant fibrosis'
     severity = 'danger'
   } else if (score >= 0.5) {
-    label = 'Indeterminate'
+    label = 'Indeterminate / possible fibrosis'
     severity = 'warning'
   }
 

@@ -12,16 +12,16 @@ export function calculateBODE(score: number): {
 
   if (score <= 2) {
     severity       = 'success';
-    interpretation = `BODE ${score} — Quartile 1; ~80% 4-year survival`;
+    interpretation = `BODE ${score} — Q1; ~80% 4-year survival. Low mortality risk.`;
   } else if (score <= 4) {
     severity       = 'warning';
-    interpretation = `BODE ${score} — Quartile 2; ~67% 4-year survival`;
+    interpretation = `BODE ${score} — Q2; ~67% 4-year survival. Moderate mortality risk.`;
   } else if (score <= 6) {
     severity       = 'danger';
-    interpretation = `BODE ${score} — Quartile 3; ~57% 4-year survival`;
+    interpretation = `BODE ${score} — Q3; ~57% 4-year survival. High mortality risk.`;
   } else {
     severity       = 'danger';
-    interpretation = `BODE ${score} — Quartile 4; ~18% 4-year survival`;
+    interpretation = `BODE ${score} — Q4; ~18% 4-year survival. Very high mortality risk.`;
   }
 
   return {

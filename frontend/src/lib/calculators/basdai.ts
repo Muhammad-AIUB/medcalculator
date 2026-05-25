@@ -24,12 +24,12 @@ export function calculateBASDAI(input: BASDAIInput): CalculationResult {
   let label = 'Low disease activity'
   let severity: 'success' | 'warning' | 'danger' = 'success'
 
-  if (score >= 4) {
-    label = 'Active disease'
+  if (score > 6) {
+    label = 'Very high disease activity'
     severity = 'danger'
-  } else if (score >= 2) {
-    label = 'Moderate disease activity'
-    severity = 'warning'
+  } else if (score >= 4) {
+    label = 'Active disease; biologic therapy may be considered'
+    severity = 'danger'
   }
 
   return {

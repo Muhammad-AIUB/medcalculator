@@ -23,16 +23,19 @@ export function calculateANC(input: AncInput): {
 
   if (anc >= 1500) {
     severity       = 'success';
-    interpretation = `ANC ${anc.toLocaleString()} cells/µL — Normal (no neutropenia)`;
+    interpretation = `ANC ${anc.toLocaleString()} cells/µL — Normal. No significant increased risk.`;
   } else if (anc >= 1000) {
     severity       = 'warning';
-    interpretation = `ANC ${anc.toLocaleString()} cells/µL — Mild neutropenia (1,000–1,499)`;
+    interpretation = `ANC ${anc.toLocaleString()} cells/µL — Mild neutropenia. Usually minimal risk.`;
   } else if (anc >= 500) {
     severity       = 'warning';
-    interpretation = `ANC ${anc.toLocaleString()} cells/µL — Moderate neutropenia (500–999)`;
+    interpretation = `ANC ${anc.toLocaleString()} cells/µL — Moderate neutropenia. Increased infection risk.`;
+  } else if (anc >= 100) {
+    severity       = 'danger';
+    interpretation = `ANC ${anc.toLocaleString()} cells/µL — Severe neutropenia. High risk of serious infection.`;
   } else {
     severity       = 'danger';
-    interpretation = `ANC ${anc.toLocaleString()} cells/µL — Severe neutropenia (< 500)`;
+    interpretation = `ANC ${anc.toLocaleString()} cells/µL — Profound neutropenia. Very high/life-threatening infection risk.`;
   }
 
   return {

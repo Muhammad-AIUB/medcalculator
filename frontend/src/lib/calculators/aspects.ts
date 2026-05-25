@@ -29,19 +29,19 @@ export function calculateASPECTS(input: ASPECTSInput): {
 
   if (score === 10) {
     severity       = 'success';
-    interpretation = 'ASPECTS 10 — Normal CT scan; no early ischemic change';
+    interpretation = 'ASPECTS 10 — No ischemic change. Normal CT.';
   } else if (score >= 8) {
     severity       = 'warning';
-    interpretation = `ASPECTS ${score} — Minimal early ischemic change`;
-  } else if (score >= 5) {
+    interpretation = `ASPECTS ${score} — Small infarct core. Good prognosis; favorable for reperfusion.`;
+  } else if (score >= 6) {
     severity       = 'danger';
-    interpretation = `ASPECTS ${score} — Moderate ischemic change; correlates with poor functional outcome`;
-  } else if (score > 0) {
+    interpretation = `ASPECTS ${score} — Moderate infarct size. Possible thrombectomy/thrombolysis candidate.`;
+  } else if (score >= 1) {
     severity       = 'danger';
-    interpretation = `ASPECTS ${score} — Extensive ischemic change; poor prognosis`;
+    interpretation = `ASPECTS ${score} — Large infarct core. Higher risk of poor outcome and hemorrhagic transformation.`;
   } else {
     severity       = 'danger';
-    interpretation = 'ASPECTS 0 — Diffuse involvement throughout the MCA territory';
+    interpretation = 'ASPECTS 0 — Diffuse MCA infarction. Very severe stroke.';
   }
 
   return {

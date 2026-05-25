@@ -19,10 +19,10 @@ export function calculateAIH(input: AIHInput): CalculationResult {
   let severity: 'success' | 'warning' | 'danger' = 'success'
 
   if (score >= 7) {
-    label = 'Definite AIH'
+    label = 'Definite Autoimmune Hepatitis'
     severity = 'danger'
   } else if (score >= 6) {
-    label = 'Probable AIH'
+    label = 'Probable Autoimmune Hepatitis'
     severity = 'warning'
   }
 

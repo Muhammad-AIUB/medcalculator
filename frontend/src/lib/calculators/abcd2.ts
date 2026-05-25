@@ -21,13 +21,13 @@ export function calculateABCD2(input: ABCD2Input): {
 
   if (score <= 3) {
     severity       = 'success';
-    interpretation = `ABCD² ${score} — Low risk (2-day stroke risk ~1%)`;
+    interpretation = `ABCD² ${score} — Low Risk. 2-day stroke risk: 1.0%, 7-day: 1.2%, 90-day: 3.1%. Outpatient management usually appropriate.`;
   } else if (score <= 5) {
     severity       = 'warning';
-    interpretation = `ABCD² ${score} — Moderate risk (2-day stroke risk ~4%)`;
+    interpretation = `ABCD² ${score} — Moderate Risk. 2-day stroke risk: 4.1%, 7-day: 5.9%, 90-day: 9.8%. Hospital observation/admission justified in most situations.`;
   } else {
     severity       = 'danger';
-    interpretation = `ABCD² ${score} — High risk (2-day stroke risk ~8%)`;
+    interpretation = `ABCD² ${score} — High Risk. 2-day stroke risk: 8.1%, 7-day: 11.7%, 90-day: 17.8%. Urgent hospitalization/specialist evaluation strongly recommended.`;
   }
 
   return {

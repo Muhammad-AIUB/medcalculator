@@ -11,14 +11,12 @@ function getBMICategory(bmi: number): {
   severity: 'success' | 'warning' | 'danger'
   description: string
 } {
-  if (bmi < 16) return { label: 'Severe Underweight', severity: 'danger', description: 'Severe malnutrition risk - immediate nutritional support needed' }
-  if (bmi < 17) return { label: 'Moderate Underweight', severity: 'danger', description: 'Moderate malnutrition risk' }
-  if (bmi < 18.5) return { label: 'Mild Underweight', severity: 'warning', description: 'Below normal weight range' }
-  if (bmi < 25) return { label: 'Normal Weight', severity: 'success', description: 'Healthy BMI range (WHO 18.5-24.9)' }
-  if (bmi < 30) return { label: 'Overweight', severity: 'warning', description: 'Above normal weight range - lifestyle modification recommended' }
-  if (bmi < 35) return { label: 'Obesity Class I', severity: 'warning', description: 'Obesity - medical assessment recommended' }
-  if (bmi < 40) return { label: 'Obesity Class II', severity: 'danger', description: 'Severe obesity - comprehensive management required' }
-  return { label: 'Obesity Class III', severity: 'danger', description: 'Morbid obesity - bariatric evaluation recommended' }
+  if (bmi < 18.5) return { label: 'Underweight', severity: 'warning', description: 'Below normal weight range (BMI < 18.5)' }
+  if (bmi < 25) return { label: 'Normal weight', severity: 'success', description: 'Healthy BMI range (WHO 18.5–24.9)' }
+  if (bmi < 30) return { label: 'Overweight', severity: 'warning', description: 'Above normal weight range (BMI 25.0–29.9)' }
+  if (bmi < 35) return { label: 'Obese (Class I)', severity: 'danger', description: 'Obesity Class I (BMI 30.0–34.9)' }
+  if (bmi < 40) return { label: 'Obese (Class II)', severity: 'danger', description: 'Obesity Class II (BMI 35.0–39.9)' }
+  return { label: 'Obese (Class III / Morbid)', severity: 'danger', description: 'Obesity Class III / Morbid obesity (BMI ≥ 40.0)' }
 }
 
 export function calculateBMI(input: BMIInput): CalculationResult {

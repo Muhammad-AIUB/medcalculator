@@ -21,16 +21,16 @@ export function calculateACR(input: AcrInput): {
 
   if (acr < 30) {
     severity = 'success';
-    category = 'A1 – Normal to mildly increased';
-    interpretation = 'Normal to mildly increased albuminuria (ACR < 30 mg/g)';
+    category = 'A1';
+    interpretation = 'Normal to mildly increased';
   } else if (acr <= 300) {
     severity = 'warning';
-    category = 'A2 – Moderately increased';
-    interpretation = 'Moderately increased albuminuria / microalbuminuria (ACR 30–300 mg/g)';
+    category = 'A2';
+    interpretation = 'Moderately increased albuminuria ("microalbuminuria")';
   } else {
     severity = 'danger';
-    category = 'A3 – Severely increased';
-    interpretation = 'Severely increased albuminuria / macroalbuminuria (ACR > 300 mg/g)';
+    category = 'A3';
+    interpretation = 'Severely increased albuminuria ("macroalbuminuria")';
   }
 
   return {
