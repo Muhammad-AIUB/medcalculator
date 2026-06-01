@@ -2238,8 +2238,8 @@ export const CALCULATORS: Calculator[] = [
   },
   {
     id: 'bsa',
-    title: 'Body Surface Area (Mosteller)',
-    shortTitle: 'BSA',
+    title: 'BSA Mosteller formula',
+    shortTitle: 'BSA Mosteller',
     emoji: '📐',
     description: 'Calculates Body Surface Area (BSA) using the Mosteller formula',
     category: 'nutrition',
@@ -2265,8 +2265,8 @@ export const CALCULATORS: Calculator[] = [
   },
   {
     id: 'bsa-costeff',
-    title: 'Body Surface Area (Costeff)',
-    shortTitle: 'BSA (Costeff)',
+    title: 'BSA Costeff formula',
+    shortTitle: 'BSA Costeff',
     emoji: '📐',
     description: 'Calculates Body Surface Area (BSA) using the Costeff formula (weight only)',
     category: 'nutrition',
