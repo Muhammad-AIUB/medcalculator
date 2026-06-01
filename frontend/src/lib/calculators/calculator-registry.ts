@@ -70,6 +70,7 @@ import { calculateGOLD } from './gold-copd'
 import { calculatePERC } from './perc'
 import { calculateStopBang } from './stop-bang'
 import { calculateMMRC } from './mmrc'
+import { calculateBSA } from './bsa'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -2230,6 +2231,33 @@ export const CALCULATORS: Calculator[] = [
         unit: '%',
         severity: result.severity,
         label: 'URR',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'bsa',
+    title: 'Body Surface Area (Mosteller)',
+    shortTitle: 'BSA',
+    emoji: '📐',
+    description: 'Calculates Body Surface Area (BSA) using the Mosteller formula',
+    category: 'nutrition',
+    icon: 'Ruler',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50',
+    tags: ['BSA', 'body surface area', 'Mosteller', 'dosing', 'chemotherapy'],
+    inputs: [
+      { id: 'heightCm', label: 'Height (cm)', type: 'number', required: true, min: 1, max: 300 },
+      { id: 'weightKg', label: 'Weight (kg)', type: 'number', required: true, min: 1, max: 500 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateBSA({ heightCm: Number(inputs.heightCm), weightKg: Number(inputs.weightKg) });
+      return {
+        calculatorId: 'bsa',
+        score: result.bsa,
+        unit: 'm²',
+        severity: result.severity,
+        label: 'Body Surface Area',
         interpretation: result.interpretation,
       };
     },
