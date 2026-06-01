@@ -79,6 +79,7 @@ const PercForm                     = dynamic(() => import('@/components/calculat
 const StopBangForm                 = dynamic(() => import('@/components/calculators/stop-bang-form').then(m => ({ default: m.StopBangForm })), { ssr: false });
 const MmrcForm                     = dynamic(() => import('@/components/calculators/mmrc-form').then(m => ({ default: m.MmrcForm })), { ssr: false });
 const BsaForm                      = dynamic(() => import('@/components/calculators/bsa-form').then(m => ({ default: m.BsaForm })), { ssr: false });
+const BsaCosteffForm               = dynamic(() => import('@/components/calculators/bsa-costeff-form').then(m => ({ default: m.BsaCosteffForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -153,12 +154,14 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   'stop-bang':                StopBangForm,
   mmrc:                       MmrcForm,
   bsa:                        BsaForm,
+  'bsa-costeff':              BsaCosteffForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
   egfr:         'GFR = 175 x Scr^-1.154 x Age^-0.203 x 1.212 (if Black) x 0.742 (if Female)',
   bmi:          'BMI = Weight (kg) / Height^2 (m^2)',
   bsa:          'BSA (m²) = √[(Height in cm × Weight in kg) / 3600]   (Mosteller)',
+  'bsa-costeff': 'BSA (m²) = (4 × W + 7) / (90 + W)   (Costeff, W in kg)',
   'meld-na':    'MELD = 3.78 x ln(Bilirubin) + 11.2 x ln(INR) + 9.57 x ln(Creatinine) + 6.43\nMELD-Na = MELD - Na - 0.025 x MELD x (140 - Na) + 140',
   'child-pugh': 'Addition of assigned points.',
   sofa:         'SOFA = Coagulation + CNS + Liver + Cardiovascular + Renal (each 0-4 pts)',

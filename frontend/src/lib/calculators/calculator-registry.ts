@@ -71,6 +71,7 @@ import { calculatePERC } from './perc'
 import { calculateStopBang } from './stop-bang'
 import { calculateMMRC } from './mmrc'
 import { calculateBSA } from './bsa'
+import { calculateBSACosteff } from './bsa-costeff'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -2254,6 +2255,32 @@ export const CALCULATORS: Calculator[] = [
       const result = calculateBSA({ heightCm: Number(inputs.heightCm), weightKg: Number(inputs.weightKg) });
       return {
         calculatorId: 'bsa',
+        score: result.bsa,
+        unit: 'm²',
+        severity: result.severity,
+        label: 'Body Surface Area',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'bsa-costeff',
+    title: 'Body Surface Area (Costeff)',
+    shortTitle: 'BSA (Costeff)',
+    emoji: '📐',
+    description: 'Calculates Body Surface Area (BSA) using the Costeff formula (weight only)',
+    category: 'nutrition',
+    icon: 'Ruler',
+    color: 'text-emerald-600',
+    bgColor: 'bg-emerald-50',
+    tags: ['BSA', 'body surface area', 'Costeff', 'dosing', 'pediatric'],
+    inputs: [
+      { id: 'weightKg', label: 'Weight (kg)', type: 'number', required: true, min: 1, max: 500 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateBSACosteff({ weightKg: Number(inputs.weightKg) });
+      return {
+        calculatorId: 'bsa-costeff',
         score: result.bsa,
         unit: 'm²',
         severity: result.severity,
