@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { calculateApache2 } from '@/lib/calculators/apache2';
-import { FieldRow, NumInput, OrDivider } from './shared-ui';
+import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
 
 interface Props { onResult: (result: any) => void; }
 
@@ -182,13 +182,13 @@ export function Apache2Form({ onResult }: Props) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput
             value={tempCStr}
-            onChange={v => { setTempCStr(v); setTempFStr(''); }}
+            onChange={v => { const n = parseFloat(v); setTempCStr(v); setTempFStr(Number.isFinite(n) ? fmt(n * 9 / 5 + 32, 1) : ''); }}
             suffix="°C" step="0.1" min={20} max={45} placeholder="Norm: 36 - 38.4"
           />
           <OrDivider />
           <NumInput
             value={tempFStr}
-            onChange={v => { setTempFStr(v); setTempCStr(''); }}
+            onChange={v => { const n = parseFloat(v); setTempFStr(v); setTempCStr(Number.isFinite(n) ? fmt((n - 32) * 5 / 9, 1) : ''); }}
             suffix="°F" step="0.1" min={68} max={113} placeholder="Norm: 96.8 - 101.1"
           />
         </div>
@@ -229,13 +229,13 @@ export function Apache2Form({ onResult }: Props) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput
             value={naMmolStr}
-            onChange={v => { setNaMmolStr(v); setNaMeqStr(''); }}
+            onChange={v => { setNaMmolStr(v); setNaMeqStr(v); }}
             suffix="mmol/L" step="1" min={0} max={250} placeholder="Norm: 130 - 149"
           />
           <OrDivider />
           <NumInput
             value={naMeqStr}
-            onChange={v => { setNaMeqStr(v); setNaMmolStr(''); }}
+            onChange={v => { setNaMeqStr(v); setNaMmolStr(v); }}
             suffix="mEq/L" step="1" min={0} max={250} placeholder="Norm: 130 - 149"
           />
         </div>
@@ -245,13 +245,13 @@ export function Apache2Form({ onResult }: Props) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput
             value={kMmolStr}
-            onChange={v => { setKMmolStr(v); setKMeqStr(''); }}
+            onChange={v => { setKMmolStr(v); setKMeqStr(v); }}
             suffix="mmol/L" step="0.1" min={0} max={15} placeholder="Norm: 3.5 - 5.4"
           />
           <OrDivider />
           <NumInput
             value={kMeqStr}
-            onChange={v => { setKMeqStr(v); setKMmolStr(''); }}
+            onChange={v => { setKMeqStr(v); setKMmolStr(v); }}
             suffix="mEq/L" step="0.1" min={0} max={15} placeholder="Norm: 3.5 - 5.4"
           />
         </div>
@@ -261,13 +261,13 @@ export function Apache2Form({ onResult }: Props) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput
             value={crUmolStr}
-            onChange={v => { setCrUmolStr(v); setCrMgdlStr(''); }}
+            onChange={v => { const n = parseFloat(v); setCrUmolStr(v); setCrMgdlStr(Number.isFinite(n) && n > 0 ? fmt(n / 88.4, 2) : ''); }}
             suffix="µmol/L" step="1" min={0} max={2000} placeholder="Norm: 62 - 115"
           />
           <OrDivider />
           <NumInput
             value={crMgdlStr}
-            onChange={v => { setCrMgdlStr(v); setCrUmolStr(''); }}
+            onChange={v => { const n = parseFloat(v); setCrMgdlStr(v); setCrUmolStr(Number.isFinite(n) && n > 0 ? fmt(n * 88.4, 0) : ''); }}
             suffix="mg/dL" step="0.1" min={0} max={25} placeholder="Norm: 0.7 - 1.3"
           />
         </div>
@@ -291,13 +291,13 @@ export function Apache2Form({ onResult }: Props) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput
             value={wbcAStr}
-            onChange={v => { setWbcAStr(v); setWbcBStr(''); }}
+            onChange={v => { setWbcAStr(v); setWbcBStr(v); }}
             suffix="×10⁹/L" step="0.1" min={0} max={200} placeholder="Norm: 3 - 14.9"
           />
           <OrDivider />
           <NumInput
             value={wbcBStr}
-            onChange={v => { setWbcBStr(v); setWbcAStr(''); }}
+            onChange={v => { setWbcBStr(v); setWbcAStr(v); }}
             suffix="×10³/µL" step="0.1" min={0} max={200} placeholder="Norm: 3 - 14.9"
           />
         </div>

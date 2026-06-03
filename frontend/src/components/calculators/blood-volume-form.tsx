@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { calculateBloodVolume, PatientType, Sex } from '@/lib/calculators/blood-volume';
-import { FieldRow, NumInput, OrDivider } from './shared-ui';
+import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
 
 interface Props { onResult: (result: any) => void; }
 
@@ -132,13 +132,13 @@ export function BloodVolumeForm({ onResult }: Props) {
           <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
             <NumInput
               value={heightCmStr}
-              onChange={v => { setHeightCmStr(v); setHeightInStr(''); }}
+              onChange={v => { const n = parseFloat(v); setHeightCmStr(v); setHeightInStr(Number.isFinite(n) && n > 0 ? fmt(n / 2.54, 1) : ''); }}
               suffix="cm" step="1" min={0} max={250} placeholder="e.g. 170"
             />
             <OrDivider />
             <NumInput
               value={heightInStr}
-              onChange={v => { setHeightInStr(v); setHeightCmStr(''); }}
+              onChange={v => { const n = parseFloat(v); setHeightInStr(v); setHeightCmStr(Number.isFinite(n) && n > 0 ? fmt(n * 2.54, 1) : ''); }}
               suffix="inch" step="0.5" min={0} max={100} placeholder="e.g. 67"
             />
           </div>
@@ -150,13 +150,13 @@ export function BloodVolumeForm({ onResult }: Props) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput
             value={weightKgStr}
-            onChange={v => { setWeightKgStr(v); setWeightLbStr(''); }}
+            onChange={v => { const n = parseFloat(v); setWeightKgStr(v); setWeightLbStr(Number.isFinite(n) && n > 0 ? fmt(n * 2.205, 1) : ''); }}
             suffix="kg" step="0.1" min={0} max={300} placeholder="e.g. 70"
           />
           <OrDivider />
           <NumInput
             value={weightLbStr}
-            onChange={v => { setWeightLbStr(v); setWeightKgStr(''); }}
+            onChange={v => { const n = parseFloat(v); setWeightLbStr(v); setWeightKgStr(Number.isFinite(n) && n > 0 ? fmt(n / 2.205, 1) : ''); }}
             suffix="lbs" step="1" min={0} max={660} placeholder="e.g. 154"
           />
         </div>

@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { calculateIronDeficit } from '@/lib/calculators/iron-deficit';
-import { FieldRow, NumInput, OrDivider } from './shared-ui';
+import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
 
 interface Props { onResult: (result: any) => void; }
 
@@ -62,13 +62,13 @@ export function IronDeficitForm({ onResult }: Props) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput
             value={wKgStr}
-            onChange={v => { setWKgStr(v); setWLbStr(''); }}
+            onChange={v => { const n = parseFloat(v); setWKgStr(v); setWLbStr(Number.isFinite(n) && n > 0 ? fmt(n * 2.205, 1) : ''); }}
             suffix="kg" step="0.1" min={0} max={300} placeholder="Norm: 1 - 150"
           />
           <OrDivider />
           <NumInput
             value={wLbStr}
-            onChange={v => { setWLbStr(v); setWKgStr(''); }}
+            onChange={v => { const n = parseFloat(v); setWLbStr(v); setWKgStr(Number.isFinite(n) && n > 0 ? fmt(n / 2.205, 1) : ''); }}
             suffix="lbs" step="1" min={0} max={660} placeholder="Norm: 2 - 330"
           />
         </div>
@@ -78,13 +78,13 @@ export function IronDeficitForm({ onResult }: Props) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput
             value={tHbGlStr}
-            onChange={v => { setTHbGlStr(v); setTHbGdlStr(''); }}
+            onChange={v => { const n = parseFloat(v); setTHbGlStr(v); setTHbGdlStr(Number.isFinite(n) && n > 0 ? fmt(n / 10, 1) : ''); }}
             suffix="g/L" step="1" min={0} max={250} placeholder="Norm: 120 - 170"
           />
           <OrDivider />
           <NumInput
             value={tHbGdlStr}
-            onChange={v => { setTHbGdlStr(v); setTHbGlStr(''); }}
+            onChange={v => { const n = parseFloat(v); setTHbGdlStr(v); setTHbGlStr(Number.isFinite(n) && n > 0 ? fmt(n * 10, 0) : ''); }}
             suffix="g/dL" step="0.1" min={0} max={25} placeholder="Norm: 12 - 17"
           />
         </div>
@@ -94,13 +94,13 @@ export function IronDeficitForm({ onResult }: Props) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput
             value={aHbGlStr}
-            onChange={v => { setAHbGlStr(v); setAHbGdlStr(''); }}
+            onChange={v => { const n = parseFloat(v); setAHbGlStr(v); setAHbGdlStr(Number.isFinite(n) && n > 0 ? fmt(n / 10, 1) : ''); }}
             suffix="g/L" step="1" min={0} max={250} placeholder="Norm: 120 - 170"
           />
           <OrDivider />
           <NumInput
             value={aHbGdlStr}
-            onChange={v => { setAHbGdlStr(v); setAHbGlStr(''); }}
+            onChange={v => { const n = parseFloat(v); setAHbGdlStr(v); setAHbGlStr(Number.isFinite(n) && n > 0 ? fmt(n * 10, 0) : ''); }}
             suffix="g/dL" step="0.1" min={0} max={25} placeholder="Norm: 12 - 17"
           />
         </div>

@@ -1,7 +1,7 @@
 'use client';
 import React, { useState, useMemo, useEffect, useRef } from 'react';
 import { calculatePreciseDapt } from '@/lib/calculators/precise-dapt';
-import { FieldRow, NumInput, OrDivider } from './shared-ui';
+import { FieldRow, NumInput, OrDivider, fmt } from './shared-ui';
 
 interface Props { onResult: (result: any) => void; }
 
@@ -90,13 +90,13 @@ export function PreciseDaptForm({ onResult }: Props) {
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput
             value={hbGlStr}
-            onChange={v => { setHbGlStr(v); setHbGdlStr(''); }}
+            onChange={v => { const n = parseFloat(v); setHbGlStr(v); setHbGdlStr(Number.isFinite(n) && n > 0 ? fmt(n / 10, 1) : ''); }}
             suffix="g/L" step="1" min={0} max={250} placeholder="120 – 180"
           />
           <OrDivider />
           <NumInput
             value={hbGdlStr}
-            onChange={v => { setHbGdlStr(v); setHbGlStr(''); }}
+            onChange={v => { const n = parseFloat(v); setHbGdlStr(v); setHbGlStr(Number.isFinite(n) && n > 0 ? fmt(n * 10, 0) : ''); }}
             suffix="g/dL" step="0.1" min={0} max={25} placeholder="12 – 18"
           />
         </div>
