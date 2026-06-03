@@ -24,12 +24,11 @@ function toTIBCUgDL(value: number, unit: string, method: 'tibc' | 'transferrin')
     if (unit === 'µmol/L') return value * 5.585
     return value
   } else {
-    // Transferrin: mg/dL → TIBC µg/dL
-    // 1 mg/dL transferrin ≈ 1.25 µg/dL TIBC (approximation)
-    if (unit === 'mg/dL') return value * 1.25
-    if (unit === 'g/L') return (value * 100) * 1.25
-    if (unit === 'g/dL') return (value * 1000) * 1.25
-    return value * 1.25
+    // Transferrin → TIBC: TIBC (µg/dL) ≈ Transferrin (mg/dL) × 1.389
+    if (unit === 'mg/dL') return value * 1.389
+    if (unit === 'g/L') return (value * 100) * 1.389
+    if (unit === 'g/dL') return (value * 1000) * 1.389
+    return value * 1.389
   }
 }
 

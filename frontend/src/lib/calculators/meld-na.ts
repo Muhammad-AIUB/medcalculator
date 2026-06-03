@@ -50,10 +50,13 @@ export function calculateMELDNa(input: MELDNaInput): CalculationResult {
     1
   )
 
-  const meldNa = MedicalUnitConverter.round(
-    meld - sodium - 0.025 * meld * (140 - sodium) + 140,
-    1
-  )
+  // MELD-Na (Kim 2008 / OPTN): Na bounded to 125–137; adjustment applied only when MELD > 11
+  const naBounded = clamp(sodium, 125, 137)
+  let meldNaRaw = meld
+  if (meld > 11) {
+    meldNaRaw = meld + 1.32 * (137 - naBounded) - (0.033 * meld * (137 - naBounded))
+  }
+  const meldNa = MedicalUnitConverter.round(clamp(meldNaRaw, 6, 40), 1)
 
   const meldClamped = clamp(meld, 6, 40)
   const mortality90day = getMELDMortality(meldNa)
@@ -86,7 +89,7 @@ export function calculateMELDNa(input: MELDNaInput): CalculationResult {
         severity,
       },
     ],
-    formula: 'MELD = 3.78 x ln(bilirubin) + 11.2 x ln(INR) + 9.57 x ln(creatinine) + 6.43\nMELD-Na = MELD Score - Na - 0.025 x MELD x (140-Na) + 140',
+    formula: 'MELD = 3.78 x ln(bilirubin) + 11.2 x ln(INR) + 9.57 x ln(creatinine) + 6.43\nMELD-Na = MELD + 1.32 x (137 - Na) - [0.033 x MELD x (137 - Na)]   (Na bounded 125-137)',
     references: ['Kamath PS et al. Hepatology. 2001', 'Kim WR et al. Hepatology. 2008'],
     timestamp: new Date().toISOString(),
   }

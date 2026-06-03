@@ -8,14 +8,15 @@ export interface APRIInput {
 }
 
 export const APRI_FORMULA =
-  'APRI = (AST in IU/L) / (AST Upper Limit of Normal in IU/L) / (Platelets in 10^9/L)'
+  'APRI = [ (AST / AST Upper Limit of Normal) x 100 ] / Platelets (10^9/L)'
 
 export function calculateAPRI(input: APRIInput): CalculationResult {
   const ast = Number(input.ast || 0)
   const astUpperLimit = Math.max(1, Number(input.astUpperLimit || 1))
   const platelets = Math.max(1, Number(input.platelets || 1))
-  const platelets109L = input.plateletUnit === '10^3/uL' ? platelets : platelets
-  const score = ast / astUpperLimit / platelets109L
+  // 10^3/µL is numerically identical to 10^9/L
+  const platelets109L = platelets
+  const score = ((ast / astUpperLimit) * 100) / platelets109L
   const roundedScore = Number(score.toFixed(4))
 
   let label = 'Significant fibrosis unlikely'
