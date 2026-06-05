@@ -34,13 +34,12 @@ function scorePulmonary(pao2?: number, fio2?: number, spo2?: number, ventilated?
 
   if (ratio === undefined) return 0
 
+  // Official SOFA: scores 3 and 4 require respiratory support (ventilation)
   if (ratio >= 400) return 0
-  if (ratio >= 300) return 1
-  if (ratio >= 200 && !ventilated) return 2
-  if (ratio >= 200 && ventilated) return 3
-  if (ratio >= 100 && ventilated) return 3
-  if (ratio < 100 && ventilated) return 4
-  return 2
+  if (ratio >= 300) return 1           // 300–399 → 1
+  if (ratio >= 200) return 2           // 200–299 → 2 (regardless of ventilation)
+  if (ratio >= 100) return ventilated ? 3 : 2   // 100–199: 3 only if ventilated
+  return ventilated ? 4 : 2            // <100: 4 only if ventilated
 }
 
 function scorePlatelets(platelets: number): number {
