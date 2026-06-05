@@ -10,7 +10,6 @@
     "sourceMap": true,
     "rootDir": "./src",
     "outDir": "./dist",
-    "baseUrl": "./",
     "incremental": true,
     "skipLibCheck": true,
     "strictNullChecks": true,
@@ -19,11 +18,11 @@
     "forceConsistentCasingInFileNames": true,
     "noFallthroughCasesInSwitch": true,
     "paths": {
-      "@common/*": ["src/common/*"],
-      "@config/*": ["src/config/*"],
-      "@core/*": ["src/core/*"],
-      "@modules/*": ["src/modules/*"],
-      "@infrastructure/*": ["src/infrastructure/*"]
+      "@common/*": ["./src/common/*"],
+      "@config/*": ["./src/config/*"],
+      "@core/*": ["./src/core/*"],
+      "@modules/*": ["./src/modules/*"],
+      "@infrastructure/*": ["./src/infrastructure/*"]
     }
   }
 }
