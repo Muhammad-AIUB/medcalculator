@@ -72,6 +72,8 @@ import { calculateStopBang } from './stop-bang'
 import { calculateMMRC } from './mmrc'
 import { calculateBSA } from './bsa'
 import { calculateBSACosteff } from './bsa-costeff'
+import { calculateEjectionFraction } from './ejection-fraction'
+import { calculateSCAIShock } from './scai-shock'
 
 export const CALCULATORS: Calculator[] = [
   {
@@ -2285,6 +2287,68 @@ export const CALCULATORS: Calculator[] = [
         unit: 'm²',
         severity: result.severity,
         label: 'Body Surface Area',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'ejection-fraction',
+    title: 'Ejection Fraction (EF)',
+    shortTitle: 'EF',
+    emoji: '🫀',
+    description: 'Left ventricular ejection fraction and stroke volume from end-diastolic and end-systolic volumes',
+    category: 'cardiovascular',
+    icon: 'HeartPulse',
+    color: 'text-rose-600',
+    bgColor: 'bg-rose-50',
+    tags: ['ejection fraction', 'EF', 'LVEF', 'stroke volume', 'heart failure', 'HFrEF'],
+    inputs: [
+      { id: 'edv', label: 'End-diastolic volume (mL)', type: 'number', required: true, min: 1, max: 600 },
+      { id: 'esv', label: 'End-systolic volume (mL)',  type: 'number', required: true, min: 0, max: 600 },
+    ],
+    calculate: (inputs) => {
+      const result = calculateEjectionFraction({ edv: Number(inputs.edv), esv: Number(inputs.esv) });
+      return {
+        calculatorId: 'ejection-fraction',
+        score: result.ef,
+        unit: '%',
+        severity: result.severity,
+        label: 'Ejection Fraction',
+        interpretation: result.interpretation,
+      };
+    },
+  },
+  {
+    id: 'scai-shock',
+    title: 'SCAI Cardiogenic Shock Stage',
+    shortTitle: 'SCAI Shock',
+    emoji: '🫀',
+    description: 'SCAI SHOCK classification (Stage A–E) for cardiogenic shock severity with in-hospital mortality',
+    category: 'cardiovascular',
+    icon: 'HeartPulse',
+    color: 'text-rose-600',
+    bgColor: 'bg-rose-50',
+    tags: ['SCAI', 'cardiogenic shock', 'shock stage', 'mortality', 'critical care'],
+    inputs: [
+      {
+        id: 'stage', label: 'SCAI Stage', type: 'select', required: true,
+        options: [
+          { value: 'A', label: 'A — At Risk' },
+          { value: 'B', label: 'B — Beginning' },
+          { value: 'C', label: 'C — Classic' },
+          { value: 'D', label: 'D — Deteriorating' },
+          { value: 'E', label: 'E — Extremis' },
+        ],
+      },
+    ],
+    calculate: (inputs) => {
+      const result = calculateSCAIShock({ stage: (inputs.stage as any) ?? 'A' });
+      return {
+        calculatorId: 'scai-shock',
+        score: result.stage as any,
+        unit: '',
+        severity: result.severity,
+        label: `SCAI Stage ${result.stage}`,
         interpretation: result.interpretation,
       };
     },

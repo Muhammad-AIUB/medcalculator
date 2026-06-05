@@ -80,6 +80,8 @@ const StopBangForm                 = dynamic(() => import('@/components/calculat
 const MmrcForm                     = dynamic(() => import('@/components/calculators/mmrc-form').then(m => ({ default: m.MmrcForm })), { ssr: false });
 const BsaForm                      = dynamic(() => import('@/components/calculators/bsa-form').then(m => ({ default: m.BsaForm })), { ssr: false });
 const BsaCosteffForm               = dynamic(() => import('@/components/calculators/bsa-costeff-form').then(m => ({ default: m.BsaCosteffForm })), { ssr: false });
+const EjectionFractionForm         = dynamic(() => import('@/components/calculators/ejection-fraction-form').then(m => ({ default: m.EjectionFractionForm })), { ssr: false });
+const ScaiShockForm                = dynamic(() => import('@/components/calculators/scai-shock-form').then(m => ({ default: m.ScaiShockForm })), { ssr: false });
 
 const FORM_MAP: Record<string, React.ComponentType<any>> = {
   egfr:         EgfrForm,
@@ -155,6 +157,8 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   mmrc:                       MmrcForm,
   bsa:                        BsaForm,
   'bsa-costeff':              BsaCosteffForm,
+  'ejection-fraction':        EjectionFractionForm,
+  'scai-shock':               ScaiShockForm,
 };
 
 const FORMULA_MAP: Record<string, string> = {
@@ -162,6 +166,8 @@ const FORMULA_MAP: Record<string, string> = {
   bmi:          'BMI = Weight (kg) / Height^2 (m^2)',
   bsa:          'BSA (m²) = √[(Height in cm × Weight in kg) / 3600]   (Mosteller)',
   'bsa-costeff': 'BSA (m²) = (4 × W + 7) / (90 + W)   (Costeff, W in kg)',
+  'ejection-fraction': 'LVEF (%) = (EDV − ESV) / EDV × 100   |   Stroke Volume = EDV − ESV',
+  'scai-shock': 'SCAI SHOCK staging — select the highest stage (A–E) whose criteria the patient meets',
   'meld-na':    'MELD = 3.78 x ln(Bilirubin) + 11.2 x ln(INR) + 9.57 x ln(Creatinine) + 6.43\nMELD-Na = MELD - Na - 0.025 x MELD x (140 - Na) + 140',
   'child-pugh': 'Addition of assigned points.',
   sofa:         'SOFA = Coagulation + CNS + Liver + Cardiovascular + Renal (each 0-4 pts)',
