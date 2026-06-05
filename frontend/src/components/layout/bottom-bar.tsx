@@ -1,12 +1,12 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { clearAppData } from '@/lib/app-data';
+import { clearAppData, clearCalculations } from '@/lib/app-data';
 
 export function BottomBar() {
   const router = useRouter();
 
   const handleRefresh = () => {
-    clearAppData();
+    clearCalculations();
     window.location.reload();
   };
 
