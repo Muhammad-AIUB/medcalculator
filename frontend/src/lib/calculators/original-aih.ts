@@ -22,7 +22,17 @@ export interface OriginalAIHInput {
 export const ORIGINAL_AIH_FORMULA = 'Addition of assigned points.'
 
 export function calculateOriginalAIH(input: OriginalAIHInput): CalculationResult {
-  const score = Object.values(input).reduce((total, value) => total + Number(value || 0), 0)
+  let score = Object.values(input).reduce((total, value) => total + Number(value || 0), 0)
+
+  // Revised Original AIH rule: if NO interface hepatitis, NOT predominantly
+  // lymphoplasmacytic, and NO rosetting of liver cells, subtract 5 points.
+  if (
+    Number(input.interfaceHepatitis || 0) === 0 &&
+    Number(input.lymphoplasmacytic || 0) === 0 &&
+    Number(input.rosetting || 0) === 0
+  ) {
+    score -= 5
+  }
 
   let label = 'AIH unlikely'
   let severity: 'success' | 'warning' | 'danger' = 'success'
