@@ -1,5 +1,5 @@
 /**
- * MedCalc Pro — Service Worker v1.2.0
+ * Pocket Medical Calculator — Service Worker v1.2.0
  * Offline-first: Cache all assets aggressively on first visit.
  * All calculations are client-side → full offline support once cached.
  */

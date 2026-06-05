@@ -1,6 +1,6 @@
 {
-  "name": "MedCalc Pro — Clinical Calculator Platform",
-  "short_name": "MedCalc Pro",
+  "name": "Pocket Medical Calculator — Clinical Calculator Platform",
+  "short_name": "Pocket Medical Calc",
   "description": "Professional clinical calculators for healthcare providers",
   "start_url": "/",
   "display": "standalone",

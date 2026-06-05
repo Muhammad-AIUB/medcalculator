@@ -50,7 +50,7 @@ async function bootstrap() {
 
   // Swagger
   const swaggerConfig = new DocumentBuilder()
-    .setTitle('MedCalc Pro API')
+    .setTitle('Pocket Medical Calculator API')
     .setDescription(`
 ## Enterprise Clinical Calculator Platform API
 
@@ -88,7 +88,7 @@ All endpoints support automatic unit conversion across 100+ medical units.
       filter: true,
       showExtensions: true,
     },
-    customSiteTitle: 'MedCalc Pro API Docs',
+    customSiteTitle: 'Pocket Medical Calculator API Docs',
     customfavIcon: '/favicon.ico',
     customCss: `
       .swagger-ui .topbar { background-color: #0891b2; }
@@ -99,7 +99,7 @@ All endpoints support automatic unit conversion across 100+ medical units.
   await app.listen(port, '0.0.0.0');
   console.log(`
 ╔══════════════════════════════════════════════════════╗
-║           MedCalc Pro API Server                     ║
+║        Pocket Medical Calculator API Server          ║
 ╠══════════════════════════════════════════════════════╣
 ║  Environment : ${nodeEnv.padEnd(36)}║
 ║  Port        : ${String(port).padEnd(36)}║

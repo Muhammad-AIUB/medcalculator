@@ -13,8 +13,8 @@ const inter = Inter({
 
 export const metadata: Metadata = {
   title: {
-    default: 'MedCalc Pro — Clinical Calculator Platform',
-    template: '%s | MedCalc Pro',
+    default: 'Pocket Medical Calculator — Clinical Calculator Platform',
+    template: '%s | Pocket Medical Calculator',
   },
   description:
     'Professional clinical calculators for healthcare providers. eGFR, Child-Pugh, MELD-Na, SOFA, BMI, EDD, Vasopressor Score, TSAT and more.',
@@ -23,12 +23,12 @@ export const metadata: Metadata = {
     'Child-Pugh', 'MELD', 'BMI', 'TSAT', 'vasopressor score',
     'hospital tool', 'ICU calculator',
   ],
-  authors: [{ name: 'MedCalc Pro' }],
+  authors: [{ name: 'Pocket Medical Calculator' }],
   manifest: '/manifest.json',
   appleWebApp: {
     capable: true,
     statusBarStyle: 'default',
-    title: 'MedCalc Pro',
+    title: 'Pocket Medical Calculator',
   },
   icons: {
     icon: '/icon-192.png',
@@ -37,9 +37,9 @@ export const metadata: Metadata = {
   openGraph: {
     type: 'website',
     locale: 'en_US',
-    title: 'MedCalc Pro — Clinical Calculator Platform',
+    title: 'Pocket Medical Calculator — Clinical Calculator Platform',
     description: 'Professional clinical calculators for healthcare providers',
-    siteName: 'MedCalc Pro',
+    siteName: 'Pocket Medical Calculator',
   },
 }
 
@@ -58,7 +58,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <link rel="manifest" href="/manifest.json" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-status-bar-style" content="default" />
-        <meta name="apple-mobile-web-app-title" content="MedCalc Pro" />
+        <meta name="apple-mobile-web-app-title" content="Pocket Medical Calculator" />
         <meta name="format-detection" content="telephone=no" />
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="msapplication-TileColor" content="#0891b2" />

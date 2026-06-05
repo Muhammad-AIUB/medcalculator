@@ -35,7 +35,7 @@ export function Header({ title, showBack, backHref = '/', className }: HeaderPro
               <Activity style={{ width: 18, height: 18 }} className="text-white" />
             </div>
             <div>
-              <p className="text-sm font-bold text-white leading-none">MedCalc Pro</p>
+              <p className="text-sm font-bold text-white leading-none">Pocket Medical Calculator</p>
               <p className="text-[10px] leading-none mt-0.5" style={{ color: 'rgba(255,255,255,0.5)' }}>
                 Clinical Calculator
               </p>

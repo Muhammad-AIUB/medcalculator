@@ -1,7 +1,8 @@
 'use client';
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import { AppShell } from '@/components/layout/app-shell';
+import { BottomBar } from '@/components/layout/bottom-bar';
+import { ExhortLogo } from '@/components/brand/exhort-logo';
 import { CALCULATORS } from '@/lib/calculators/calculator-registry';
 import { useUIStore } from '@/store/ui.store';
 import { X } from 'lucide-react';
@@ -49,47 +50,68 @@ export default function DashboardPage() {
   );
 
   return (
-    <AppShell>
-      <div className="space-y-3 py-2">
-        {slots.map((calcId, i) => {
-          const calc = calcId ? CALCULATORS.find(c => c.id === calcId) : null;
-          return (
-            <div key={i} className="flex items-center gap-2">
-              {calc ? (
-                /* Filled slot */
-                <button
-                  onClick={() => router.push(`/calculators/${calc.id}`)}
-                  className="flex-1 text-left px-4 py-3 rounded-xl border-2 border-[#0E7490] bg-[#0E7490]/10 active:scale-[0.98] transition-all"
-                >
-                  <p className="text-sm font-semibold text-[#0E7490]">{calc.title}</p>
-                  {(() => {
-                    const last = history.find(h => h.calculatorId === calc.id);
-                    return last ? (
-                      <p className="text-xs text-muted-foreground mt-0.5">{last.summary}</p>
-                    ) : null;
-                  })()}
-                </button>
-              ) : (
-                /* Empty slot */
-                <button
-                  onClick={() => { setActiveSlot(i); setSearch(''); }}
-                  className="flex-1 text-left px-4 py-4 rounded-xl border-2 border-dashed border-border text-sm text-muted-foreground hover:border-[#0E7490]/50 transition-all"
-                >
-                  + Add Calculator
-                </button>
-              )}
-              {calc && (
-                <button
-                  onClick={() => removeSlot(i)}
-                  className="h-10 w-10 flex items-center justify-center rounded-lg text-muted-foreground hover:text-red-500 transition-colors"
-                >
-                  <X className="h-4 w-4" />
-                </button>
-              )}
-            </div>
-          );
-        })}
+    <div className="min-h-screen bg-white flex flex-col">
+      {/* Teal gradient header band */}
+      <div
+        className="w-full h-14 shrink-0"
+        style={{ background: 'linear-gradient(180deg, #0a5d57 0%, #0e7d74 50%, #16a99c 100%)' }}
+      />
+
+      {/* Title + brand */}
+      <div className="w-full max-w-2xl mx-auto px-4 pt-5">
+        <h1 className="text-[26px] sm:text-3xl font-extrabold tracking-tight text-gray-800 leading-tight">
+          Pocket Medical Calculator
+        </h1>
+        <div className="flex justify-end mt-3">
+          <ExhortLogo />
+        </div>
       </div>
+
+      {/* Calculator slots */}
+      <main className="flex-1 w-full max-w-2xl mx-auto px-4 pt-4 pb-24">
+        <div className="space-y-3">
+          {slots.map((calcId, i) => {
+            const calc = calcId ? CALCULATORS.find(c => c.id === calcId) : null;
+            return (
+              <div key={i} className="flex items-center gap-2">
+                {calc ? (
+                  /* Filled slot */
+                  <button
+                    onClick={() => router.push(`/calculators/${calc.id}`)}
+                    className="flex-1 text-left px-4 py-3 rounded-xl border-2 border-[#0E7490] bg-[#0E7490]/10 active:scale-[0.98] transition-all"
+                  >
+                    <p className="text-sm font-semibold text-[#0E7490]">{calc.title}</p>
+                    {(() => {
+                      const last = history.find(h => h.calculatorId === calc.id);
+                      return last ? (
+                        <p className="text-xs text-muted-foreground mt-0.5">{last.summary}</p>
+                      ) : null;
+                    })()}
+                  </button>
+                ) : (
+                  /* Empty slot */
+                  <button
+                    onClick={() => { setActiveSlot(i); setSearch(''); }}
+                    className="flex-1 text-left px-4 py-4 rounded-xl border-2 border-dashed border-border text-sm text-muted-foreground hover:border-[#0E7490]/50 transition-all"
+                  >
+                    + Add Calculator
+                  </button>
+                )}
+                {calc && (
+                  <button
+                    onClick={() => removeSlot(i)}
+                    className="h-10 w-10 flex items-center justify-center rounded-lg text-muted-foreground hover:text-red-500 transition-colors"
+                  >
+                    <X className="h-4 w-4" />
+                  </button>
+                )}
+              </div>
+            );
+          })}
+        </div>
+      </main>
+
+      <BottomBar />
 
       {/* Search modal */}
       {activeSlot !== null && (
@@ -129,6 +151,6 @@ export default function DashboardPage() {
           </div>
         </div>
       )}
-    </AppShell>
+    </div>
   );
 }

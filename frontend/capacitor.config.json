@@ -1,6 +1,6 @@
 {
   "appId": "com.medcalcpro.app",
-  "appName": "MedCalc Pro",
+  "appName": "Pocket Medical Calculator",
   "webDir": "out",
   "server": {
     "androidScheme": "https"

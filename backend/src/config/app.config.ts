@@ -5,6 +5,6 @@ export const appConfig = registerAs('app', () => ({
   nodeEnv: process.env.NODE_ENV || 'development',
   apiPrefix: process.env.API_PREFIX || 'api',
   apiVersion: process.env.API_VERSION || '1',
-  appName: 'Medical Calculator Platform',
+  appName: 'Pocket Medical Calculator',
   appDescription: 'Production-grade medical calculator API with unit conversion',
 }));

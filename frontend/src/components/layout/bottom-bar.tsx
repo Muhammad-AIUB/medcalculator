@@ -1,6 +1,5 @@
 'use client';
 import { useRouter } from 'next/navigation';
-import { Home, RefreshCw, LogOut } from 'lucide-react';
 import { clearAppData } from '@/lib/app-data';
 
 export function BottomBar() {
@@ -12,7 +11,7 @@ export function BottomBar() {
   };
 
   const handleExit = () => {
-    if (confirm('Exit MedCalc Pro?')) {
+    if (confirm('Exit Pocket Medical Calculator?')) {
       clearAppData();
       window.close();
       setTimeout(() => {
@@ -22,30 +21,22 @@ export function BottomBar() {
     }
   };
 
+  const btnClass =
+    'flex items-center justify-center rounded-2xl bg-white border border-gray-200 ' +
+    'text-gray-500 font-semibold shadow-sm h-12 px-4 ' +
+    'active:scale-[0.97] transition-all';
+
   return (
-    <nav className="fixed bottom-0 left-0 right-0 z-40 border-t border-white/10" style={{ background: '#0F2744' }}>
-      <div className="grid grid-cols-3 h-16 max-w-2xl mx-auto">
-        <button
-          onClick={() => router.push('/')}
-          className="flex flex-col items-center justify-center gap-1 text-white/60 hover:text-white transition-colors"
-        >
-          <Home className="h-5 w-5" />
-          <span className="text-[11px] font-semibold tracking-wide">HOME</span>
+    <nav className="fixed bottom-0 left-0 right-0 z-40 bg-gray-100 border-t border-gray-200">
+      <div className="grid grid-cols-3 gap-3 px-4 py-3 max-w-2xl mx-auto">
+        <button onClick={() => router.push('/subscribe')} className={btnClass}>
+          Home
         </button>
-        <button
-          onClick={handleRefresh}
-          className="flex flex-col items-center justify-center gap-1 transition-colors"
-          style={{ color: '#38D8F5' }}
-        >
-          <RefreshCw className="h-6 w-6" strokeWidth={2.5} />
-          <span className="text-[11px] font-bold tracking-wide">REFRESH</span>
+        <button onClick={handleRefresh} className={btnClass}>
+          Refresh
         </button>
-        <button
-          onClick={handleExit}
-          className="flex flex-col items-center justify-center gap-1 text-white/60 hover:text-red-400 transition-colors"
-        >
-          <LogOut className="h-5 w-5" />
-          <span className="text-[11px] font-semibold tracking-wide">EXIT</span>
+        <button onClick={handleExit} className={btnClass}>
+          EXIT
         </button>
       </div>
     </nav>
