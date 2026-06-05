@@ -8,9 +8,18 @@ export class CalculatorsService {
   private readonly logger = new Logger(CalculatorsService.name);
   private readonly registry = CalculatorRegistry.getInstance();
 
+  // The registry is a startup-built singleton, so these projections never
+  // change at runtime — compute them once and reuse across all requests.
+  private cachedCalculators?: ReturnType<CalculatorsService['buildAllCalculators']>;
+  private cachedCategories?: ReturnType<CalculatorsService['buildCategories']>;
+
   constructor(private readonly formulaEngine: FormulaEngine) {}
 
   getAllCalculators() {
+    return (this.cachedCalculators ??= this.buildAllCalculators());
+  }
+
+  private buildAllCalculators() {
     return this.registry.getAllMetadata().map((meta) => ({
       id: meta.id,
       title: meta.title,
@@ -72,6 +81,10 @@ export class CalculatorsService {
   }
 
   getCategories() {
+    return (this.cachedCategories ??= this.buildCategories());
+  }
+
+  private buildCategories() {
     const all = this.registry.getAllMetadata();
     const categories = [...new Set(all.map((c) => c.category))];
     return categories.map((cat) => ({

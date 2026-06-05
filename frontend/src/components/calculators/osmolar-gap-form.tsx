@@ -70,7 +70,7 @@ export function OsmolarGapForm({ onResult }: Props) {
       inputs: { stoolOsm: osm, sodium: na, potassium: k },
       formulaUsed: 'Stool Osmolal Gap = Stool Osm - (2 x (Na + K))\nStool Osmolal Gap = 290 mOsm/kg - (2 x (Na + K))',
     });
-  }, [liveResult]);
+  }, [liveResult, k, na, osm]);
 
   return (
     <div className="space-y-6">

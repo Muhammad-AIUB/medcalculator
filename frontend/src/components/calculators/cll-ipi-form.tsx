@@ -103,7 +103,7 @@ export function CllIpiForm({ onResult }: Props) {
       formulaUsed: 'Addition of the selected criteria:\n\nAge >65 years: +1\nBinet B-C or Rai I-IV: +1\nSerum β2-microglobulin >3.5 mg/L: +2\nIGHV unmutated: +2\nDeletion 17p and/or TP53 mutation: +4\n\n0–1: Low (~93% 5-yr OS)\n2–3: Intermediate (~79% 5-yr OS)\n4–6: High (~64% 5-yr OS)\n7–10: Very High (~23% 5-yr OS)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, age, b2m, clinicalStage, ighv, tp53]);
 
   return (
     <div className="divide-y divide-gray-100">

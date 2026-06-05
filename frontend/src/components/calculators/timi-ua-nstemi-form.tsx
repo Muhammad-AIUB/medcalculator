@@ -79,7 +79,7 @@ export function TimiUaNstemiForm({ onResult }: Props) {
         'Positive cardiac marker',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, age65, asaUse, cadRiskFactors, cardiacMarker, knownCAD, severeAngina, stChanges]);
 
   return (
     <div className="divide-y divide-gray-100">

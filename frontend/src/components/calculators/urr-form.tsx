@@ -66,7 +66,7 @@ export function UrrForm({ onResult }: Props) {
         '    = (1 - Upost / Upre) x 100',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, upost, upre]);
 
   return (
     <div className="space-y-6">

@@ -39,7 +39,7 @@ export function AncForm({ onResult }: Props) {
       formulaUsed: 'ANC = 10 × WBC count (×10³/µL) × (% neutrophils + % bands)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, bandsPct, neutrophilsPct, wbcCount]);
 
   return (
     <div className="space-y-6">

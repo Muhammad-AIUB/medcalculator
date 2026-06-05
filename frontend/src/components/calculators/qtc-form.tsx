@@ -91,7 +91,7 @@ export function QtcForm({ onResult }: Props) {
         'QT and RR in seconds for Bazett/Fridericia; QT in ms for others',
       references: liveResult.references,
     });
-  }, [liveResult, formula]);
+  }, [liveResult, formula, hr, paperSpeed, qtMs]);
 
   return (
     <div className="divide-y divide-gray-100">

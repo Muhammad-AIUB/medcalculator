@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, HttpCode, HttpStatus, Header } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { CalculatorsService } from './calculators.service';
 import { CalculateDto, BatchCalculateDto } from './dto/calculate.dto';
@@ -10,6 +10,7 @@ export class CalculatorsController {
   constructor(private readonly calculatorsService: CalculatorsService) {}
 
   @Get()
+  @Header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'List all calculators', description: 'Returns metadata for all registered clinical calculators' })
   @ApiResponse({ status: 200, description: 'Calculator list returned successfully' })
   getAllCalculators() {
@@ -17,6 +18,7 @@ export class CalculatorsController {
   }
 
   @Get('categories')
+  @Header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'List calculator categories', description: 'Returns all categories with their calculators' })
   @ApiResponse({ status: 200, description: 'Categories returned successfully' })
   getCategories() {
@@ -24,6 +26,7 @@ export class CalculatorsController {
   }
 
   @Get(':id')
+  @Header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'Get calculator metadata', description: 'Returns full metadata for a specific calculator including input definitions and validation rules' })
   @ApiParam({ name: 'id', example: 'egfr', description: 'Calculator identifier' })
   @ApiResponse({ status: 200, description: 'Calculator metadata returned' })

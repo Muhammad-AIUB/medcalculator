@@ -82,7 +82,7 @@ export function BsaForm({ onResult }: Props) {
       formulaUsed: 'BSA (m²) = √[(Height in cm × Weight in kg) / 3600]   (Mosteller)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, heightCm, weightKg]);
 
   return (
     <div className="space-y-6">

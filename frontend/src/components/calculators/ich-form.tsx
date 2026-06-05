@@ -67,7 +67,7 @@ export function IchForm({ onResult }: Props) {
         `30-day mortality: ${liveResult.mortality}`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, age80, gcs, ichVolume, infratentorial, ivh]);
 
   return (
     <div className="divide-y divide-gray-100">

@@ -1,4 +1,4 @@
-import { BadRequestException, Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import {
   MOLAR_MASSES,
   UNIT_REGISTRY,
@@ -28,7 +28,6 @@ export interface ConvertAllResult {
 
 @Injectable()
 export class UnitNormalizer {
-  private readonly logger = new Logger(UnitNormalizer.name);
 
   /**
    * Convert a value from one unit to another.
@@ -257,7 +256,6 @@ export class UnitNormalizer {
     const toDef = UNIT_REGISTRY[toSymbol];
 
     const massCanonicals = new Set(['g/L']);
-    const molarCanonicals = new Set(['mmol/L']);
 
     const fromIsMass = massCanonicals.has(fromDef.canonicalUnit);
     const toIsMass = massCanonicals.has(toDef.canonicalUnit);

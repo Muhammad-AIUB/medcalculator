@@ -292,7 +292,7 @@ export function MocaForm({ onResult }: Props) {
         `     = ${liveResult.score}/30`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, education, sel]);
 
   return (
     <div className="space-y-0">

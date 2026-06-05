@@ -56,7 +56,7 @@ export function CalciumCorrectionForm({ onResult }: Props) {
         'Note: formula uses albumin in g/dL and calcium in mg/dL',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, albGdl, caMgDl, normAlbGdl]);
 
   const toggleBtn = (label: string, onClick: () => void) => (
     <button

@@ -95,7 +95,7 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
       formulaUsed: 'eGFR = 142 × min(Scr/κ,1)^α × max(Scr/κ,1)^⁻¹·² × 0.9938^Age × (1.012 if female)   [CKD-EPI 2021, race-free]',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, age, creatMgdl, sex]);
 
   return (
     <div>

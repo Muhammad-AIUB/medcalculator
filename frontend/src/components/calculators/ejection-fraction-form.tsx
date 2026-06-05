@@ -44,7 +44,7 @@ export function EjectionFractionForm({ onResult }: Props) {
       formulaUsed: 'LVEF (%) = (EDV − ESV) / EDV × 100\nStroke Volume = EDV − ESV',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, edv, esv]);
 
   return (
     <div className="space-y-6">

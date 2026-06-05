@@ -78,8 +78,12 @@ export class ConversionService {
     }
   }
 
+  // Static registry data — memoize so repeated reads don't rebuild it.
+  private cachedAllUnits?: ReturnType<ConversionRegistryService['getAllUnits']>;
+  private cachedCategories?: ReturnType<ConversionRegistryService['getCategories']>;
+
   getAllUnits() {
-    return this.registry.getAllUnits();
+    return (this.cachedAllUnits ??= this.registry.getAllUnits());
   }
 
   getUnitsByCategory(category: string) {
@@ -96,6 +100,6 @@ export class ConversionService {
   }
 
   getCategories() {
-    return this.registry.getCategories();
+    return (this.cachedCategories ??= this.registry.getCategories());
   }
 }

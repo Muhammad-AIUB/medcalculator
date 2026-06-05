@@ -116,7 +116,7 @@ export function GraceForm({ onResult }: Props) {
         '>=285  |  99%',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, abnormalEnzymes, age, cardiacArrest, crMg, hr, killip, sbp, stDeviation]);
 
   return (
     <div className="divide-y divide-gray-100">

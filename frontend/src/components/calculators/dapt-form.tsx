@@ -94,7 +94,7 @@ export function DaptForm({ onResult }: Props) {
       formulaUsed: 'Addition of the selected points.',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, age, chfLvef, diabetes, miPresentation, paclitaxel, priorPciMi, smoking, stentDiam, veinGraft]);
 
   return (
     <div className="rounded-xl border border-border overflow-hidden">

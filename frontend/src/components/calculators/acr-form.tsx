@@ -84,7 +84,7 @@ export function AcrForm({ onResult }: Props) {
         'ACR (mg/g) = Albumin (mg/dL) / Creatinine (g/dL)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, albumin, crGdl]);
 
   return (
     <div className="space-y-6">

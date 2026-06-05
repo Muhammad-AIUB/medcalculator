@@ -1,4 +1,4 @@
-import type { Calculator, CalculationResult } from '@/types/calculator'
+import type { Calculator } from '@/types/calculator'
 import { calculateEGFR } from './egfr'
 import { calculateChildPugh } from './child-pugh'
 import { calculateMELDNa } from './meld-na'

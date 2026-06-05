@@ -36,7 +36,7 @@ export function MentzerIndexForm({ onResult }: Props) {
       formulaUsed: 'Mentzer Index = MCV (fL) / RBC count (10⁶/µL)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, mcv, rbcCount]);
 
   return (
     <div className="space-y-6">

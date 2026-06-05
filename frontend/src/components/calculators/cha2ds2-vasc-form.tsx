@@ -85,7 +85,7 @@ export function Cha2ds2VascForm({ onResult }: Props) {
       formulaUsed: 'Addition of the selected points:\n\nAge <65: 0 | 65-74: +1 | ≥75: +2\nSex female: +1\nCHF history: +1\nHypertension history: +1\nStroke/TIA/thromboembolism history: +2\nVascular disease history: +1\nDiabetes history: +1',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, age, chf, diabetes, hypertension, sex, stroke, vascular]);
 
   return (
     <div className="divide-y divide-gray-100">

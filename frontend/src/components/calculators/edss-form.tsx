@@ -159,7 +159,7 @@ export function EdssForm({ onResult }: Props) {
           : `EDSS derived from Functional Systems Scale (FSS total = ${liveResult.fssTotal})`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, ambulationIdx, fss]);
 
   const setFss = (id: string, idx: number) =>
     setFssIdx(prev => ({ ...prev, [id]: idx }));
@@ -205,7 +205,7 @@ export function EdssForm({ onResult }: Props) {
       </div>
 
       {/* FSS fields */}
-      {FSS_FIELDS.map((field, fi) => (
+      {FSS_FIELDS.map((field) => (
         <div key={field.id}
           className="grid grid-cols-[1fr_1fr] gap-4 py-4 border-b border-gray-100 last:border-0">
           <div className="space-y-1 pr-1">

@@ -124,7 +124,7 @@ export function StopBangForm({ onResult }: Props) {
         `0–2: Low risk\n3–4: Moderate risk\n5–8: High risk for moderate-to-severe OSA`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, vals]);
 
   return (
     <div className="space-y-0">

@@ -1,5 +1,5 @@
 import type { CalculationResult } from '@/types/calculator'
-import { format, addDays, addWeeks, differenceInDays, differenceInWeeks, parseISO } from 'date-fns'
+import { format, addDays, differenceInDays, parseISO } from 'date-fns'
 
 interface EDDInput {
   method: 'lmp' | 'ultrasound'

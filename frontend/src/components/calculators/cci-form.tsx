@@ -67,7 +67,7 @@ export function CciForm({ onResult }: Props) {
         `20-hour threshold: CCI ≥ 4,500 = adequate`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, heightCm, postPlt, prePlt, timeHour, unitContent, weightKg]);
 
   return (
     <div className="space-y-6">

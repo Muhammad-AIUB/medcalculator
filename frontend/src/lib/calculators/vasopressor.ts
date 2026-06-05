@@ -28,9 +28,7 @@ const VIS_MULTIPLIERS: Record<string, number> = {
 }
 
 // Convert drug dose to mcg/kg/min
-function toMcgKgMin(drug: string, dose: number, unit: string, weightKg: number): number {
-  const d = drug.toLowerCase()
-
+function toMcgKgMin(dose: number, unit: string, weightKg: number): number {
   if (unit === 'mcg/kg/min') return dose
 
   if (unit === 'mcg/min') return dose / weightKg
@@ -64,7 +62,7 @@ function getVIS(drugs: VasopressorDrug[], weightKg: number): number {
     if (!drug.enabled || drug.dose <= 0) continue
 
     const name = drug.name.toLowerCase()
-    const mcgKgMin = toMcgKgMin(name, drug.dose, drug.unit, weightKg)
+    const mcgKgMin = toMcgKgMin(drug.dose, drug.unit, weightKg)
 
     const multiplier = VIS_MULTIPLIERS[name] ?? 1
     vis += mcgKgMin * multiplier

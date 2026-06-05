@@ -36,7 +36,7 @@ export function HuntHessForm({ onResult }: Props) {
       formulaUsed: 'Selection of group of symptoms, assigned point value (Grade I–V).',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, selected]);
 
   return (
     <div className="space-y-4">

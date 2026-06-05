@@ -93,7 +93,7 @@ export function HasBledForm({ onResult }: Props) {
         'Alcohol use (>=8 drinks/week): +1',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, alcohol, bleeding, elderly, hypertension, labileINR, liverDisease, medications, renalDisease, stroke]);
 
   return (
     <div className="divide-y divide-gray-100">

@@ -1,6 +1,5 @@
 import type { CalculationResult } from '@/types/calculator'
 import { bilirubinConvert, creatinineConvert } from '@/lib/conversion/converter'
-import { MedicalUnitConverter } from '@/lib/conversion/converter'
 
 interface SOFAInput {
   pao2?: number

@@ -110,12 +110,7 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
       formulaUsed: 'VIS Score',
       warnings: liveResult.score && liveResult.score > 30 ? ['VIS > 30: Refractory shock — very high mortality risk'] : [],
     });
-  }, [liveResult]);
-
-  const clearAll = () => {
-    setKgStr(''); setLbStr('');
-    setDrugs(DRUGS.map(d => ({ name: d.name, dose: '', unit: d.defaultUnit, enabled: false })));
-  };
+  }, [liveResult, drugs, weightKg]);
 
   return (
     <div className="space-y-6">

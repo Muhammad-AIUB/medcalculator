@@ -89,7 +89,7 @@ export function Abcd2Form({ onResult }: Props) {
         `      = ${age60} + ${bp} + ${clinical} + ${duration} + ${diabetes} = ${liveResult.score}`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, age60, bp, clinical, diabetes, duration]);
 
   return (
     <div className="divide-y divide-gray-100">

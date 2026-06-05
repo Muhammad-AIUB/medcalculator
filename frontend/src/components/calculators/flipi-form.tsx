@@ -83,7 +83,7 @@ export function FlipIForm({ onResult }: Props) {
       formulaUsed: 'Addition of the selected points (each +1):\n\nAge >60 years\n>4 nodal sites\nLDH elevated\nHemoglobin <120 g/L (12 g/dL)\nStage III–IV\n\n0–1: Low Risk (~71% 10-yr OS)\n2:   Intermediate Risk (~51% 10-yr OS)\n3–5: High Risk (~36% 10-yr OS)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, age60, hemoglobin, ldh, nodalSites, stageIIIIV]);
 
   const stageDesc = (
     <ul className="text-xs text-gray-500 space-y-1 list-disc list-inside leading-snug">

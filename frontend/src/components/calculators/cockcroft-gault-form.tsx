@@ -109,7 +109,7 @@ export function CockcroftGaultForm({ onResult }: Props) {
         'ABW = IBW + 0.4 x (Actual weight - IBW)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, age, crMgDl, heightCm, sex, weightKg]);
 
   return (
     <div className="space-y-6">

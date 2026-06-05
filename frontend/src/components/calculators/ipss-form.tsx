@@ -70,7 +70,7 @@ export function IpssForm({ onResult }: Props) {
       formulaUsed: 'Addition of the selected points.',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, blasts, cytopenias, karyotype]);
 
   return (
     <div className="divide-y divide-gray-100">

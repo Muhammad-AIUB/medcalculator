@@ -121,7 +121,7 @@ export default function DashboardPage() {
         >
           <div
             className="w-full max-w-2xl max-h-[80vh] rounded-2xl overflow-hidden"
-            style={{ background: '#0F2744' }}
+            style={{ background: 'linear-gradient(180deg, #0a5d57 0%, #0e7d74 50%, #16a99c 100%)' }}
             onClick={e => e.stopPropagation()}
           >
             {/* Search input */}

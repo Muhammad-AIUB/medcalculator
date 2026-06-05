@@ -152,7 +152,7 @@ export function Apache2Form({ onResult }: Props) {
         `             + Sodium + Potassium + Creatinine + Hematocrit + WBC + (15 − GCS)`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, aado2_val, age, arf, chronicHealth, creatinine, fio2High, gcs_val, hct_val, hr_val, map_val, pao2_val, ph_val, potassium, rr_val, sodium, tempC, wbc]);
 
   return (
     <div className="space-y-5">

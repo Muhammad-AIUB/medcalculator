@@ -1,5 +1,5 @@
 import { ApiProperty, ApiPropertyOptional } from '@nestjs/swagger';
-import { IsString, IsNotEmpty, IsObject, IsOptional, IsUUID } from 'class-validator';
+import { IsString, IsNotEmpty, IsObject, IsOptional } from 'class-validator';
 
 export class CalculateDto {
   @ApiProperty({ example: 'egfr', description: 'Calculator identifier' })

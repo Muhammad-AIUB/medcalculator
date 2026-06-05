@@ -49,7 +49,7 @@ export function PlasmaDosageForm({ onResult }: Props) {
         `Expected to raise coagulation factors by ~20% immediately after infusion.`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, dosageMlKg, unitVolumeMl, weightKg]);
 
   return (
     <div className="space-y-6">

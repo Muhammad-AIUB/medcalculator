@@ -216,7 +216,7 @@ export class SofaCalculator implements ICalculator {
     ],
   };
 
-  validate(inputs: CalculationInput): string[] {
+  validate(_inputs: CalculationInput): string[] {
     return []; // All inputs optional — score 0 if not provided
   }
 

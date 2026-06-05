@@ -118,7 +118,7 @@ export function AnionGapForm({ onResult }: Props) {
         'Albumin Corrected Delta Ratio = Corrected Delta Gap / (24 - HCO3)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, albGdL, cl, hco3, na]);
 
   return (
     <div className="space-y-6">

@@ -5,7 +5,7 @@ import {
   ICalculator,
   CalculatorRegistry
 } from '../calculator.registry';
-import { roundTo, clamp } from '../../../../common/utils/calculation.utils';
+import { roundTo } from '../../../../common/utils/calculation.utils';
 
 interface CkdStage {
   stage: string;

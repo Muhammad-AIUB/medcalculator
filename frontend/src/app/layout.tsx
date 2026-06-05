@@ -1,8 +1,8 @@
 import type { Metadata, Viewport } from 'next'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from 'next-themes'
-import { Toaster } from 'sonner'
 import { PWARegister } from '@/components/pwa-register'
+import { SplashHide } from '@/components/splash-hide'
 import './globals.css'
 
 const inter = Inter({
@@ -71,19 +71,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           disableTransitionOnChange={false}
         >
           {children}
-          <Toaster
-            position="top-center"
-            toastOptions={{
-              style: {
-                background: 'hsl(var(--card))',
-                color: 'hsl(var(--card-foreground))',
-                border: '1px solid hsl(var(--border))',
-                borderRadius: '0.75rem',
-              },
-            }}
-          />
         </ThemeProvider>
         <PWARegister />
+        <SplashHide />
       </body>
     </html>
   )

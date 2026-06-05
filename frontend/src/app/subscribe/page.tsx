@@ -1,13 +1,14 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import {
   BellRing, User, Stethoscope, Hash, Mail, Phone,
-  ShieldCheck, CheckCircle2, Sparkles,
+  ShieldCheck, CheckCircle2, Sparkles, BadgeCheck,
 } from 'lucide-react';
 import { BottomBar } from '@/components/layout/bottom-bar';
 import { ExhortLogo } from '@/components/brand/exhort-logo';
 import { CountryAutocomplete } from '@/components/ui/country-autocomplete';
+import { sendSubscription, flushPendingSubscription } from '@/lib/subscribe';
 
 const PROFESSIONS = ['Doctor', 'Doctor assistant', 'Nurse', 'Medical Technologist'];
 
@@ -24,18 +25,40 @@ export default function SubscribePage() {
   const router = useRouter();
   const [showForm, setShowForm] = useState(false);
   const [submitted, setSubmitted] = useState(false);
+  const [alreadySubscribed, setAlreadySubscribed] = useState(false);
+  const [showAlreadyPopup, setShowAlreadyPopup] = useState(false);
   const [form, setForm] = useState(EMPTY);
+
+  // Detect an existing subscription on load, and retry any subscription that
+  // failed to reach the sheet earlier (e.g. the user was offline).
+  useEffect(() => {
+    try {
+      if (localStorage.getItem('subscription')) setAlreadySubscribed(true);
+    } catch {}
+    void flushPendingSubscription();
+  }, []);
 
   const update =
     (key: keyof typeof EMPTY) =>
     (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) =>
       setForm(prev => ({ ...prev, [key]: e.target.value }));
 
+  const handleSubscribeClick = () => {
+    if (alreadySubscribed) {
+      setShowAlreadyPopup(true);
+      return;
+    }
+    setShowForm(true);
+  };
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     try {
       localStorage.setItem('subscription', JSON.stringify({ ...form, at: Date.now() }));
     } catch {}
+    // Send to the Google Sheet (queues for retry if offline).
+    void sendSubscription(form);
+    setAlreadySubscribed(true);
     setSubmitted(true);
   };
 
@@ -100,10 +123,10 @@ export default function SubscribePage() {
 
             {!showForm ? (
               <button
-                onClick={() => setShowForm(true)}
+                onClick={handleSubscribeClick}
                 className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#0E7490] to-[#16a99c] text-sm font-semibold text-white shadow-lg shadow-cyan-900/20 active:scale-[0.98] transition-all"
               >
-                Sign up <span className="ml-1 font-normal text-white/80">(optional)</span>
+                Subscribe <span className="ml-1 font-normal text-white/80">(optional)</span>
               </button>
             ) : (
               <form onSubmit={handleSubmit} className="mt-6 space-y-3.5">
@@ -195,9 +218,53 @@ export default function SubscribePage() {
             )}
           </div>
         )}
+
+        {/* Beta notice */}
+        <div className="mt-6 rounded-2xl border border-gray-100 bg-white/70 p-5 text-center shadow-sm">
+          <p className="text-sm leading-relaxed text-gray-600">
+            This is a <span className="font-semibold text-[#0E7490]">beta version</span>. We are
+            testing extensively and repeatedly this app for any anomalies. If you find any, please
+            send a screenshot and details to{' '}
+            <a
+              href="mailto:shahariar.dmc@gmail.com"
+              className="font-semibold text-[#0E7490] underline underline-offset-2"
+            >
+              shahariar.dmc@gmail.com
+            </a>
+          </p>
+          <p className="mt-3 text-sm text-gray-600">Regards</p>
+          <p className="text-sm font-semibold text-gray-800">Dr. Shahariar</p>
+        </div>
       </main>
 
       <BottomBar />
+
+      {/* Already-subscribed popup */}
+      {showAlreadyPopup && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 px-6"
+          onClick={() => setShowAlreadyPopup(false)}
+        >
+          <div
+            className="w-full max-w-sm rounded-3xl bg-white p-7 text-center shadow-2xl"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="mx-auto flex h-16 w-16 items-center justify-center rounded-full bg-cyan-50">
+              <BadgeCheck className="h-9 w-9 text-[#0E7490]" />
+            </div>
+            <p className="mt-4 text-xl font-bold text-gray-800">You&apos;re already subscribed</p>
+            <p className="mt-1 text-sm text-gray-500">
+              You&apos;ve already subscribed with this device, so there&apos;s no need to subscribe again.
+            </p>
+            <button
+              onClick={() => setShowAlreadyPopup(false)}
+              className="mt-6 inline-flex h-12 w-full items-center justify-center rounded-xl bg-gradient-to-r from-[#0E7490] to-[#16a99c] text-sm font-semibold text-white shadow-lg shadow-cyan-900/20 active:scale-[0.98] transition-all"
+            >
+              Got it
+            </button>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

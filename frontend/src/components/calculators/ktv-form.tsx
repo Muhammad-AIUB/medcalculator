@@ -61,7 +61,7 @@ export function KtvForm({ onResult }: Props) {
         'Kt/V = (K x t) / V',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, clearance, time, weightKg]);
 
   return (
     <div className="space-y-6">

@@ -14,7 +14,10 @@ export function Header({ title, showBack, backHref = '/', className }: HeaderPro
   return (
     <header
       className={cn('sticky top-0 z-40 w-full', className)}
-      style={{ background: '#0F2744', borderBottom: '1px solid rgba(255,255,255,0.08)' }}
+      style={{
+        background: 'linear-gradient(180deg, #0a5d57 0%, #0e7d74 50%, #16a99c 100%)',
+        borderBottom: '1px solid rgba(255,255,255,0.08)',
+      }}
     >
       <div className="flex h-14 items-center gap-3 px-4 max-w-2xl mx-auto">
         {showBack ? (

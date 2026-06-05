@@ -50,7 +50,7 @@ export function Curb65Form({ onResult }: Props) {
         `4–5: Very high risk (ICU consideration)`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, vals]);
 
   return (
     <div className="space-y-0">

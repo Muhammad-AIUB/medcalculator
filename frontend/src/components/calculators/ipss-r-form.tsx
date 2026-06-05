@@ -100,7 +100,7 @@ export function IpssRForm({ onResult }: Props) {
       formulaUsed: 'Addition of the selected points.',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, anc, blasts, cytogenetics, hemoglobin, platelets]);
 
   return (
     <div className="divide-y divide-gray-100">

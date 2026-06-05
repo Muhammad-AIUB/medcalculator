@@ -90,7 +90,7 @@ export function BodeForm({ onResult }: Props) {
         `BMI:  >21→0, ≤21→1`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, sel.bmi, sel.fev1, sel.mmrc, sel.mwd]);
 
   return (
     <div className="space-y-0">

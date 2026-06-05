@@ -4,6 +4,10 @@ import { useEffect } from 'react';
 export function PWARegister() {
   useEffect(() => {
     if (typeof window === 'undefined' || !('serviceWorker' in navigator)) return;
+    // Inside the Capacitor Android app all assets are already on-device, so a
+    // service worker is redundant — and its cache can serve stale files after
+    // an app update. Skip SW registration there; keep it for web/PWA builds.
+    if ((window as unknown as { Capacitor?: unknown }).Capacitor) return;
     window.addEventListener('load', () => {
       navigator.serviceWorker
         .register('/sw.js', { scope: '/' })

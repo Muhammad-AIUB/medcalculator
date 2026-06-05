@@ -263,9 +263,6 @@ export class BmiCalculator implements ICalculator {
       notes.push('Sex not provided — Ideal Body Weight and Adjusted Body Weight not calculated.');
     }
 
-    // ── BMI Prime ─────────────────────────────────────────────────
-    const bmiPrime = roundTo(bmi / 25, 2);
-
     // Warnings
     if (bmi < 16) warnings.push('Severely underweight — assess for malnutrition, eating disorder.');
     if (bmi > 40) warnings.push('Class III obesity — high risk for comorbidities. Consider bariatric evaluation.');

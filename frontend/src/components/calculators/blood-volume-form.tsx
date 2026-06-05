@@ -51,7 +51,7 @@ export function BloodVolumeForm({ onResult }: Props) {
         hematocrit,
       });
     } catch { return null; }
-  }, [patientType, sex, heightCm, weightKg, hematocrit]);
+  }, [patientType, sex, heightCm, weightKg, hematocrit, isAdult]);
 
   const onResultRef = useRef(onResult);
   useEffect(() => { onResultRef.current = onResult; });
@@ -83,7 +83,7 @@ export function BloodVolumeForm({ onResult }: Props) {
       formulaUsed: formula,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, heightCm, hematocrit, isAdult, patientType, sex, weightKg]);
 
   return (
     <div className="space-y-6">

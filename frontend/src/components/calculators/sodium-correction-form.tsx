@@ -63,7 +63,7 @@ export function SodiumCorrectionForm({ onResult }: Props) {
       formulaUsed:
         'Corrected Na (Katz, 1973) = Measured Na + 0.016 x (Serum glucose - 100)\nCorrected Na (Hillier, 1999) = Measured Na + 0.024 x (Serum glucose - 100)\n\nNote: Serum glucose must be in mg/dL',
     });
-  }, [liveResult]);
+  }, [liveResult, glcMg, na]);
 
   return (
     <div className="space-y-6">

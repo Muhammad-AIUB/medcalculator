@@ -110,7 +110,7 @@ export function CardiacOutputForm({ onResult }: Props) {
         'SaO2 and SvO2 as decimals (auto-converted from %)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, age70plus, hbGdl, heightCm, hr, sao2Pct, svo2Pct, weightKg]);
 
   return (
     <div className="divide-y divide-gray-100">

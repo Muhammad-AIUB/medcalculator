@@ -97,7 +97,7 @@ export function SofaForm({ onResult }: SofaFormProps) {
       inputs: { ventilated, platelets, gcs, bilirubin, cardio, renal },
       formulaUsed: 'SOFA = Coagulation + CNS + Liver + Cardiovascular + Renal (each 0–4 pts)',
     });
-  }, [liveResult]);
+  }, [liveResult, bilirubin, cardio, gcs, platelets, renal, ventilated]);
 
   return (
     <div>

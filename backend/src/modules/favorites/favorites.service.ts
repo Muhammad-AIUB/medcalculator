@@ -1,22 +1,19 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../../infrastructure/database/prisma.service';
 import { AddFavoriteDto } from './dto/favorites.dto';
 
 @Injectable()
 export class FavoritesService {
-  private readonly logger = new Logger(FavoritesService.name);
-
   constructor(private readonly prisma: PrismaService) {}
 
   async add(dto: AddFavoriteDto) {
-    // Upsert user first (session-based)
-    await this.prisma.user.upsert({
+    // Upsert returns the user row, so there's no need for a follow-up lookup.
+    const user = await this.prisma.user.upsert({
       where: { sessionId: dto.userId },
       create: { sessionId: dto.userId },
       update: {},
+      select: { id: true },
     });
-    // upsert guarantees the row exists — safe to assert non-null
-    const user = await this.prisma.user.findUniqueOrThrow({ where: { sessionId: dto.userId } });
     return this.prisma.favorite.upsert({
       where: { userId_calculatorId: { userId: user.id, calculatorId: dto.calculatorId } },
       create: { userId: user.id, calculatorId: dto.calculatorId, pinnedOrder: dto.pinnedOrder },
@@ -25,19 +22,18 @@ export class FavoritesService {
   }
 
   async findByUser(userId: string) {
-    const user = await this.prisma.user.findUnique({ where: { sessionId: userId } });
-    if (!user) return [];
+    // Single query: filter favorites by the related user's sessionId (JOIN),
+    // instead of a separate user lookup followed by a favorites query.
     return this.prisma.favorite.findMany({
-      where: { userId: user.id },
+      where: { user: { sessionId: userId } },
       orderBy: [{ pinnedOrder: 'asc' }, { createdAt: 'desc' }],
     });
   }
 
   async remove(userId: string, calculatorId: string) {
-    const user = await this.prisma.user.findUnique({ where: { sessionId: userId } });
-    if (!user) return { deleted: 0 };
+    // Single query: delete via the user relation filter, no prior lookup needed.
     const result = await this.prisma.favorite.deleteMany({
-      where: { userId: user.id, calculatorId },
+      where: { calculatorId, user: { sessionId: userId } },
     });
     return { deleted: result.count };
   }

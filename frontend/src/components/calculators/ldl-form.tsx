@@ -92,7 +92,7 @@ export function LdlForm({ onResult }: Props) {
         'Note: Not valid when Triglycerides > 400 mg/dL (Friedewald equation)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, hdlMgDl, tcMgDl, tgMgDl]);
 
   return (
     <div className="space-y-6">

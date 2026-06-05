@@ -11,7 +11,12 @@ import { LoggingInterceptor } from './common/interceptors/logging.interceptor';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule, {
-    logger: ['error', 'warn', 'log', 'debug'],
+    // Verbose levels in dev; lean (error/warn/log) in production to keep the
+    // logging path cheap under high request volume.
+    logger:
+      process.env.NODE_ENV === 'production'
+        ? ['error', 'warn', 'log']
+        : ['error', 'warn', 'log', 'debug'],
   });
 
   const configService = app.get(ConfigService);

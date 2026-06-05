@@ -53,7 +53,7 @@ export function BsaCosteffForm({ onResult }: Props) {
       formulaUsed: 'BSA (m²) = (4 × W + 7) / (90 + W)   (Costeff, W in kg)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, weightKg]);
 
   return (
     <div className="space-y-6">

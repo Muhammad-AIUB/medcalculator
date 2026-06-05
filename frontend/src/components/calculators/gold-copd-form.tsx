@@ -4,9 +4,6 @@ import { calculateGOLD, GOLDInput } from '@/lib/calculators/gold-copd';
 
 interface Props { onResult: (result: any) => void; }
 
-const ACTIVE   = { background: '#0E7490', color: '#ffffff' } as const;
-const INACTIVE = { background: '#ffffff', color: '#1e293b' } as const;
-
 // ── Stacked button block (no score labels) ────────────────────────────────────
 function Stacked({
   options, selectedIdx, onChange,
@@ -71,7 +68,7 @@ export function GoldCopdForm({ onResult }: Props) {
         `Result: ${liveResult.gradeLabel} / ${liveResult.groupLabel}`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, exacerbationIdx, fev1Idx, symptomsIdx]);
 
   return (
     <div className="space-y-0">

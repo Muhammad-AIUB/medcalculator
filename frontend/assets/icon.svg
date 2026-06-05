@@ -1,0 +1,71 @@
+<svg width="1024" height="1024" viewBox="0 0 1024 1024" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0" stop-color="#eef3f9"/>
+      <stop offset="1" stop-color="#dde6f0"/>
+    </linearGradient>
+    <linearGradient id="pocket" x1="0" y1="0" x2="0.3" y2="1">
+      <stop offset="0" stop-color="#ffffff"/>
+      <stop offset="1" stop-color="#e7edf4"/>
+    </linearGradient>
+    <linearGradient id="calc" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0" stop-color="#28456b"/>
+      <stop offset="1" stop-color="#1c3354"/>
+    </linearGradient>
+    <filter id="sh" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="10" stdDeviation="16" flood-color="#1c3354" flood-opacity="0.30"/>
+    </filter>
+  </defs>
+
+  <!-- Card background + blue rounded frame -->
+  <rect width="1024" height="1024" fill="url(#bg)"/>
+  <rect x="74" y="74" width="876" height="876" rx="188" fill="none" stroke="#3f7fc1" stroke-width="14"/>
+
+  <!-- Calculator (drawn first; pocket overlaps its lower half) -->
+  <g transform="rotate(5 512 360)" filter="url(#sh)">
+    <rect x="332" y="150" width="368" height="430" rx="40" fill="url(#calc)"/>
+    <rect x="332" y="150" width="368" height="430" rx="40" fill="none" stroke="#16314f" stroke-width="6"/>
+
+    <!-- small plus above display -->
+    <g fill="#cdd9e8">
+      <rect x="470" y="186" width="50" height="16" rx="5"/>
+      <rect x="487" y="169" width="16" height="50" rx="5"/>
+    </g>
+
+    <!-- display -->
+    <rect x="372" y="232" width="288" height="150" rx="16" fill="#f3f6fa"/>
+    <text x="392" y="326" font-family="Arial, sans-serif" font-size="54" font-weight="800" fill="#1c3354">C+M</text>
+    <text x="648" y="298" font-family="'Courier New', monospace" font-size="44" font-weight="700" fill="#1c3354" text-anchor="end">88.5</text>
+    <text x="648" y="352" font-family="'Courier New', monospace" font-size="44" font-weight="700" fill="#1c3354" text-anchor="end">7.2</text>
+
+    <!-- button row -->
+    <g>
+      <rect x="372" y="408" width="64" height="64" rx="16" fill="#f3f6fa"/>
+      <rect x="448" y="408" width="64" height="64" rx="16" fill="#f3f6fa"/>
+      <rect x="524" y="408" width="64" height="64" rx="16" fill="#f3f6fa"/>
+      <rect x="600" y="408" width="64" height="64" rx="16" fill="#3f7fc1"/>
+      <!-- plus -->
+      <g fill="#1c3354"><rect x="392" y="434" width="24" height="10" rx="3"/><rect x="399" y="427" width="10" height="24" rx="3"/></g>
+      <!-- minus -->
+      <rect x="468" y="434" width="24" height="10" rx="3" fill="#1c3354"/>
+      <!-- times -->
+      <g fill="#1c3354" transform="rotate(45 556 440)"><rect x="544" y="434" width="24" height="10" rx="3"/><rect x="551" y="427" width="10" height="24" rx="3"/></g>
+      <!-- power -->
+      <g fill="none" stroke="#ffffff" stroke-width="6" stroke-linecap="round">
+        <path d="M632 426 a18 18 0 1 0 16 0"/>
+        <line x1="632" y1="420" x2="632" y2="442"/>
+      </g>
+    </g>
+  </g>
+
+  <!-- Shirt pocket (overlaps the calculator's lower half) -->
+  <g filter="url(#sh)">
+    <path d="M250 470 H720 a18 18 0 0 1 18 18 V760 a14 14 0 0 1 -6 11 L500 905 a18 18 0 0 1 -20 0 L262 781 a14 14 0 0 1 -6 -11 V488 a18 18 0 0 1 -6 -18 Z"
+          fill="url(#pocket)" stroke="#c4cedb" stroke-width="6"/>
+    <!-- top seam -->
+    <line x1="276" y1="556" x2="712" y2="556" stroke="#c4cedb" stroke-width="6"/>
+  </g>
+
+  <!-- sparkle -->
+  <path d="M648 612 l10 26 26 10 -26 10 -10 26 -10 -26 -26 -10 26 -10 Z" fill="#9fb4cc"/>
+</svg>

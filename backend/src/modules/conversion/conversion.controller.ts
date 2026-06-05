@@ -1,4 +1,4 @@
-import { Controller, Get, Post, Param, Body, HttpCode, HttpStatus } from '@nestjs/common';
+import { Controller, Get, Post, Param, Body, HttpCode, HttpStatus, Header } from '@nestjs/common';
 import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { ConversionService } from './conversion.service';
 import { ConvertDto, ConvertAllDto, ConversionResultDto, ConvertAllResultDto } from './dto/convert.dto';
@@ -26,6 +26,7 @@ export class ConversionController {
   }
 
   @Get('units')
+  @Header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'List all supported units', description: 'Returns the complete registry of supported medical units' })
   @ApiResponse({ status: 200, description: 'Unit registry returned' })
   getAllUnits() {
@@ -33,6 +34,7 @@ export class ConversionController {
   }
 
   @Get('units/categories')
+  @Header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'List unit categories', description: 'Returns all available unit categories' })
   @ApiResponse({ status: 200, description: 'Categories list' })
   getCategories() {
@@ -40,6 +42,7 @@ export class ConversionController {
   }
 
   @Get('units/:category')
+  @Header('Cache-Control', 'public, max-age=3600, stale-while-revalidate=86400')
   @ApiOperation({ summary: 'Get units by category' })
   @ApiParam({ name: 'category', example: 'concentration', enum: ['concentration', 'weight', 'length', 'pressure', 'rate', 'volume', 'temperature'] })
   @ApiResponse({ status: 200, description: 'Units for the given category' })

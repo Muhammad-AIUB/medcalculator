@@ -259,9 +259,30 @@ export function CalculatorPageClient({ id }: Props) {
   const calculator = useMemo(() => getCalculator(id), [id]);
   const { addToRecent, addHistoryEntry } = useUIStore();
   const [result, setResult] = useState<any>(null);
-  const [resetKey, setResetKey] = useState(0);
+  const [resetKey] = useState(0);
 
   const FormComponent = FORM_MAP[id];
+
+  // Hooks must run on every render in the same order, so this useCallback has
+  // to be declared before any early return below.
+  const handleResult = useCallback((res: any) => {
+    setResult(res);
+    addToRecent(id);
+    if (res) {
+      const primaryOutput = res.outputs?.[0];
+      addHistoryEntry({
+        calculatorId: id,
+        calculatorName: calculator?.title ?? '',
+        inputs: res.inputs ?? {},
+        outputs: res.outputs ?? [],
+        units: res.units,
+        calculatedAt: new Date().toISOString(),
+        summary: primaryOutput
+          ? `${primaryOutput.label}: ${primaryOutput.value}${primaryOutput.unit ? ' ' + primaryOutput.unit : ''}`
+          : 'Calculated',
+      });
+    }
+  }, [id, calculator, addToRecent, addHistoryEntry]);
 
   if (!calculator || !FormComponent) {
     return (
@@ -274,25 +295,6 @@ export function CalculatorPageClient({ id }: Props) {
       </AppShell>
     );
   }
-
-  const handleResult = useCallback((res: any) => {
-    setResult(res);
-    addToRecent(id);
-    if (res) {
-      const primaryOutput = res.outputs?.[0];
-      addHistoryEntry({
-        calculatorId: id,
-        calculatorName: calculator.title,
-        inputs: res.inputs ?? {},
-        outputs: res.outputs ?? [],
-        units: res.units,
-        calculatedAt: new Date().toISOString(),
-        summary: primaryOutput
-          ? `${primaryOutput.label}: ${primaryOutput.value}${primaryOutput.unit ? ' ' + primaryOutput.unit : ''}`
-          : 'Calculated',
-      });
-    }
-  }, [id, calculator, addToRecent, addHistoryEntry]);
 
   const primary = result?.outputs?.[0];
   const sev   = primary?.interpretation?.severity ?? 'neutral';

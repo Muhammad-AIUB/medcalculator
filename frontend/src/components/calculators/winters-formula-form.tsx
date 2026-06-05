@@ -56,7 +56,7 @@ export function WintersFormulaForm({ onResult }: Props) {
         'Note: although the original Winters formula used ±2,\nnewer data suggest pCO2 may vary up to ±5',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, hco3]);
 
   return (
     <div className="space-y-6">

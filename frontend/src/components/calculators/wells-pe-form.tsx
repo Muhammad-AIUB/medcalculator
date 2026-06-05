@@ -85,7 +85,7 @@ export function WellsPeForm({ onResult }: Props) {
         'Two-Tier:   ≤4 PE Unlikely (D-dimer) | ≥5 PE Likely (CTPA)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, dvtSigns, heartRate, hemoptysis, immobilization, malignancy, pe1st, previousPeDvt]);
 
   return (
     <div className="divide-y divide-gray-100">

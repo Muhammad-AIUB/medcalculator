@@ -123,7 +123,7 @@ export function OsmolalityForm({ onResult }: Props) {
         'Osmolar Gap = Measured Serum Osm - Calculated Serum Osm (Purssell)',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, bunMg, etohMg, glcMg, measOsm, na]);
 
   return (
     <div className="space-y-6">

@@ -1,5 +1,5 @@
 import { Controller, Get, Post, Delete, Param, Body, Query, HttpCode, HttpStatus, Req } from '@nestjs/common';
-import { ApiTags, ApiOperation, ApiResponse, ApiQuery, ApiParam } from '@nestjs/swagger';
+import { ApiTags, ApiOperation, ApiResponse, ApiParam } from '@nestjs/swagger';
 import { Request } from 'express';
 import { HistoryService } from './history.service';
 import { CreateHistoryDto, HistoryQueryDto } from './dto/history.dto';

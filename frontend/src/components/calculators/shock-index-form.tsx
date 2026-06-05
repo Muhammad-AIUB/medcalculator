@@ -37,7 +37,7 @@ export function ShockIndexForm({ onResult }: Props) {
       formulaUsed: 'Shock Index = HR / SBP',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, hr, sbp]);
 
   return (
     <div className="space-y-6">

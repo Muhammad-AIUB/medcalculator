@@ -38,14 +38,14 @@ export function MrsForm({ onResult }: Props) {
       formulaUsed: 'Assignation of points based on severity of disability (0 = No symptoms, 6 = Dead).',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, selected]);
 
   return (
     <div className="space-y-4">
       <div className="grid grid-cols-[1fr_1fr] gap-4 py-2">
         <div className="space-y-1 pr-2">
-          <p className="text-sm font-semibold text-[#0E7490]">Patient's Baseline Activity</p>
-          <p className="text-xs text-amber-600">Choose best fit of patient's ability</p>
+          <p className="text-sm font-semibold text-[#0E7490]">Patient&apos;s Baseline Activity</p>
+          <p className="text-xs text-amber-600">Choose best fit of patient&apos;s ability</p>
         </div>
 
         <div className="rounded-xl border-2 overflow-hidden divide-y divide-gray-100"

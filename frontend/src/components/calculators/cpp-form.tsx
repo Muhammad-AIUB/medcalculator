@@ -35,7 +35,7 @@ export function CppForm({ onResult }: Props) {
       formulaUsed: 'CPP = MAP - ICP',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, icp, map]);
 
   return (
     <div className="space-y-6">

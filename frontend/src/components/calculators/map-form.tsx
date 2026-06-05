@@ -37,7 +37,7 @@ export function MapForm({ onResult }: Props) {
       formulaUsed: 'MAP = 1/3 x SBP + 2/3 x DBP',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, dbp, sbp]);
 
   return (
     <div className="space-y-6">

@@ -9,6 +9,12 @@ import { Observable } from 'rxjs';
 import { tap } from 'rxjs/operators';
 import { Request, Response } from 'express';
 
+// Under high request volume, logging every request synchronously becomes a
+// throughput bottleneck (formatting + stdout writes on the hot path). We log
+// only what's actionable: errors and slow requests. Normal fast responses are
+// not logged. Override the threshold with SLOW_REQUEST_MS.
+const SLOW_REQUEST_MS = Number(process.env.SLOW_REQUEST_MS ?? 500);
+
 @Injectable()
 export class LoggingInterceptor implements NestInterceptor {
   private readonly logger = new Logger(LoggingInterceptor.name);
@@ -18,21 +24,18 @@ export class LoggingInterceptor implements NestInterceptor {
     const request = ctx.getRequest<Request>();
     const response = ctx.getResponse<Response>();
 
-    const { method, url, ip } = request;
-    const userAgent = request.get('User-Agent') || '';
+    const { method, url } = request;
     const startTime = Date.now();
-
-    this.logger.log(
-      `Incoming Request: ${method} ${url} | IP: ${ip} | UA: ${userAgent}`,
-    );
 
     return next.handle().pipe(
       tap({
         next: () => {
           const duration = Date.now() - startTime;
-          this.logger.log(
-            `Response: ${method} ${url} ${response.statusCode} | ${duration}ms`,
-          );
+          if (duration >= SLOW_REQUEST_MS) {
+            this.logger.warn(
+              `Slow: ${method} ${url} ${response.statusCode} | ${duration}ms`,
+            );
+          }
         },
         error: (err: Error) => {
           const duration = Date.now() - startTime;

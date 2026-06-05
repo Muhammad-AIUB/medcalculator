@@ -69,7 +69,6 @@ export function useUnitSync(
       lastValueRef.current = numVal
       setValueState(numVal)
       setAllValues(newAllValues)
-      const unitDef = findUnit(targetUnit)
       setDisplayValueState(numVal > 0 ? String(numVal) : '')
 
       onChange?.(numVal, targetUnit, newAllValues)

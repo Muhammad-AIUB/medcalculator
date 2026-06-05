@@ -1,9 +1,16 @@
 'use client';
-import { useRouter } from 'next/navigation';
+import { useRouter, usePathname } from 'next/navigation';
 import { clearAppData, clearCalculations } from '@/lib/app-data';
 
 export function BottomBar() {
   const router = useRouter();
+  const pathname = usePathname();
+
+  // Home page shows MORE (→ subscribe); every other page (calculators,
+  // subscribe) shows HOME (→ home).
+  const onHome = pathname === '/';
+  const navLabel = onHome ? 'MORE' : 'HOME';
+  const navTarget = onHome ? '/subscribe' : '/';
 
   const handleRefresh = () => {
     clearCalculations();
@@ -29,8 +36,8 @@ export function BottomBar() {
   return (
     <nav className="fixed bottom-0 left-0 right-0 z-40 bg-gray-100 border-t border-gray-200">
       <div className="grid grid-cols-3 gap-3 px-4 py-3 max-w-2xl mx-auto">
-        <button onClick={() => router.push('/subscribe')} className={btnClass}>
-          Home
+        <button onClick={() => router.push(navTarget)} className={btnClass}>
+          {navLabel}
         </button>
         <button onClick={handleRefresh} className={btnClass}>
           Refresh

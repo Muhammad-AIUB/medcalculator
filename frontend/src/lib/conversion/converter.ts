@@ -1,5 +1,4 @@
 import { UNIT_REGISTRY, MOLAR_MASSES, findUnit, SUBSTANCE_UNIT_PAIRS } from './unit-registry'
-import type { UnitDefinition } from '@/types/conversion'
 
 export class MedicalUnitConverter {
   /**

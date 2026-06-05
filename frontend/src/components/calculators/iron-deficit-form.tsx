@@ -54,7 +54,7 @@ export function IronDeficitForm({ onResult }: Props) {
         `= ${liveResult.ironDeficitMg.toLocaleString()} mg`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, actualHbGdl, ironStoresMg, targetHbGdl, weightKg]);
 
   return (
     <div className="space-y-6">

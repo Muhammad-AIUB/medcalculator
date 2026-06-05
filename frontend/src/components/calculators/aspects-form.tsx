@@ -81,7 +81,7 @@ export function AspectsForm({ onResult }: Props) {
         `MCA Cortex: I, M1, M2, M3, M4, M5, M6 (7 points)`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, vals]);
 
   return (
     <div className="space-y-0">

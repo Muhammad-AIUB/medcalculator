@@ -52,7 +52,7 @@ export function PercForm({ onResult }: Props) {
         `≥1 (PERC Positive): Cannot rule out PE — further workup required`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, vals]);
 
   return (
     <div className="space-y-0">

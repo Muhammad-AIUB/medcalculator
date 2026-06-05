@@ -206,7 +206,7 @@ export function NihssForm({ onResult }: Props) {
       formulaUsed: 'Addition of the selected points across all 15 NIHSS items (1A, 1B, 1C, 2–11).\n\nMax score: 42',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, sel]);
 
   const set = (id: string, idx: number) =>
     setSel(prev => ({ ...prev, [id]: idx }));

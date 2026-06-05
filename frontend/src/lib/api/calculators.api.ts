@@ -1,5 +1,5 @@
 import { apiClient } from './client';
-import type { Calculator, CalculationResult } from '@/types/calculator';
+import type { CalculationResult } from '@/types/calculator';
 
 export interface CalculateRequest {
   inputs: Record<string, unknown>;

@@ -82,7 +82,7 @@ export function FenaForm({ onResult }: Props) {
       formulaUsed: 'FENa (%) = 100 x (SCr x UNa) / (SNa x UCr)\n\nSCr = serum creatinine, UNa = urine sodium\nSNa = serum sodium, UCr = urine creatinine',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, sCr, sNa, uCr, uNa]);
 
   return (
     <div className="space-y-6">

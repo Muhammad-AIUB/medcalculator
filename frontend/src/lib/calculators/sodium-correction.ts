@@ -1,5 +1,3 @@
-import type { CalculationResult } from '@/types/calculator';
-
 interface SodiumCorrectionInput {
   sodium: number;    // mEq/L (= mmol/L)
   glucose: number;   // mg/dL

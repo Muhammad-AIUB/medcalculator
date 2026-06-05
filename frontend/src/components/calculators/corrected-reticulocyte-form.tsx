@@ -45,7 +45,7 @@ export function CorrectedReticulocyteForm({ onResult }: Props) {
         `RPI = ${liveResult.rpi}`,
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, measuredHct, normalHct, rbcCount, reticulocytePct]);
 
   return (
     <div className="space-y-6">

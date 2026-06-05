@@ -86,7 +86,7 @@ export function WellsDvtForm({ onResult }: Props) {
       formulaUsed: 'Addition of the selected points.',
       references: liveResult.references,
     });
-  }, [liveResult]);
+  }, [liveResult, activeCancer, altDiagnosis, bedridden, calfSwelling, collateralVeins, entireLeg, localTenderness, paralysis, pittingEdema, priorDvt]);
 
   return (
     <div className="divide-y divide-gray-100">
