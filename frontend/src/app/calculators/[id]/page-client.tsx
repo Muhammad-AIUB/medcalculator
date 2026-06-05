@@ -48,7 +48,6 @@ const CardiacOutputForm     = dynamic(() => import('@/components/calculators/car
 const LdlForm               = dynamic(() => import('@/components/calculators/ldl-form').then(m => ({ default: m.LdlForm })), { ssr: false });
 const WellsPeForm           = dynamic(() => import('@/components/calculators/wells-pe-form').then(m => ({ default: m.WellsPeForm })), { ssr: false });
 const ShockIndexForm        = dynamic(() => import('@/components/calculators/shock-index-form').then(m => ({ default: m.ShockIndexForm })), { ssr: false });
-const PreciseDaptForm       = dynamic(() => import('@/components/calculators/precise-dapt-form').then(m => ({ default: m.PreciseDaptForm })), { ssr: false });
 const DaptForm                     = dynamic(() => import('@/components/calculators/dapt-form').then(m => ({ default: m.DaptForm })), { ssr: false });
 const CorrectedReticulocyteForm    = dynamic(() => import('@/components/calculators/corrected-reticulocyte-form').then(m => ({ default: m.CorrectedReticulocyteForm })), { ssr: false });
 const AncForm                      = dynamic(() => import('@/components/calculators/anc-form').then(m => ({ default: m.AncForm })), { ssr: false });
@@ -125,7 +124,6 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   ldl:                 LdlForm,
   'wells-pe':          WellsPeForm,
   'shock-index':       ShockIndexForm,
-  'precise-dapt':             PreciseDaptForm,
   dapt:                       DaptForm,
   'corrected-reticulocyte':   CorrectedReticulocyteForm,
   anc:                        AncForm,
@@ -205,7 +203,6 @@ const FORMULA_MAP: Record<string, string> = {
   ldl:                 'LDL (mg/dL) = Total Cholesterol (mg/dL) - HDL (mg/dL) - Triglycerides (mg/dL) / 5\n\nNote: Friedewald equation — not valid when Triglycerides > 400 mg/dL',
   'wells-pe':          'Addition of selected points:\n\nClinical signs/symptoms of DVT: +3\nPE is #1 diagnosis or equally likely: +3\nHeart rate > 100: +1.5\nImmobilization >=3 days or surgery in past 4 weeks: +1.5\nPrevious objectively diagnosed PE or DVT: +1.5\nHemoptysis: +1\nMalignancy (treatment within 6 months or palliative): +1\n\nThree-Tier: 0-1 Low | 2-6 Moderate | >6 High\nTwo-Tier: <=4 PE Unlikely (D-dimer) | >=5 PE Likely (CTPA)',
   'shock-index':       'Shock Index = HR / SBP\n\nNormal: 0.5 – 0.7\n>0.7 – 1.0: Mild compromise\n>1.0 – 1.4: Moderate shock\n>1.4:       Severe shock',
-  'precise-dapt':      'PRECISE-DAPT Score (0–100) derived from the PRECISE-DAPT linear prediction model\n\nLP = 0.04376×Age + 0.000087×CrCl² − 0.0462×CrCl\n   + 0.2274×WBC − 0.77044×Hgb + 0.84637×PriorBleeding\n\n< 25:  Low bleeding risk → Standard/long DAPT (12–24 months)\n≥ 25:  High bleeding risk → Short DAPT (3–6 months)',
   dapt:                'Addition of the selected points:\n\nAge ≥75: -2 | 65-74: -1 | <65: 0\nCigarette smoking (within 1 year): +1\nDiabetes mellitus: +1\nMI at presentation: +1\nPrior PCI or prior MI: +1\nPaclitaxel-eluting stent: +1\nStent diameter <3 mm: +1\nCHF or LVEF <30%: +2\nVein graft stent: +2\n\nScore ≥ 2: Prolonged DAPT (>12 months) reasonable\nScore < 2: Standard DAPT (≤12 months) recommended',
   'corrected-reticulocyte': 'ARC (cells/µL) = (Reticulocyte % / 100) × RBC (cells/µL)\n\nCorrected Reticulocyte % = Reticulocyte % × (Measured Hct / Normal Hct)\n\nRPI = Corrected Reticulocyte % / Maturation Factor\n\nMaturation Factor:\n≥35%: 1.0 | 25–<35%: 1.5 | 20–<25%: 2.0 | <20%: 2.5\n\nRPI ≥ 3: Hyperproliferative\nRPI 2–3: Borderline\nRPI < 2: Hypoproliferative',
   anc:                 'ANC = 10 × WBC count (×10³/µL) × (% PMNs + % bands)\n\nANC ≥ 1500 cells/µL: Normal\nANC 1000–1499:       Mild neutropenia\nANC 500–999:         Moderate neutropenia\nANC < 500:           Severe neutropenia',
