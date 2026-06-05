@@ -55,7 +55,6 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
   const [ageStr, setAgeStr] = useState('');
   const [mgdlStr, setMgdlStr] = useState('');
   const [umolStr, setUmolStr] = useState('');
-  const [black, setBlack]   = useState(false);
 
   const onMgdlChange = useCallback((v: string) => {
     setMgdlStr(v);
@@ -75,9 +74,9 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
   const liveResult = useMemo(() => {
     if (creatMgdl <= 0 || age < 1) return null;
     try {
-      return calculateEGFR({ creatinine: creatMgdl, creatinineUnit: 'mg/dL', age, sex, formula: 'mdrd', black });
+      return calculateEGFR({ creatinine: creatMgdl, creatinineUnit: 'mg/dL', age, sex, formula: 'ckd-epi-2021' });
     } catch { return null; }
-  }, [creatMgdl, age, sex, black]);
+  }, [creatMgdl, age, sex]);
 
   const onResultRef = useRef(onResult);
   useEffect(() => { onResultRef.current = onResult; });
@@ -92,8 +91,8 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
         unit: 'mL/min/1.73m²',
         interpretation: { text: liveResult.interpretation, severity: liveResult.severity as any },
       }],
-      inputs: { creatinine: creatMgdl, creatinineUnit: 'mg/dL', age, sex, black },
-      formulaUsed: 'GFR = 175 × Scr⁻¹·¹⁵⁴ × Age⁻⁰·²⁰³ × 1.212 (if Black) × 0.742 (if Female)',
+      inputs: { creatinine: creatMgdl, creatinineUnit: 'mg/dL', age, sex },
+      formulaUsed: 'eGFR = 142 × min(Scr/κ,1)^α × max(Scr/κ,1)^⁻¹·² × 0.9938^Age × (1.012 if female)   [CKD-EPI 2021, race-free]',
       references: liveResult.references,
     });
   }, [liveResult]);
@@ -121,15 +120,6 @@ export function EgfrForm({ onResult }: EgfrFormProps) {
           <OrDivider />
           <NumInput value={mgdlStr} onChange={onMgdlChange} suffix="mg/dL" step="0.01" min={0.1} max={30} />
         </div>
-      </Field>
-
-      {/* 4. Black race */}
-      <Field label="Black race" hint="Race may/may not provide better estimates of GFR; optional">
-        <Toggle
-          options={[{ value: 'no', label: 'No' }, { value: 'yes', label: 'Yes' }]}
-          value={black ? 'yes' : 'no'}
-          onChange={(v) => setBlack(v === 'yes')}
-        />
       </Field>
     </div>
   );
