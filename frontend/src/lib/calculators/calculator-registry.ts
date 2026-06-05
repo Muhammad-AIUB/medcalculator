@@ -309,15 +309,15 @@ export const CALCULATORS: Calculator[] = [
   },
   {
     id: 'frax',
-    title: 'FRAX',
-    shortTitle: 'FRAX',
-    emoji: 'FRAX',
-    description: 'Fracture risk assessment point score',
+    title: 'FRACTURE Index',
+    shortTitle: 'FRACTURE Index',
+    emoji: '🦴',
+    description: 'FRACTURE Index (Black 2001) — point score for fracture risk in postmenopausal women, with or without BMD',
     category: 'nutrition',
     icon: 'Bone',
     color: 'text-emerald-600',
     bgColor: 'bg-emerald-50 dark:bg-emerald-950',
-    tags: ['FRAX', 'fracture', 'osteoporosis', 'bone', 'BMD'],
+    tags: ['FRACTURE Index', 'fracture', 'osteoporosis', 'bone', 'BMD', 'FRAX'],
     inputs: [],
     calculate: (inputs) =>
       calculateFRAX({

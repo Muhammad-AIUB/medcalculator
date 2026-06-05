@@ -71,9 +71,9 @@ const groups = [
     note: 'Optional',
     options: [
       { label: '>=-1', score: 0 },
-      { label: 'Between -1 and -2', score: 1 },
-      { label: 'Between -2 and -2.5', score: 2 },
-      { label: '<-2.5', score: 3 },
+      { label: 'Between -1 and -2', score: 2 },
+      { label: 'Between -2 and -2.5', score: 3 },
+      { label: '<-2.5', score: 4 },
     ],
   },
 ] as const;
@@ -179,7 +179,7 @@ export function FraxForm({ onResult }: FraxFormProps) {
       outputs: [
         {
           id: 'frax',
-          label: 'FRAX',
+          label: 'FRACTURE Index',
           value: liveResult.score ?? 0,
           unit: 'points',
           interpretation: { text: liveResult.interpretation, severity, classification: liveResult.label },
