@@ -33,10 +33,19 @@ export function NumInput({
       disabled ? 'opacity-50 border-[#0E7490]/40' : 'border-[#0E7490]/50 focus-within:border-[#0E7490]',
     )}>
       <input
-        type="number"
+        type="text"
         inputMode="decimal"
         value={value}
-        onChange={(e) => onChange(e.target.value)}
+        onChange={(e) => {
+          // type="text" + manual numeric filtering avoids a type="number" quirk
+          // where some Android keyboards/locales report an empty value, which
+          // silently broke the auto unit-conversion. Allow digits, one dot, and
+          // an optional leading minus.
+          let v = e.target.value.replace(/[^0-9.-]/g, '');
+          const dot = v.indexOf('.');
+          if (dot !== -1) v = v.slice(0, dot + 1) + v.slice(dot + 1).replace(/\./g, '');
+          onChange(v);
+        }}
         min={min}
         max={max}
         step={step}

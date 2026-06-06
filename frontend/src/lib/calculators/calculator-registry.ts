@@ -56,6 +56,7 @@ import { calculatePlasmaDosage } from './plasma-dosage'
 import { calculateIronDeficit } from './iron-deficit'
 import { calculateNIHSS } from './nihss'
 import { calculateABCD2 } from './abcd2'
+import { calculateNEWS } from './news'
 import { calculateICH } from './ich'
 import { calculateMRS } from './mrs'
 import { calculateHuntHess } from './hunt-hess'
@@ -1764,6 +1765,31 @@ export const CALCULATORS: Calculator[] = [
         diabetes: Number(inputs.diabetes) as 0|1,
       });
       return { calculatorId: 'abcd2', score: result.score, unit: '', severity: result.severity, label: 'ABCD² Score', interpretation: result.interpretation };
+    },
+  },
+  {
+    id: 'news',
+    title: 'National Early Warning Score (NEWS)',
+    shortTitle: 'NEWS',
+    emoji: '🚨',
+    description: 'Aggregate physiological score (respiratory rate, SpO₂, supplemental O₂, temperature, blood pressure, heart rate, consciousness) to detect acute clinical deterioration',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['NEWS', 'early warning', 'deterioration', 'sepsis', 'vital signs', 'acute', 'critical care'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateNEWS({
+        respiratory:    Number(inputs.respiratory ?? 0),
+        spo2:           Number(inputs.spo2 ?? 0),
+        supplementalO2: Number(inputs.supplementalO2 ?? 0),
+        temperature:    Number(inputs.temperature ?? 0),
+        systolicBP:     Number(inputs.systolicBP ?? 0),
+        heartRate:      Number(inputs.heartRate ?? 0),
+        consciousness:  Number(inputs.consciousness ?? 0),
+      });
+      return { calculatorId: 'news', score: result.score, unit: 'points', severity: result.severity, label: 'NEWS', interpretation: result.interpretation };
     },
   },
   {
