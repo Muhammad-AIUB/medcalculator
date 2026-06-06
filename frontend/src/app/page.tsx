@@ -1,6 +1,5 @@
 'use client';
 import { useState, useEffect } from 'react';
-import { useRouter } from 'next/navigation';
 import { BottomBar } from '@/components/layout/bottom-bar';
 import { ExhortLogo } from '@/components/brand/exhort-logo';
 import { CALCULATORS } from '@/lib/calculators/calculator-registry';
@@ -11,7 +10,6 @@ const SLOT_COUNT = 5;
 const STORAGE_KEY = 'home-slots';
 
 export default function DashboardPage() {
-  const router = useRouter();
   const { history } = useUIStore();
   const [slots, setSlots] = useState<(string | null)[]>(Array(SLOT_COUNT).fill(null));
   const [activeSlot, setActiveSlot] = useState<number | null>(null);
@@ -77,7 +75,7 @@ export default function DashboardPage() {
                 {calc ? (
                   /* Filled slot */
                   <button
-                    onClick={() => router.push(`/calculators/${calc.id}`)}
+                    onClick={() => { window.location.href = `/calculators/${calc.id}/`; }}
                     className="flex-1 text-left px-4 py-3 rounded-xl border-2 border-[#0E7490] bg-[#0E7490]/10 active:scale-[0.98] transition-all"
                   >
                     <p className="text-sm font-semibold text-[#0E7490]">{calc.title}</p>
