@@ -52,9 +52,9 @@ export function NumInput({
         placeholder={placeholder ?? '0'}
         disabled={disabled}
         readOnly={readOnly}
-        className="min-w-0 flex-1 h-11 px-3 bg-transparent text-base font-medium text-right outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:cursor-not-allowed"
+        className="min-w-0 flex-1 h-11 px-2 bg-transparent text-base font-medium text-right outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:cursor-not-allowed"
       />
-      <div className="flex items-center px-2 h-11 text-xs font-medium text-muted-foreground min-w-12 justify-center whitespace-nowrap">
+      <div className="flex items-center pr-2 pl-1 h-11 text-xs font-medium text-muted-foreground justify-center whitespace-nowrap">
         {suffix}
       </div>
     </div>

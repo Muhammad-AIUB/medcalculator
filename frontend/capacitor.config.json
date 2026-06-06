@@ -7,13 +7,13 @@
   },
   "android": {
     "allowMixedContent": true,
-    "backgroundColor": "#0F2744"
+    "backgroundColor": "#0a2038"
   },
   "plugins": {
     "SplashScreen": {
       "launchShowDuration": 3000,
       "launchAutoHide": true,
-      "backgroundColor": "#0F2744",
+      "backgroundColor": "#0a2038",
       "showSpinner": false,
       "splashFullScreen": true,
       "splashImmersive": true,
