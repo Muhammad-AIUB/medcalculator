@@ -17,7 +17,7 @@
       "showSpinner": false,
       "splashFullScreen": true,
       "splashImmersive": true,
-      "androidScaleType": "CENTER_CROP"
+      "androidScaleType": "FIT_CENTER"
     }
   }
 }
