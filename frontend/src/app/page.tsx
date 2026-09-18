@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useMemo } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomBar } from '@/components/layout/bottom-bar';
 import { ExhortLogo } from '@/components/brand/exhort-logo';
@@ -45,9 +45,31 @@ export default function DashboardPage() {
   };
 
   const normalizedSearch = search.trim().toLowerCase();
-  const filtered = CALCULATORS.filter(c =>
-    c.title.toLowerCase().startsWith(normalizedSearch)
-  );
+  // Match title, shortTitle, description and tags. 67 of 72 titles are multi-word
+  // ("Corrected Reticulocyte Percentage"), so a prefix-only match on the title hid
+  // calculators behind their own name: "reticulocyte", "RPI", "FENa", "anion gap"
+  // and "sleep apnea" all returned nothing. Ranked so an exact title prefix still leads.
+  const filtered = useMemo(() => {
+    if (!normalizedSearch) return CALCULATORS;
+    const rank = (c: (typeof CALCULATORS)[number]) => {
+      const title = c.title.toLowerCase();
+      const short = (c.shortTitle ?? '').toLowerCase();
+      const desc = (c.description ?? '').toLowerCase();
+      const tags = (c.tags ?? []).map(t => t.toLowerCase());
+      if (title.startsWith(normalizedSearch)) return 0;
+      if (short.startsWith(normalizedSearch)) return 1;
+      if (tags.some(t => t.startsWith(normalizedSearch))) return 2;
+      if (title.includes(normalizedSearch)) return 3;
+      if (short.includes(normalizedSearch) || tags.some(t => t.includes(normalizedSearch))) return 4;
+      if (desc.includes(normalizedSearch)) return 5;
+      return -1;
+    };
+    return CALCULATORS
+      .map(c => ({ c, r: rank(c) }))
+      .filter(x => x.r >= 0)
+      .sort((a, b) => a.r - b.r || a.c.title.localeCompare(b.c.title))
+      .map(x => x.c);
+  }, [normalizedSearch]);
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -138,15 +160,21 @@ export default function DashboardPage() {
 
             {/* Results */}
             <div className="max-h-[calc(80vh-77px)] overflow-y-auto">
-              {filtered.map(calc => (
-                <button
-                  key={calc.id}
-                  onClick={() => selectCalc(calc.id)}
-                  className="w-full text-left px-5 py-3.5 text-sm font-medium text-white hover:bg-white/10 transition-colors border-b border-white/5"
-                >
-                  {calc.title}
-                </button>
-              ))}
+              {filtered.length === 0 ? (
+                <p className="px-5 py-6 text-sm text-white/50">
+                  No calculator matches &ldquo;{search.trim()}&rdquo;.
+                </p>
+              ) : (
+                filtered.map(calc => (
+                  <button
+                    key={calc.id}
+                    onClick={() => selectCalc(calc.id)}
+                    className="w-full text-left px-5 py-3.5 text-sm font-medium text-white hover:bg-white/10 transition-colors border-b border-white/5"
+                  >
+                    {calc.title}
+                  </button>
+                ))
+              )}
             </div>
           </div>
         </div>
