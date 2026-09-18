@@ -179,7 +179,7 @@ const FORMULA_MAP: Record<string, string> = {
   sdai:         'SDAI = Tender Joint Count + Swollen Joint Count + CRP, mg/dL + Patient Global Activity + Provider Global Activity',
   basdai:       'BASDAI = ((Q1 + Q2 + Q3 + Q4) + ((Q5 + Q6) / 2)) / 5',
   sledai:       'SLEDAI Score = sum of all selected item points.',
-  'das28-esr':  'DAS28-ESR= (0.56*sqrt(Tender Joint Count)+0.28*sqrt(Swollen Joint Count)+0.7*ln(ESR)+0.014*(global health))',
+  'das28-esr':  'DAS28-ESR = 0.56*sqrt(Tender Joint Count) + 0.28*sqrt(Swollen Joint Count) + 0.70*ln(ESR) + 0.014*(Global Health on 0-100 scale)',
   apri:         'APRI = (AST in IU/L) / (AST Upper Limit of Normal in IU/L) / (Platelets in 10^9/L)',
   'fib-4':      'FIB-4 Score = (Age x AST) / (Platelets x sqrt(ALT))',
   vasopressor:  'VIS = Dopamine + Dobutamine + (Epinephrine x 100) + (Norepinephrine x 100) + (Vasopressin x 2.5) + (Milrinone x 10) + Phenylephrine',
@@ -211,7 +211,7 @@ const FORMULA_MAP: Record<string, string> = {
   'mentzer-index':        'Mentzer Index = MCV (fL) / RBC count (10⁶/µL)\n\n< 13: Thalassaemia trait likely\n= 13: Indeterminate\n> 13: Iron deficiency anaemia likely',
   'calcium-correction':   'Corrected Calcium (mg/dL) = (0.8 × (Normal Albumin − Patient Albumin)) + Serum Ca\n\nNote: formula uses albumin in g/dL and calcium in mg/dL\nNormal albumin reference: 4 g/dL (40 g/L)\n\n< 8.5 mg/dL:  Hypocalcaemia\n8.5–10.5:     Normal\n> 10.5 mg/dL: Hypercalcaemia',
   flipi:                  'Addition of the selected points (each +1):\n\nAge >60 years\n>4 nodal sites\nLDH elevated\nHemoglobin <120 g/L (12 g/dL)\nStage III–IV\n\n0–1: Low Risk (~71% 10-yr OS)\n2:   Intermediate Risk (~51% 10-yr OS)\n3–5: High Risk (~36% 10-yr OS)',
-  cci:                    'CCI = Count Increment (×10⁹/L) × BSA (m²) / Unit Content (×10¹¹) × 1000\n\nBSA (Mosteller) = √(Height cm × Weight kg / 3600)\n\n1-hour CCI ≥ 7,500:  Adequate response\n1-hour CCI < 7,500:  Poor response\n20-hour CCI ≥ 4,500: Adequate response\n20-hour CCI < 4,500: Poor response (platelet refractoriness)',
+  cci:                    'CCI = Count Increment (×10⁹/L) × BSA (m²) / Unit Content (×10¹¹) × 1000\n\nBSA (Mosteller) = √(Height cm × Weight kg / 3600), rounded to 1 decimal place\n\n1-hour CCI ≥ 7,500:  Adequate response\n1-hour CCI < 7,500:  Poor response\n20-hour CCI ≥ 4,500: Adequate response\n20-hour CCI < 4,500: Poor response (platelet refractoriness)',
   'plasma-dosage':        'Total plasma dosage (mL) = Desired dosage (mL/kg) × Weight (kg)\n\nUnits needed = ⌈Total mL / Unit volume mL⌉\n\nStandard dose: 10 mL/kg\nRange: 10–20 mL/kg\nExpected effect: ~20% increase in coagulation factors immediately after infusion',
   'blood-volume':         'Adults / Children ≥25 kg (Nadler formula):\nMale:   TBV (L) = 0.3669 × H(m)³ + 0.03219 × W(kg) + 0.6041\nFemale: TBV (L) = 0.3561 × H(m)³ + 0.03308 × W(kg) + 0.1833\n\nNeonates / Children <25 kg:\nPreterm neonate: 100 mL/kg\nTerm neonate:    85 mL/kg\nInfant 1-4 mo:   75 mL/kg\nChild <25 kg:    70 mL/kg\n\nRBC Volume (mL)   = TBV × Hct / 100\nPlasma Volume (mL) = TBV × (1 − Hct / 100)',
   'ipss-r':               'Addition of the selected points:\n\nCytogenetic group: Very good 0 | Good +1 | Intermediate +2 | Poor +3 | Very poor +4\nMedullary blasts %: ≤2→0, >2 to <5→+1, 5–10→+2, >10→+3\nHemoglobin (g/dL): ≥10→0, 8–<10→+1, <8→+1.5\nPlatelets (×10³/µL): ≥100→0, 50–<100→+0.5, <50→+1\nANC (×10³/µL): ≥0.8→0, <0.8→+0.5\n\n≤1.5: Very Low | >1.5–3: Low | >3–4.5: Intermediate | >4.5–6: High | >6: Very High',
@@ -229,7 +229,7 @@ const FORMULA_MAP: Record<string, string> = {
   'hunt-hess': 'Selection of group of symptoms, assigned point value:\n\nGrade 1: Mild headache, alert, minimal nuchal rigidity (~70% survival)\nGrade 2: Full nuchal rigidity, moderate-severe headache, no neuro deficit (~60% survival)\nGrade 3: Lethargy/confusion, mild focal deficit (~50% survival)\nGrade 4: Stuporous, more severe focal deficit (~20% survival)\nGrade 5: Comatose, severe neurological impairment (~10% survival)',
   aspects: 'ASPECTS = 10 − (1 point for each region with early ischemic change)\n\nSubcortical Structures (3 pts): C (Caudate), IC (Internal Capsule), L (Lentiform nucleus)\nMCA Cortex (7 pts): I (Insular ribbon), M1 (Anterior MCA cortex), M2 (Lateral to insular ribbon),\nM3 (Posterior MCA cortex), M4 (Rostral to M1), M5 (Rostral to M3), M6 (Posterior rostral to M3)\n\n10:  Normal CT scan\n8–9: Minimal ischemic change\n≤7:  Highly correlates with negative functional outcome (mRS)\n0:   Diffuse involvement throughout MCA territory',
   apache2: 'APACHE II = APS + Age Points + Chronic Health Points\n\nAPS (Acute Physiology Score, 0–60): sum of 12 physiological variables\n  Temperature | MAP | Heart rate | Respiratory rate | Oxygenation\n  Arterial pH | Sodium | Potassium | Creatinine (×2 if ARF)\n  Hematocrit | WBC | (15 − GCS)\n\nAge Points: <44→0, 45-54→+2, 55-64→+3, 65-74→+5, ≥75→+6\nChronic Health: +5 if severe organ failure/immunocompromise\n\nMax score: 71\n\nScore  | Predicted Hospital Mortality\n0–4    | ~4%\n5–9    | ~8%\n10–14  | ~15%\n15–19  | ~25%\n20–24  | ~40%\n25–29  | ~55%\n30–34  | ~75%\n≥35    | ~85%',
-  'stop-bang': 'STOP-BANG = S + T + O + P + B + A + N + G (each = 1 point)\n\nS — Snoring loudly (louder than talking or heard through closed doors)\nT — Tired / fatigued / sleepy during daytime\nO — Observed to stop breathing during sleep\nP — Pressure — high blood pressure (or being treated for it)\nB — BMI >35 kg/m²\nA — Age >50 years\nN — Neck circumference >40 cm\nG — Gender male\n\nMax score: 8\n\n0–2: Low risk for moderate-to-severe OSA\n3–4: Moderate risk for moderate-to-severe OSA\n5–8: High risk for moderate-to-severe OSA',
+  'stop-bang': 'STOP-BANG = S + T + O + P + B + A + N + G (each = 1 point)\n\nS — Snoring loudly (louder than talking or heard through closed doors)\nT — Tired / fatigued / sleepy during daytime\nO — Observed to stop breathing during sleep\nP — Pressure — high blood pressure (or being treated for it)\nB — BMI >35 kg/m²\nA — Age >50 years\nN — Neck circumference >40 cm\nG — Gender male\n\nMax score: 8\n\n0–2: Low risk for moderate-to-severe OSA\n3–8: High risk for moderate-to-severe OSA',
   mmrc: 'mMRC Grade = selection of appropriate grade (0–4)\n\nGrade 0: Dyspnea only with strenuous exercise\nGrade 1: Dyspnea when hurrying or walking up a slight hill\nGrade 2: Walks slower than people of the same age because of dyspnea, or has to stop for breath when walking at own pace on level ground\nGrade 3: Stops for breath after walking 100 yards (91 m) or after a few minutes on level ground\nGrade 4: Too dyspneic to leave house or breathless when dressing\n\nNote: Walking should be assessed on level ground',
   perc: 'PERC Rule — if ANY criterion is present, PE cannot be ruled out:\n\n1. Age ≥50\n2. HR ≥100 bpm\n3. O₂ sat <95% on room air\n4. Unilateral leg swelling\n5. Hemoptysis\n6. Recent surgery or trauma (≤4 weeks, requiring general anesthesia)\n7. Prior PE or DVT\n8. Hormone use (oral contraceptives, HRT, or estrogenic hormones)\n\nScore 0 (PERC Negative): PE can be ruled out without further testing in LOW pre-test probability patients\nScore ≥1 (PERC Positive): PE cannot be ruled out — proceed with further workup (D-dimer or imaging)\n\nNote: PERC is only valid when pre-test probability is low (<15%)',
   'gold-copd': 'GOLD Grade (1–4) — from post-bronchodilator FEV₁ % predicted (requires FEV₁/FVC <0.7):\n  GOLD 1: ≥80% (Mild)\n  GOLD 2: 50–79% (Moderate)\n  GOLD 3: 30–49% (Severe)\n  GOLD 4: <30% (Very Severe)\n\nGOLD Group (A/B/E) — from exacerbation history + symptom burden:\n  Group E: ≥2 moderate exacerbations OR ≥1 leading to hospitalization\n  Group A: 0 or 1 moderate exacerbation (not leading to admission) AND mMRC <2 / CAT <10\n  Group B: 0 or 1 moderate exacerbation (not leading to admission) AND mMRC ≥2 / CAT ≥10\n\nNote: GOLD 1–4 = grade of airflow obstruction; GOLD A/B/E = groups for treatment decisions\nSource: Global Initiative for Chronic Obstructive Lung Disease (GOLD) 2024 Report',
@@ -300,6 +300,13 @@ export function CalculatorPageClient({ id }: Props) {
   }
 
   const primary = result?.outputs?.[0];
+  // Everything after outputs[0]. Default ceiling is 1 dp, which is what MDCalc uses
+  // for most outputs (Fick CI 2.1, anion-gap delta ratio 1.4, delta gap 13.0). Where it
+  // prints more (corrected reticulocyte % 0.42), the output carries its own `decimals`.
+  // `minDecimals` is opt-in (default 0, so nothing changes unless a calculator sets it) and
+  // pads trailing zeros the way MDCalc does for continuous values: FENa 0.0, DAS28 4.0,
+  // anion gap 25.0. Only set it where MDCalc has actually been observed padding.
+  const secondary: any[] = result?.outputs?.slice(1) ?? [];
   const sev   = primary?.interpretation?.severity ?? 'neutral';
   const color = severityColors[sev] ?? severityColors.neutral;
   const bg    = primary ? (severityBg[sev] ?? severityBg.neutral) : '#f8fafc';
@@ -324,13 +331,53 @@ export function CalculatorPageClient({ id }: Props) {
               <div className="flex items-baseline gap-2">
                 <span className="text-5xl font-bold" style={{ color }}>
                   {typeof primary.value === 'number'
-                    ? primary.value.toLocaleString(undefined, { maximumFractionDigits: 1 })
+                    ? primary.value.toLocaleString(undefined, {
+                        maximumFractionDigits: primary.decimals ?? 1,
+                        minimumFractionDigits: primary.minDecimals ?? 0,
+                      })
                     : primary.value}
                 </span>
                 {primary.unit && (
                   <span className="text-base font-medium text-gray-500">{primary.unit}</span>
                 )}
               </div>
+              {secondary.length > 0 && (
+                <div className="pt-3 space-y-2.5 border-t" style={{ borderColor: `${color}33` }}>
+                  {secondary.map((o, i) => {
+                    const oSev   = o?.interpretation?.severity ?? 'neutral';
+                    const oColor = severityColors[oSev] ?? severityColors.neutral;
+                    const shown  = typeof o.value === 'number'
+                      ? o.value.toLocaleString(undefined, {
+                          maximumFractionDigits: o.decimals ?? 1,
+                          minimumFractionDigits: o.minDecimals ?? 0,
+                        })
+                      : String(o.value ?? '');
+                    // Skip the note when it adds nothing: bmi/meld-na sub-results set
+                    // interpretation.text to the value itself, and some forms repeat the
+                    // primary's interpretation (already shown in the Interpretation panel).
+                    const note = o?.interpretation?.text;
+                    const showNote = note
+                      && String(note).trim() !== shown
+                      && String(note).trim() !== String(primary?.interpretation?.text ?? '').trim();
+                    return (
+                      <div key={o.id ?? o.label ?? i}>
+                        <div className="flex items-baseline justify-between gap-3">
+                          <span className="text-sm font-medium text-gray-600">{o.label}</span>
+                          <span className="text-lg font-bold whitespace-nowrap" style={{ color: oColor }}>
+                            {shown}
+                            {o.unit && (
+                              <span className="ml-1 text-xs font-medium text-gray-500">{o.unit}</span>
+                            )}
+                          </span>
+                        </div>
+                        {showNote && (
+                          <p className="text-xs text-gray-500 mt-0.5">{note}</p>
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
               {result.warnings?.length > 0 && (
                 <div className="pt-2 border-t border-amber-200 space-y-1">
                   {result.warnings.map((w: string, i: number) => (

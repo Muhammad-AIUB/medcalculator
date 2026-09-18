@@ -21,7 +21,10 @@ export function calculateDAS28ESR(input: DAS28ESRInput): CalculationResult {
     0.28 * Math.sqrt(swollenJointCount) +
     0.7 * Math.log(esr) +
     0.014 * globalHealth100
-  const roundedScore = Number(score.toFixed(2))
+  // Do NOT return a pre-rounded score: the result panel rounds to 1 dp for display,
+  // so rounding to 2 dp here double-rounds (ESR 5, GH 8 -> 2.2466 -> 2.25 -> 2.3,
+  // where MDCalc shows 2.2). The 2 dp value is for the interpretation text only.
+  const displayScore = Number(score.toFixed(2))
 
   let label = 'Remission'
   let severity: 'success' | 'warning' | 'danger' = 'success'
@@ -39,11 +42,11 @@ export function calculateDAS28ESR(input: DAS28ESRInput): CalculationResult {
 
   return {
     calculatorId: 'das28-esr',
-    score: roundedScore,
+    score,
     unit: 'points',
     severity,
     label,
-    interpretation: `${roundedScore} points`,
+    interpretation: `DAS28-ESR ${displayScore} — ${label}`,
     formula: DAS28_ESR_FORMULA,
     timestamp: new Date().toISOString(),
   }

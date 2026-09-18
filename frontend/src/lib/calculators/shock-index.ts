@@ -10,7 +10,9 @@ export function calculateShockIndex(input: ShockIndexInput): {
   references: string[];
 } {
   const { heartRate, sbp } = input;
-  const shockIndex = Math.round((heartRate / sbp) * 100) / 100;
+  // Raw value: the result panel rounds once for display. Pre-rounding here would
+  // double-round (MDCalc rounds the exact value once).
+  const shockIndex = heartRate / sbp;
 
   let severity: 'success' | 'warning' | 'danger';
   let interpretation: string;

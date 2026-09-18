@@ -49,6 +49,7 @@ export function KtvForm({ onResult }: Props) {
           label: 'Kt/V',
           value: liveResult.ktv,
           unit: '',
+          decimals: 2,   // MDCalc shows this to 2 dp
           interpretation: { text: liveResult.interpretation, severity: liveResult.severity },
         },
       ],

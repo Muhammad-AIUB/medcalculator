@@ -121,7 +121,7 @@ export function StopBangForm({ onResult }: Props) {
       formulaUsed:
         `STOP-BANG = S + T + O + P + B + A + N + G\n` +
         `          = ${vals.snore}+${vals.tired}+${vals.observed}+${vals.pressure}+${vals.bmi}+${vals.age}+${vals.neck}+${vals.gender} = ${liveResult.score}\n\n` +
-        `0–2: Low risk\n3–4: Moderate risk\n5–8: High risk for moderate-to-severe OSA`,
+        `0–2: Low risk\n3–8: High risk for moderate-to-severe OSA`,
       references: liveResult.references,
     });
   }, [liveResult, vals]);

@@ -22,7 +22,7 @@ export function calculateAnionGap(input: AnionGapInput): CalculationResult & {
   const ag         = sodium - (chloride + bicarbonate);
   const deltaGap   = ag - NORMAL_AG;
   const deltaRatio = (24 - bicarbonate) !== 0
-    ? Math.round((deltaGap / (24 - bicarbonate)) * 100) / 100
+    ? deltaGap / (24 - bicarbonate)
     : 0;
 
   let correctedAg: number | undefined;
@@ -33,7 +33,7 @@ export function calculateAnionGap(input: AnionGapInput): CalculationResult & {
     correctedAg         = ag + 2.5 * (4 - albumin);
     correctedDeltaGap   = correctedAg - NORMAL_AG;
     correctedDeltaRatio = (24 - bicarbonate) !== 0
-      ? Math.round((correctedDeltaGap / (24 - bicarbonate)) * 100) / 100
+      ? correctedDeltaGap / (24 - bicarbonate)
       : 0;
     correctedAg         = Math.round(correctedAg   * 10) / 10;
     correctedDeltaGap   = Math.round(correctedDeltaGap * 10) / 10;

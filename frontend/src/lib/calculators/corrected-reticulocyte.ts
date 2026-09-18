@@ -29,25 +29,29 @@ export function calculateCorrectedReticulocyte(input: CorrectedReticulocyteInput
   // RBC input is in × 10⁶ cells/µL, so actual = rbcCount × 10⁶
   const arc = Math.round((reticulocytePct / 100) * rbcCount * 1e6);
 
-  // Corrected reticulocyte %
-  const correctedRetic = Math.round((reticulocytePct * (measuredHct / normalHct)) * 100) / 100;
+  // Corrected reticulocyte %. Keep the raw value for the RPI below: MDCalc divides the
+  // UNROUNDED corrected value by the maturation factor, so rounding here first shifts the
+  // RPI (retic 10, Hct 30, normal 45: 6.67/1.5 = 4.45 -> 4.5, but MDCalc shows 4.4).
+  const correctedRaw   = reticulocytePct * (measuredHct / normalHct);
+  const correctedRetic = Math.round(correctedRaw * 100) / 100;
 
   // Maturation factor & RPI
   const matFactor = maturationFactor(measuredHct);
-  const rpi       = Math.round((correctedRetic / matFactor) * 100) / 100;
+  const rpi       = correctedRaw / matFactor;              // raw; the panel rounds once
+  const shownRpi  = Math.round(rpi * 10) / 10;             // 1 dp, as MDCalc shows the RPI
 
   let interpretation: string;
   let severity: 'success' | 'warning' | 'danger';
 
   if (rpi >= 3) {
     severity       = 'warning';
-    interpretation = `RPI ${rpi} ≥ 3 — hyperproliferative; adequate marrow response (suggests hemolysis or acute blood loss)`;
+    interpretation = `RPI ${shownRpi} ≥ 3 — hyperproliferative; adequate marrow response (suggests hemolysis or acute blood loss)`;
   } else if (rpi >= 2) {
     severity       = 'warning';
-    interpretation = `RPI ${rpi} (2–3) — borderline marrow response`;
+    interpretation = `RPI ${shownRpi} (2–3) — borderline marrow response`;
   } else {
     severity       = 'danger';
-    interpretation = `RPI ${rpi} < 2 — hypoproliferative; inadequate bone marrow response`;
+    interpretation = `RPI ${shownRpi} < 2 — hypoproliferative; inadequate bone marrow response`;
   }
 
   return {

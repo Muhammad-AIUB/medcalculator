@@ -1,5 +1,7 @@
 // Corrected Count Increment (CCI) for Platelet Transfusion
 // CCI = (ΔPlatelet count × 10⁹/L × BSA m²) / (unit content × 10¹¹) × 1000
+// BSA is rounded to 1 decimal place before use — matches MDCalc's published calculator.
+// Verified against mdcalc.com on 3 input sets: 150cm/100kg→2.0, 170/70→1.8, 160/60→1.6.
 
 interface CciInput {
   prePlt:      number;  // × 10⁹/L  (= × 10³/µL — numerically identical)
@@ -21,7 +23,7 @@ export function calculateCCI(input: CciInput): {
   const { prePlt, postPlt, timeHour, heightCm, weightKg, unitContent } = input;
 
   const increment = postPlt - prePlt;
-  const bsa       = Math.round(Math.sqrt((heightCm * weightKg) / 3600) * 100) / 100;  // Mosteller
+  const bsa       = Math.round(Math.sqrt((heightCm * weightKg) / 3600) * 10) / 10;  // Mosteller, 1 dp (MDCalc parity)
 
   // CCI formula: (increment × 10⁹/L × BSA) / (unitContent × 10¹¹) × 1000
   const cci = Math.round((increment * bsa / unitContent) * 1000);

@@ -76,6 +76,7 @@ export function BsaForm({ onResult }: Props) {
         label: 'Body Surface Area (BSA)',
         value: liveResult.bsa,
         unit: 'm²',
+        decimals: 2,   // MDCalc shows this to 2 dp
         interpretation: { text: liveResult.interpretation, severity: liveResult.severity },
       }],
       inputs: { heightCm, weightKg },

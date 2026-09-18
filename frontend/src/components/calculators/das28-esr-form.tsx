@@ -110,6 +110,7 @@ export function Das28EsrForm({ onResult }: Das28EsrFormProps) {
           label: 'DAS28-ESR Score',
           value: liveResult.score ?? 0,
           unit: 'points',
+          minDecimals: 1,   // MDCalc pads: "4.0 points"
           interpretation: { text: liveResult.interpretation, severity, classification: liveResult.label },
         },
       ],

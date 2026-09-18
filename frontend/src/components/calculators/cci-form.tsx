@@ -60,9 +60,9 @@ export function CciForm({ onResult }: Props) {
       inputs: { prePlt, postPlt, timeHour, heightCm, weightKg, unitContent },
       formulaUsed:
         `CCI = Count Increment × BSA / Unit Content\n` +
-        `    = ${liveResult.increment} × 10⁹/L × ${liveResult.bsa} m² / ${unitContent} × 10¹¹ × 1000\n` +
+        `    = ${liveResult.increment} × 10⁹/L × ${liveResult.bsa.toFixed(1)} m² / ${unitContent} × 10¹¹ × 1000\n` +
         `    = ${liveResult.cci.toLocaleString()}\n\n` +
-        `BSA (Mosteller) = √(H cm × W kg / 3600) = ${liveResult.bsa} m²\n\n` +
+        `BSA (Mosteller) = √(H cm × W kg / 3600) = ${liveResult.bsa.toFixed(1)} m²\n\n` +
         `1-hour threshold:  CCI ≥ 7,500 = adequate\n` +
         `20-hour threshold: CCI ≥ 4,500 = adequate`,
       references: liveResult.references,

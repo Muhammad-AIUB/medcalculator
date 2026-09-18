@@ -17,21 +17,27 @@ export function calculateCalciumCorrection(input: CalciumCorrectionInput): {
 } {
   const { calciumMgDl, albuminGdl, normalAlbuminGdl } = input;
 
-  const correctedCaMgDl  = Math.round((0.8 * (normalAlbuminGdl - albuminGdl) + calciumMgDl) * 100) / 100;
-  const correctedCaMmolL = Math.round((correctedCaMgDl / 4.0) * 100) / 100;
+  // Raw value: the result panel rounds once for display. Pre-rounding here would
+  // double-round (MDCalc rounds the exact value once).
+  const correctedCaMgDl  = 0.8 * (normalAlbuminGdl - albuminGdl) + calciumMgDl;
+  // mmol/L comes off the RAW mg/dL, not the rounded one (chaining shifted 1.945 -> 1.95 -> 2.0;
+  // MDCalc shows 1.9).
+  const correctedCaMmolL = correctedCaMgDl / 4.0;
+  const shownMgDl  = Math.round(correctedCaMgDl  * 10) / 10;
+  const shownMmolL = Math.round(correctedCaMmolL * 10) / 10;
 
   let interpretation: string;
   let severity: 'success' | 'warning' | 'danger';
 
   if (correctedCaMgDl < 8.5) {
     severity       = 'danger';
-    interpretation = `Hypocalcaemia — Corrected Ca ${correctedCaMgDl} mg/dL (${correctedCaMmolL} mmol/L) < 8.5 mg/dL`;
+    interpretation = `Hypocalcaemia — Corrected Ca ${shownMgDl} mg/dL (${shownMmolL} mmol/L) < 8.5 mg/dL`;
   } else if (correctedCaMgDl <= 10.5) {
     severity       = 'success';
-    interpretation = `Normal — Corrected Ca ${correctedCaMgDl} mg/dL (${correctedCaMmolL} mmol/L) within 8.5–10.5 mg/dL`;
+    interpretation = `Normal — Corrected Ca ${shownMgDl} mg/dL (${shownMmolL} mmol/L) within 8.5–10.5 mg/dL`;
   } else {
     severity       = 'danger';
-    interpretation = `Hypercalcaemia — Corrected Ca ${correctedCaMgDl} mg/dL (${correctedCaMmolL} mmol/L) > 10.5 mg/dL`;
+    interpretation = `Hypercalcaemia — Corrected Ca ${shownMgDl} mg/dL (${shownMmolL} mmol/L) > 10.5 mg/dL`;
   }
 
   return {

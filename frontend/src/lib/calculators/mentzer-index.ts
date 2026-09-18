@@ -14,20 +14,23 @@ export function calculateMentzerIndex(input: MentzerInput): {
 } {
   const { mcv, rbcCount } = input;
 
-  const index = Math.round((mcv / rbcCount) * 100) / 100;
+  // Raw value: the result panel rounds once for display. Pre-rounding here would
+  // double-round (MDCalc rounds the exact value once).
+  const index = mcv / rbcCount;
+  const shown = Math.round(index * 10) / 10;   // 1 dp, as MDCalc and the panel show it
 
   let interpretation: string;
   let severity: 'success' | 'warning' | 'danger';
 
   if (index < 13) {
     severity       = 'warning';
-    interpretation = `Mentzer Index ${index} < 13 — Thalassaemia trait likely`;
+    interpretation = `Mentzer Index ${shown} < 13 — Thalassaemia trait likely`;
   } else if (index > 13) {
     severity       = 'danger';
-    interpretation = `Mentzer Index ${index} > 13 — Iron deficiency anaemia likely`;
+    interpretation = `Mentzer Index ${shown} > 13 — Iron deficiency anaemia likely`;
   } else {
     severity       = 'warning';
-    interpretation = `Mentzer Index ${index} = 13 — Indeterminate (overlap between thalassaemia and iron deficiency)`;
+    interpretation = `Mentzer Index ${shown} = 13 — Indeterminate (overlap between thalassaemia and iron deficiency)`;
   }
 
   return {

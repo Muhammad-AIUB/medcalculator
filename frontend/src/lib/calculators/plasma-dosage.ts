@@ -16,8 +16,11 @@ export function calculatePlasmaDosage(input: PlasmaDosageInput): {
 } {
   const { weightKg, dosageMlKg, unitVolumeMl } = input;
 
-  const totalMl     = Math.round(dosageMlKg * weightKg);
-  const unitsNeeded = Math.ceil(totalMl / unitVolumeMl);
+  const rawMl       = dosageMlKg * weightKg;
+  const totalMl     = Math.round(rawMl);
+  // Ceil the RAW volume: ceiling an already-rounded volume drops a whole unit
+  // (41.7 kg at 12 mL/kg = 500.4 mL needs 3 x 250 mL units, not 2).
+  const unitsNeeded = Math.ceil(rawMl / unitVolumeMl);
 
   let severity: 'success' | 'warning' | 'danger';
   let interpretation: string;

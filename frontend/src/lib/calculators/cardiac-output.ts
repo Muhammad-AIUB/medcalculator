@@ -36,8 +36,8 @@ export function calculateCardiacOutput(input: CardiacOutputInput): {
   return {
     bsa:   Math.round(bsa  * 100) / 100,
     vo2:   Math.round(vo2  * 10)  / 10,
-    co:    Math.round(co   * 100) / 100,
-    ci:    Math.round(ci   * 100) / 100,
+    co,
+    ci,
     sv:    Math.round(sv   * 10)  / 10,
     references: [
       'Fick A. Uber die Messung des Blutquantums in den Herzventrikeln. Sitzungsber Phys Med Ges Wurzburg. 1870',

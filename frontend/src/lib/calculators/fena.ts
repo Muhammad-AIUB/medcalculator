@@ -12,7 +12,9 @@ export function calculateFENa(input: FENaInput): CalculationResult {
 
   // FENa (%) = 100 × (SCr × UNa) / (SNa × UCr)
   const fena  = 100 * (serumCreatinine * urineSodium) / (serumSodium * urineCreatinine);
-  const score = Math.round(fena * 100) / 100;
+  // Raw value: the result panel rounds once for display. Pre-rounding here would
+  // double-round (MDCalc rounds the exact value once).
+  const score = fena;
 
   let severity: CalculationResult['severity'];
   let interpretation: string;

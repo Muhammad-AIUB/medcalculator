@@ -147,6 +147,7 @@ export function Fib4Form({ onResult }: Fib4FormProps) {
           id: 'fib-4',
           label: 'FIB-4 Score',
           value: liveResult.score ?? 0,
+          decimals: 2,   // MDCalc shows FIB-4 to 2 dp (e.g. 0.45)
           interpretation: { text: liveResult.interpretation, severity, classification: liveResult.label },
         },
       ],

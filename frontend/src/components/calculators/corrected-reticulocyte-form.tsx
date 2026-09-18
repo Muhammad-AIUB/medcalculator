@@ -30,13 +30,32 @@ export function CorrectedReticulocyteForm({ onResult }: Props) {
   useEffect(() => {
     if (!liveResult) return;
     onResultRef.current({
-      outputs: [{
-        id: 'corrected-reticulocyte',
-        label: 'Corrected Reticulocyte %',
-        value: liveResult.correctedRetic,
-        unit: '%',
-        interpretation: { text: liveResult.interpretation, severity: liveResult.severity },
-      }],
+      // Order and primary match MDCalc: its headline is the RPI, with corrected
+      // retic % and absolute count listed beneath it.
+      outputs: [
+        {
+          id: 'rpi',
+          label: 'Reticulocyte Production Index (RPI)',
+          value: liveResult.rpi,
+          unit: 'RPI',   // dimensionless: names the headline, which is otherwise a bare number
+                         // sitting above two labelled rows
+          interpretation: { text: liveResult.interpretation, severity: liveResult.severity },
+        },
+        {
+          id: 'corrected-reticulocyte',
+          label: 'Corrected Reticulocyte %',
+          value: liveResult.correctedRetic,
+          unit: '%',
+          decimals: 2,   // MDCalc prints this one to 2 dp (0.42, 8.89)
+        },
+        {
+          id: 'arc',
+          label: 'Absolute Reticulocyte Count',
+          value: liveResult.arc,
+          unit: 'cells/µL',
+          decimals: 0,
+        },
+      ],
       inputs: { reticulocytePct, rbcCount, measuredHct, normalHct },
       formulaUsed:
         `Absolute Reticulocyte Count = ${liveResult.arc.toLocaleString()} cells/µL\n` +

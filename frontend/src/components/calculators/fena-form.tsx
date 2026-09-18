@@ -76,6 +76,7 @@ export function FenaForm({ onResult }: Props) {
         label: 'FENa',
         value: liveResult.score ?? 0,
         unit: '%',
+        minDecimals: 1,   // MDCalc pads: "0.0 %"
         interpretation: { text: liveResult.interpretation, severity: liveResult.severity },
       }],
       inputs: { serumSodium: sNa, serumCreatinine: sCr, urineSodium: uNa, urineCreatinine: uCr },

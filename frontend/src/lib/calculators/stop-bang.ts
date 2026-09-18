@@ -25,12 +25,13 @@ export function calculateStopBang(input: StopBangInput): {
   let interpretation: string;
   let severity: 'success' | 'warning' | 'danger';
 
+  // Dichotomous cutoff per Chung 2008 (the reference cited below): 0-2 low, >=3 high.
+  // Verified against mdcalc.com at scores 0,1,2,3,4,5,8 - it shows only these two
+  // bands, and the composition of the score does not shift it (STOP=0 with BANG=4
+  // still reads High; STOP=3 with no BANG item still reads High).
   if (score <= 2) {
     severity       = 'success';
     interpretation = `STOP-BANG ${score} — Low risk of moderate-to-severe OSA`;
-  } else if (score <= 4) {
-    severity       = 'warning';
-    interpretation = `STOP-BANG ${score} — Moderate risk of moderate-to-severe OSA`;
   } else {
     severity       = 'danger';
     interpretation = `STOP-BANG ${score} — High risk of moderate-to-severe OSA`;
