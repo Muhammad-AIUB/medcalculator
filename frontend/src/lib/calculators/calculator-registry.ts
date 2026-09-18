@@ -57,6 +57,9 @@ import { calculateIronDeficit } from './iron-deficit'
 import { calculateNIHSS } from './nihss'
 import { calculateABCD2 } from './abcd2'
 import { calculateNEWS } from './news'
+import { calculateNEWS2 } from './news2'
+import { calculateIPIDlbcl } from './ipi-dlbcl'
+import { calculateCnsIpi } from './cns-ipi'
 import { calculateICH } from './ich'
 import { calculateMRS } from './mrs'
 import { calculateHuntHess } from './hunt-hess'
@@ -1790,6 +1793,79 @@ export const CALCULATORS: Calculator[] = [
         consciousness:  Number(inputs.consciousness ?? 0),
       });
       return { calculatorId: 'news', score: result.score, unit: 'points', severity: result.severity, label: 'NEWS', interpretation: result.interpretation };
+    },
+  },
+  {
+    id: 'news2',
+    title: 'National Early Warning Score 2 (NEWS2)',
+    shortTitle: 'NEWS2',
+    emoji: '🚨',
+    description: 'Updated NEWS recommended by the NHS: adds an SpO₂ scale for hypercapnic respiratory failure and scores new-onset confusion (ACVPU)',
+    category: 'critical-care',
+    icon: 'Activity',
+    color: 'text-red-600',
+    bgColor: 'bg-red-50',
+    tags: ['NEWS2', 'NEWS 2', 'early warning', 'deterioration', 'sepsis', 'vital signs', 'acute', 'critical care', 'ACVPU', 'hypercapnic'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateNEWS2({
+        respiratory:    Number(inputs.respiratory ?? 0),
+        spo2:           Number(inputs.spo2 ?? 0),
+        supplementalO2: Number(inputs.supplementalO2 ?? 0),
+        temperature:    Number(inputs.temperature ?? 0),
+        systolicBP:     Number(inputs.systolicBP ?? 0),
+        heartRate:      Number(inputs.heartRate ?? 0),
+        consciousness:  Number(inputs.consciousness ?? 0),
+        hypercapnic:    Boolean(inputs.hypercapnic ?? false),
+      });
+      return { calculatorId: 'news2', score: result.score, unit: 'points', severity: result.severity, label: 'NEWS2', interpretation: result.interpretation };
+    },
+  },
+  {
+    id: 'ipi-dlbcl',
+    title: 'International Prognostic Index for DLBCL (IPI / R-IPI)',
+    shortTitle: 'IPI / R-IPI',
+    emoji: '🩸',
+    description: 'Predicts overall and progression-free survival in diffuse large B-cell lymphoma from 5 risk factors, banded as both the original IPI and the rituximab-era R-IPI',
+    category: 'hematology',
+    icon: 'Activity',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    tags: ['IPI', 'R-IPI', 'DLBCL', 'diffuse large B-cell lymphoma', 'lymphoma', 'prognosis', 'oncology', 'hematology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateIPIDlbcl({
+        ageOver60:       Boolean(inputs.ageOver60),
+        stageIIIorIV:    Boolean(inputs.stageIIIorIV),
+        ecogOver1:       Boolean(inputs.ecogOver1),
+        ldhElevated:     Boolean(inputs.ldhElevated),
+        extranodalOver1: Boolean(inputs.extranodalOver1),
+      });
+      return { calculatorId: 'ipi-dlbcl', score: result.score, unit: 'points', severity: result.severity, label: 'IPI', interpretation: result.interpretation };
+    },
+  },
+  {
+    id: 'cns-ipi',
+    title: 'CNS International Prognostic Index (CNS-IPI)',
+    shortTitle: 'CNS-IPI',
+    emoji: '🧠',
+    description: 'Predicts risk of central nervous system relapse in diffuse large B-cell lymphoma treated with R-CHOP',
+    category: 'hematology',
+    icon: 'Activity',
+    color: 'text-purple-600',
+    bgColor: 'bg-purple-50',
+    tags: ['CNS-IPI', 'CNS IPI', 'DLBCL', 'diffuse large B-cell lymphoma', 'lymphoma', 'CNS relapse', 'prophylaxis', 'oncology', 'hematology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateCnsIpi({
+        ageOver60:       Boolean(inputs.ageOver60),
+        ldhElevated:     Boolean(inputs.ldhElevated),
+        ecogOver1:       Boolean(inputs.ecogOver1),
+        stageIIIorIV:    Boolean(inputs.stageIIIorIV),
+        extranodalOver1: Boolean(inputs.extranodalOver1),
+        kidneyOrAdrenal: Boolean(inputs.kidneyOrAdrenal),
+      });
+      return { calculatorId: 'cns-ipi', score: result.score, unit: 'points', severity: result.severity, label: 'CNS-IPI', interpretation: result.interpretation };
     },
   },
   {

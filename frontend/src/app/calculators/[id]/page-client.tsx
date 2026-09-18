@@ -65,6 +65,9 @@ const IronDeficitForm              = dynamic(() => import('@/components/calculat
 const NihssForm                    = dynamic(() => import('@/components/calculators/nihss-form').then(m => ({ default: m.NihssForm })), { ssr: false });
 const Abcd2Form                    = dynamic(() => import('@/components/calculators/abcd2-form').then(m => ({ default: m.Abcd2Form })), { ssr: false });
 const NewsForm                     = dynamic(() => import('@/components/calculators/news-form').then(m => ({ default: m.NewsForm })), { ssr: false });
+const News2Form                    = dynamic(() => import('@/components/calculators/news2-form').then(m => ({ default: m.News2Form })), { ssr: false });
+const IpiDlbclForm                 = dynamic(() => import('@/components/calculators/ipi-dlbcl-form').then(m => ({ default: m.IpiDlbclForm })), { ssr: false });
+const CnsIpiForm                   = dynamic(() => import('@/components/calculators/cns-ipi-form').then(m => ({ default: m.CnsIpiForm })), { ssr: false });
 const IchForm                      = dynamic(() => import('@/components/calculators/ich-form').then(m => ({ default: m.IchForm })), { ssr: false });
 const MrsForm                      = dynamic(() => import('@/components/calculators/mrs-form').then(m => ({ default: m.MrsForm })), { ssr: false });
 const HuntHessForm                 = dynamic(() => import('@/components/calculators/hunt-hess-form').then(m => ({ default: m.HuntHessForm })), { ssr: false });
@@ -142,6 +145,9 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   nihss:                      NihssForm,
   abcd2:                      Abcd2Form,
   news:                       NewsForm,
+  news2:                      News2Form,
+  'ipi-dlbcl':                IpiDlbclForm,
+  'cns-ipi':                  CnsIpiForm,
   ich:                        IchForm,
   mrs:                        MrsForm,
   'hunt-hess':                HuntHessForm,
