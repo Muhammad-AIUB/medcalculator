@@ -45,9 +45,11 @@ export function calculateMELDNa(input: MELDNaInput): CalculationResult {
   const inr = Math.max(1.0, input.inr)
   const sodium = input.sodium
 
-  const meld = MedicalUnitConverter.round(
-    3.78 * Math.log(bili) + 11.2 * Math.log(inr) + 9.57 * Math.log(creat) + 6.43,
-    1
+  // MELD is reported as a whole number, and OPTN rounds it BEFORE the sodium
+  // adjustment. Keeping a decimal here shifted the result (Cr 4.0, bili 1.0, INR 1.0,
+  // Na 136 gave 20.4; MDCalc's UNOS/OPTN calculator gives 21).
+  const meld = Math.round(
+    3.78 * Math.log(bili) + 11.2 * Math.log(inr) + 9.57 * Math.log(creat) + 6.43
   )
 
   // MELD-Na (Kim 2008 / OPTN): Na bounded to 125–137; adjustment applied only when MELD > 11
@@ -56,7 +58,7 @@ export function calculateMELDNa(input: MELDNaInput): CalculationResult {
   if (meld > 11) {
     meldNaRaw = meld + 1.32 * (137 - naBounded) - (0.033 * meld * (137 - naBounded))
   }
-  const meldNa = MedicalUnitConverter.round(clamp(meldNaRaw, 6, 40), 1)
+  const meldNa = Math.round(clamp(meldNaRaw, 6, 40))
 
   const meldClamped = clamp(meld, 6, 40)
   const mortality90day = getMELDMortality(meldNa)

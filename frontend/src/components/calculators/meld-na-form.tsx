@@ -19,11 +19,14 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
 
   const bilMg = parseFloat(bilMgStr) || 0;
   const inr = parseFloat(inrStr) || 0;
-  const creatMg = onDialysis ? 4.0 : (parseFloat(creatMgStr) || 0);
+  // Pass the entered value straight through. calculateMELDNa() substitutes 4.0 mg/dL
+  // when onDialysis, so the field stays editable the way MDCalc leaves it.
+  const creatMg = parseFloat(creatMgStr) || 0;
   const sodium = parseFloat(sodiumMeqStr || sodiumMmolStr) || 0;
 
   const liveResult = useMemo(() => {
-    if (bilMg <= 0 || inr <= 0 || creatMg <= 0 || sodium <= 0) return null;
+    // On dialysis the creatinine value is ignored, so it is not required.
+    if (bilMg <= 0 || inr <= 0 || (!onDialysis && creatMg <= 0) || sodium <= 0) return null;
 
     try {
       return calculateMELDNa({
@@ -171,23 +174,21 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
       <FieldRow label="Creatinine">
         <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
           <NumInput
-            value={onDialysis ? fmt(4.0 * 88.4, 1) : creatUmolStr}
+            value={creatUmolStr}
             onChange={onCreatUmolChange}
             suffix="µmol/L"
             step="1"
             min={1}
             max={1326}
-            disabled={onDialysis}
           />
           <OrDivider />
           <NumInput
-            value={onDialysis ? '4.0' : creatMgStr}
+            value={creatMgStr}
             onChange={onCreatMgChange}
             suffix="mg/dL"
             step="0.01"
             min={0.1}
             max={15}
-            disabled={onDialysis}
           />
         </div>
       </FieldRow>
