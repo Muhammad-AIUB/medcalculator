@@ -12,8 +12,10 @@ out/
 # dirty in every diff and conflicts on every merge.
 *.tsbuildinfo
 
-# Capacitor Android (generated at build time by GitHub Actions)
-frontend/android/
+# The Capacitor Android project is committed, not regenerated. It carries state
+# that `npx cap add android` would silently reset: the Play versionCode, the
+# release R8/shrinkResources config, and the target API level Play enforces.
+# Its own android/.gitignore keeps build output and local.properties out.
 
 # Environment
 .env
