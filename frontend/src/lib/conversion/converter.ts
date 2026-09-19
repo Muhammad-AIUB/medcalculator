@@ -1,4 +1,5 @@
-import { UNIT_REGISTRY, MOLAR_MASSES, findUnit, SUBSTANCE_UNIT_PAIRS } from './unit-registry'
+import type { UnitDefinition } from '@/types/conversion'
+import { UNIT_REGISTRY, MOLAR_MASSES, VALENCES, findUnit, SUBSTANCE_UNIT_PAIRS } from './unit-registry'
 
 export class MedicalUnitConverter {
   /**
@@ -51,6 +52,20 @@ export class MedicalUnitConverter {
       return value
     }
 
+    // mEq/L carries no meaning until the ion is known, so it cannot go through
+    // the fixed factor in the registry.
+    if (from.symbol === 'mEq/L' || to.symbol === 'mEq/L') {
+      const fromFactor = this.canonicalFactor(from, substance)
+      const toFactor = this.canonicalFactor(to, substance)
+      if (fromFactor === undefined || toFactor === undefined) {
+        console.warn(
+          `mEq/L needs a substance with a known valence (got ${substance ?? 'none'})`,
+        )
+        return value
+      }
+      return this.round((value * fromFactor) / toFactor, to.precision)
+    }
+
     // Convert via canonical unit
     const canonical = typeof from.toCanonical === 'function'
       ? from.toCanonical(value)
@@ -76,6 +91,9 @@ export class MedicalUnitConverter {
     for (const [symbol, unit] of Object.entries(UNIT_REGISTRY)) {
       if (symbol === fromUnit) continue
       if (!targetCategories.includes(unit.category)) continue
+      // An unconvertible mEq/L comes back as the input value untouched, which in
+      // this table would read as a genuine equivalent. Leave it out instead.
+      if (symbol === 'mEq/L' && this.canonicalFactor(unit, substance) === undefined) continue
 
       try {
         const converted = this.convert(value, fromUnit, symbol, substance)
@@ -103,6 +121,23 @@ export class MedicalUnitConverter {
 
   private static isTemperatureUnit(unit: string): boolean {
     return ['°C', '°F', 'K', 'C', 'F', 'celsius', 'fahrenheit'].includes(unit)
+  }
+
+  /**
+   * How much of its category's canonical unit one of `unit` is worth.
+   *
+   * For everything but mEq/L this is the registry's own `toCanonical`. mEq/L is
+   * mmol/L × valence, so one mEq/L is 1000 / valence µmol/L — 1000 for sodium,
+   * 500 for calcium. Returns undefined when that cannot be answered (mEq/L with
+   * no substance, or a unit whose conversion is a function), so callers refuse
+   * rather than quietly treating 5 mEq/L of calcium as 5 mmol/L.
+   */
+  private static canonicalFactor(unit: UnitDefinition, substance?: string): number | undefined {
+    if (unit.symbol === 'mEq/L') {
+      const valence = substance ? VALENCES[substance] : undefined
+      return valence ? 1000 / valence : undefined
+    }
+    return typeof unit.toCanonical === 'number' ? unit.toCanonical : undefined
   }
 
   private static isMassConc(unit: string): boolean {
@@ -150,7 +185,18 @@ export class MedicalUnitConverter {
     if (typeof from.toCanonical === 'function') {
       inFromCanonical = from.toCanonical(value)
     } else {
-      inFromCanonical = value * from.toCanonical
+      const fromFactor = this.canonicalFactor(from, substance)
+      if (fromFactor === undefined) {
+        console.warn(`Cannot read ${fromUnit} without a substance with a known valence`)
+        return value
+      }
+      inFromCanonical = value * fromFactor
+    }
+
+    const toFactor = this.canonicalFactor(to, substance)
+    if (toFactor === undefined) {
+      console.warn(`Cannot write ${toUnit} without a substance with a known valence`)
+      return value
     }
 
     // Cross-category conversion runs through the two canonical units: mg/dL for
@@ -178,11 +224,11 @@ export class MedicalUnitConverter {
     }
 
     if (to.category === 'concentration-mass') {
-      const result = mgPerDL / (to.toCanonical as number)
+      const result = mgPerDL / toFactor
       return this.round(result, to.precision)
     } else if (to.category === 'concentration-molar') {
       const umolPerL = (mgPerDL * UMOL_PER_L_PER_MG_PER_DL) / molarMass
-      const result = umolPerL / (to.toCanonical as number)
+      const result = umolPerL / toFactor
       return this.round(result, to.precision)
     }
 

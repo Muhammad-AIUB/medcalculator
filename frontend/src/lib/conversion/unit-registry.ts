@@ -1,8 +1,7 @@
 import type { UnitDefinition, UnitCategory } from '@/types/conversion'
 
 // Grams per mole, used to convert a mass concentration to a molar one
-// (µmol/L = mg/dL × 10000 / M). Two entries below need a clinical decision before
-// anything is wired up to them — see the notes inline.
+// (µmol/L = mg/dL × 10000 / M).
 export const MOLAR_MASSES: Record<string, number> = {
   creatinine: 113.12,
   bilirubin: 584.66,
@@ -12,17 +11,37 @@ export const MOLAR_MASSES: Record<string, number> = {
   cholesterol: 386.65,
   triglycerides: 885.43,
   calcium: 40.08,
-  // NEEDS A DECISION before use: 94.97 is the mass of the phosphate ion (PO4).
-  // Laboratories report serum *phosphorus*, and the standard conversion for that
-  // is mg/dL × 0.3229 = mmol/L, i.e. M = 30.97. Converting a reported phosphorus
-  // with 94.97 understates it roughly threefold.
-  phosphate: 94.97,
+  // Elemental P (30.97), not the phosphate ion PO4 (94.97), because what a
+  // laboratory reports is serum *phosphorus*. This reproduces the standard
+  // mg/dL × 0.3229 = mmol/L; the ion's mass understated a reported phosphorus
+  // roughly threefold.
+  phosphorus: 30.97,
   magnesium: 24.31,
   iron: 55.85,
   albumin: 66500,
   sodium: 22.99,
   potassium: 39.10,
   chloride: 35.45,
+}
+
+/**
+ * Charge per ion, used for mEq/L.
+ *
+ * mEq/L is mmol/L × valence, so the unit says nothing on its own: 140 mEq/L of
+ * sodium is 140 mmol/L, but 5 mEq/L of calcium is 2.5 mmol/L. A conversion that
+ * involves mEq/L therefore needs to know the substance, and the converter
+ * refuses rather than guessing when it does not.
+ *
+ * Bicarbonate has no entry in MOLAR_MASSES because mEq/L and mmol/L are both
+ * molar units — the valence is the whole conversion, no molar mass required.
+ */
+export const VALENCES: Record<string, number> = {
+  sodium: 1,
+  potassium: 1,
+  chloride: 1,
+  bicarbonate: 1,
+  calcium: 2,
+  magnesium: 2,
 }
 
 export const UNIT_REGISTRY: Record<string, UnitDefinition> = {
@@ -36,10 +55,10 @@ export const UNIT_REGISTRY: Record<string, UnitDefinition> = {
   'µmol/L': { symbol: 'µmol/L', name: 'micromoles per liter', category: 'concentration-molar', toCanonical: 1, precision: 1, aliases: ['umol/L', 'umol/l', 'µmol/l'] },
   'mmol/L': { symbol: 'mmol/L', name: 'millimoles per liter', category: 'concentration-molar', toCanonical: 1000, precision: 2, aliases: ['mmol/l', 'mM'] },
   'nmol/L': { symbol: 'nmol/L', name: 'nanomoles per liter', category: 'concentration-molar', toCanonical: 0.001, precision: 1, aliases: ['nmol/l'] },
-  // NEEDS A DECISION before use: this sits in the molar category with the same
-  // canonical factor as µmol/L, so 140 mEq/L of sodium reads as 140 µmol/L. mEq/L
-  // is mmol/L × valence, so the honest factor is 1000 for a monovalent ion and 500
-  // for a divalent one — the registry has nowhere to record valence yet.
+  // toCanonical is a placeholder here and is never read: mEq/L is mmol/L ×
+  // valence, so its real factor is 1000 / valence and depends on the substance.
+  // The converter resolves it from VALENCES and refuses the conversion when the
+  // ion is unknown — see canonicalFactor in converter.ts.
   'mEq/L': { symbol: 'mEq/L', name: 'milliequivalents per liter', category: 'concentration-molar', toCanonical: 1, precision: 1, aliases: ['meq/L', 'meq/l', 'mEq/l'] },
   'kg': { symbol: 'kg', name: 'kilograms', category: 'weight', toCanonical: 1, precision: 1, aliases: ['kgs', 'kilogram', 'kilograms'] },
   'lb': { symbol: 'lb', name: 'pounds', category: 'weight', toCanonical: 0.453592, precision: 1, aliases: ['lbs', 'pound', 'pounds'] },

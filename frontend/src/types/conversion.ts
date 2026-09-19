@@ -48,7 +48,7 @@ export type SubstanceKey =
   | 'cholesterol'
   | 'triglycerides'
   | 'calcium'
-  | 'phosphate'
+  | 'phosphorus'
   | 'magnesium'
   | 'iron'
   | 'albumin'

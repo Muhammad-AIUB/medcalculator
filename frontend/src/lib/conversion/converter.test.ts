@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import { MOLAR_MASSES } from './unit-registry'
+import { MOLAR_MASSES, VALENCES } from './unit-registry'
 import {
   MedicalUnitConverter,
   albuminConvert,
@@ -137,5 +137,77 @@ describe('temperature', () => {
     expect(MedicalUnitConverter.convert(98.6, '°F', '°C')).toBe(37)
     expect(MedicalUnitConverter.convert(0, '°C', '°F')).toBe(32)
     expect(MedicalUnitConverter.convert(40, '°C', '°F')).toBe(104)
+  })
+})
+
+/**
+ * mEq/L is mmol/L x valence, so it is the one unit in the registry whose factor
+ * is not a property of the unit. It used to sit in the molar category with the
+ * same canonical factor as µmol/L, which made 140 mEq/L of sodium read as
+ * 140 µmol/L — off by a thousand — and 5 mEq/L of calcium read as 5 mmol/L.
+ */
+describe('mEq/L', () => {
+  const conv = (v: number, from: string, to: string, substance?: string) =>
+    MedicalUnitConverter.convert(v, from, to, substance)
+
+  it('is one-to-one with mmol/L for a monovalent ion', () => {
+    expect(conv(140, 'mEq/L', 'mmol/L', 'sodium')).toBe(140)
+    expect(conv(140, 'mmol/L', 'mEq/L', 'sodium')).toBe(140)
+    expect(conv(4.0, 'mEq/L', 'mmol/L', 'potassium')).toBe(4)
+    expect(conv(24, 'mEq/L', 'mmol/L', 'bicarbonate')).toBe(24)
+  })
+
+  it('halves a divalent ion going to mmol/L', () => {
+    // 5 mEq/L of calcium is 2.5 mmol/L, which is the normal serum total.
+    expect(conv(5, 'mEq/L', 'mmol/L', 'calcium')).toBe(2.5)
+    expect(conv(2.5, 'mmol/L', 'mEq/L', 'calcium')).toBe(5)
+    expect(conv(2, 'mEq/L', 'mmol/L', 'magnesium')).toBe(1)
+  })
+
+  it('reaches µmol/L with the same factor', () => {
+    expect(conv(140, 'mEq/L', 'µmol/L', 'sodium')).toBe(140000)
+    expect(conv(5, 'mEq/L', 'µmol/L', 'calcium')).toBe(2500)
+  })
+
+  it('refuses rather than guessing when the ion is unknown', () => {
+    // No substance at all, and a substance with a molar mass but no valence:
+    // both must come back untouched instead of pretending mEq/L is µmol/L.
+    expect(conv(140, 'mEq/L', 'mmol/L')).toBe(140)
+    expect(conv(140, 'mEq/L', 'mmol/L', 'creatinine')).toBe(140)
+  })
+
+  it('is left out of convertAll when the ion is unknown', () => {
+    // Reporting it as the input value would read as a real equivalent.
+    expect(MedicalUnitConverter.convertAll(140, 'mmol/L')).not.toHaveProperty('mEq/L')
+    expect(MedicalUnitConverter.convertAll(140, 'mmol/L', 'sodium')['mEq/L']).toBe(140)
+  })
+
+  it('crosses from a mass concentration for a divalent ion', () => {
+    // 10 mg/dL of calcium is 2.495 mmol/L, so 4.99 mEq/L.
+    expect(conv(10, 'mg/dL', 'mEq/L', 'calcium')).toBeCloseTo(4.99, 1)
+  })
+
+  it('knows a valence for every ion a form offers in mEq/L', () => {
+    for (const ion of ['sodium', 'potassium', 'chloride', 'bicarbonate', 'calcium', 'magnesium']) {
+      expect(VALENCES[ion], `${ion} has no valence`).toBeGreaterThan(0)
+    }
+  })
+})
+
+/**
+ * Laboratories report serum phosphorus, not phosphate, so the molar mass has to
+ * be that of elemental P. The registry carried the phosphate ion's 94.97, which
+ * understated a reported phosphorus roughly threefold.
+ */
+describe('phosphorus', () => {
+  it('uses the standard mg/dL to mmol/L factor of 0.3229', () => {
+    expect(MedicalUnitConverter.convert(1, 'mg/dL', 'mmol/L', 'phosphorus')).toBeCloseTo(0.323, 2)
+    // 3.5 mg/dL, the bottom of the usual adult range, is 1.13 mmol/L.
+    expect(MedicalUnitConverter.convert(3.5, 'mg/dL', 'mmol/L', 'phosphorus')).toBeCloseTo(1.13, 2)
+  })
+
+  it('no longer carries the phosphate ion mass', () => {
+    expect(MOLAR_MASSES).not.toHaveProperty('phosphate')
+    expect(MOLAR_MASSES.phosphorus).toBeCloseTo(30.97, 2)
   })
 })
