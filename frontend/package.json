@@ -7,7 +7,9 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "type-check": "tsc --noEmit"
+    "type-check": "tsc --noEmit",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "//browserslist": "App ships only inside a modern Android WebView (Capacitor), so target modern Chromium — this drops Next's legacy polyfills (~92KB) and legacy transforms.",
   "browserslist": [
@@ -58,6 +60,7 @@
     "postcss": "^8.4.38",
     "puppeteer": "^24.43.1",
     "tailwindcss": "^3.4.3",
-    "typescript": "^5.4.5"
+    "typescript": "^5.4.5",
+    "vitest": "^4.1.11"
   }
 }
