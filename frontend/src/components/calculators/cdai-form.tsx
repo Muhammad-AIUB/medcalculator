@@ -1,10 +1,16 @@
 'use client';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { CDAI_FORMULA, calculateCDAI } from '@/lib/calculators/cdai';
+import { NumInput, isFilled } from './shared-ui';
 
 interface CdaiFormProps {
   onResult: (result: any) => void;
 }
+
+// CDAI is scored on the 28-joint count, so anything above 28 is a miscount or a
+// value meant for another box — 40 tender joints used to go straight into the
+// score as "high disease activity" with nothing to question it.
+const JOINT_COUNT_MAX = 28;
 
 const assessmentOptions = Array.from({ length: 21 }, (_, index) => {
   const value = index * 0.5;
@@ -32,21 +38,16 @@ function NumberRow({
       <label className="text-base font-normal leading-tight text-foreground" htmlFor={title}>
         {title}
       </label>
-      <div className="flex overflow-hidden rounded-lg border border-border bg-background shadow-sm">
-        <input
-          id={title}
-          type="number"
-          min="0"
-          step="1"
-          inputMode="numeric"
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className="min-h-[42px] flex-1 bg-transparent px-3 text-right text-base font-semibold outline-none"
-        />
-        <span className="flex min-w-[66px] items-center justify-center border-l border-border px-3 text-sm font-semibold text-foreground">
-          joints
-        </span>
-      </div>
+      <NumInput
+        id={title}
+        value={value}
+        onChange={onChange}
+        suffix="joints"
+        min={0}
+        max={JOINT_COUNT_MAX}
+        step="1"
+        placeholder="0 - 28"
+      />
     </div>
   );
 }
@@ -99,6 +100,8 @@ export function CdaiForm({ onResult }: CdaiFormProps) {
   );
 
   const liveResult = useMemo(() => calculateCDAI(inputs), [inputs]);
+  const complete = isFilled(tenderJointCount) && isFilled(swollenJointCount);
+
   const onResultRef = useRef(onResult);
 
   useEffect(() => {
@@ -106,6 +109,13 @@ export function CdaiForm({ onResult }: CdaiFormProps) {
   });
 
   useEffect(() => {
+    // A blank box is read as 0 (or 1, to keep a division safe), so without this
+    // an untouched form reports a real-looking score. Hold the result until the
+    // clinician has actually entered the values.
+    if (!complete) {
+      onResultRef.current(null);
+      return;
+    }
     const severity = liveResult.severity as any;
     onResultRef.current({
       outputs: [
@@ -120,7 +130,7 @@ export function CdaiForm({ onResult }: CdaiFormProps) {
       inputs,
       formulaUsed: CDAI_FORMULA,
     });
-  }, [inputs, liveResult]);
+  }, [complete, inputs, liveResult]);
 
   return (
     <div>

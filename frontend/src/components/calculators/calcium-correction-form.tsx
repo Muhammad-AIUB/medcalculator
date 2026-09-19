@@ -39,7 +39,10 @@ export function CalciumCorrectionForm({ onResult }: Props) {
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!liveResult) return;
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
     onResultRef.current({
       outputs: [{
         id: 'calcium-correction',
@@ -73,7 +76,7 @@ export function CalciumCorrectionForm({ onResult }: Props) {
     <div className="space-y-6">
       <FieldRow label="Calcium">
         <div className="flex items-stretch gap-2">
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <NumInput
               value={caStr} onChange={setCaStr}
               suffix={caUnit === 'mmol' ? 'mmol/L' : 'mg/dL'}
@@ -94,7 +97,7 @@ export function CalciumCorrectionForm({ onResult }: Props) {
 
       <FieldRow label="Albumin">
         <div className="flex items-stretch gap-2">
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <NumInput
               value={albStr} onChange={setAlbStr}
               suffix={albUnit === 'gl' ? 'g/L' : 'g/dL'}
@@ -115,7 +118,7 @@ export function CalciumCorrectionForm({ onResult }: Props) {
 
       <FieldRow label="Normal albumin: 4 g/dL or 40 g/L">
         <div className="flex items-stretch gap-2">
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <NumInput
               value={normAlbStr} onChange={setNormAlbStr}
               suffix={normAlbUnit === 'gl' ? 'g/L' : 'g/dL'}

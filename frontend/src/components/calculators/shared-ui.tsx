@@ -15,10 +15,11 @@ export function FieldRow({ label, hint, children }: { label: string; hint?: stri
 }
 
 export function NumInput({
-  value, onChange, suffix, min, max, step, placeholder, disabled, readOnly,
+  value, onChange, suffix, min, max, step, placeholder, disabled, readOnly, id,
 }: {
   value: string;
   onChange: (v: string) => void;
+  /** Unit shown inside the box. Pass '' where the unit is a separate control. */
   suffix: string;
   min?: number;
   max?: number;
@@ -26,13 +27,37 @@ export function NumInput({
   placeholder?: string;
   disabled?: boolean;
   readOnly?: boolean;
+  /** Lets a sibling <label htmlFor> keep pointing at the real input. */
+  id?: string;
 }) {
+  // Thirty-seven forms already declare a plausible range per field and per unit
+  // (sodium 100-180 mmol/L, creatinine 0.1-30 mg/dL, heart rate 20-300). They were
+  // passed straight to a type="text" input, where the browser ignores them, so a
+  // value typed into the wrong box produced a confident, impossible result: 70 in
+  // the "ft" box gave a body surface area of 6.48 m2 with nothing to flag it.
+  // Warn, never block — a real patient can sit outside a textbook range.
+  const typed = parseFloat(value);
+  const outOfRange =
+    Number.isFinite(typed) &&
+    ((min !== undefined && typed < min) || (max !== undefined && typed > max));
+
+  // A field may declare only one end (tsat's iron is min 0 with no ceiling).
+  // Naming both regardless printed "Expected 0–undefined mcg/dL".
+  const expected =
+    min !== undefined && max !== undefined ? `${min}–${max}`
+      : min !== undefined ? `at least ${min}`
+      : `at most ${max}`;
+
   return (
+    <div className="min-w-0">
     <div className={cn(
       'flex items-stretch overflow-hidden rounded-lg border-2 bg-background',
-      disabled ? 'opacity-50 border-[#0E7490]/40' : 'border-[#0E7490]/50 focus-within:border-[#0E7490]',
+      disabled ? 'opacity-50 border-[#0E7490]/40'
+        : outOfRange ? 'border-red-500 focus-within:border-red-600'
+        : 'border-[#0E7490]/50 focus-within:border-[#0E7490]',
     )}>
       <input
+        id={id}
         type="text"
         inputMode="decimal"
         value={value}
@@ -54,9 +79,17 @@ export function NumInput({
         readOnly={readOnly}
         className="min-w-0 flex-1 h-11 px-2 bg-transparent text-base font-medium text-right outline-none [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none disabled:cursor-not-allowed"
       />
-      <div className="flex items-center pr-2 pl-1 h-11 text-xs font-medium text-muted-foreground justify-center whitespace-nowrap">
-        {suffix}
-      </div>
+      {suffix && (
+        <div className="flex items-center pr-2 pl-1 h-11 text-xs font-medium text-muted-foreground justify-center whitespace-nowrap">
+          {suffix}
+        </div>
+      )}
+    </div>
+    {outOfRange && (
+      <p className="mt-1 text-xs font-medium text-red-600">
+        Expected {expected} {suffix}
+      </p>
+    )}
     </div>
   );
 }
@@ -83,6 +116,15 @@ export function OrDivider() {
   return <span className="px-1 text-xs font-medium text-muted-foreground">OR</span>;
 }
 
+// Tailwind only emits classes it can see as literal strings, so the column count
+// has to map to whole class names rather than be interpolated into one.
+const GRID_COLS: Record<number, string> = {
+  1: 'grid-cols-1',
+  2: 'grid-cols-2',
+  3: 'grid-cols-3',
+  4: 'grid-cols-4',
+};
+
 export function OptionButtons<T extends string | undefined>({
   options,
   value,
@@ -95,7 +137,7 @@ export function OptionButtons<T extends string | undefined>({
   columns?: number;
 }) {
   return (
-    <div className={cn('grid gap-0 rounded-lg overflow-hidden border border-gray-200', `grid-cols-${columns}`)}>
+    <div className={cn('grid gap-0 rounded-lg overflow-hidden border border-gray-200', GRID_COLS[columns] ?? GRID_COLS[3])}>
       {options.map((opt) => {
         const active = value === opt.value;
         return (
@@ -137,3 +179,19 @@ export function InterpretationTable({ rows }: { rows: [string, string][] }) {
 
 export const round = (n: number, d = 1) => Math.round(n * Math.pow(10, d)) / Math.pow(10, d);
 export const fmt = (n: number, d = 1) => (Number.isFinite(n) ? round(n, d).toString() : '');
+
+/**
+ * True when a numeric field actually holds a number the clinician typed.
+ *
+ * Forms read a blank box as `Number(x || 0)` or `Number(x || 1)` — the fallback
+ * keeps a division safe, but it also means an untouched form still produces a
+ * real-looking score. DAS28-ESR reported "Remission" on a completely empty form
+ * that way. Gate the result on this so nothing is shown until the value is in.
+ * A typed "0" is a real answer and passes; only an empty or unparseable box fails.
+ *
+ * Several values mean "any one of these", which is the shape of the mirrored unit
+ * pairs — isFilled(platelets109L, platelets103Ul). For several separately required
+ * fields, call it once per field and combine the results with &&.
+ */
+export const isFilled = (...values: string[]) =>
+  values.some((v) => v.trim() !== '' && Number.isFinite(Number(v)));

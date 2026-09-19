@@ -1,5 +1,7 @@
 'use client';
-import React, { useState, useMemo, useEffect, useRef } from 'react';
+import React, { useState, useMemo, useEffect, useRef, useCallback } from 'react';
+import { scorePulmonary } from '@/lib/calculators/sofa';
+import { NumInput, OrDivider, fmt } from './shared-ui';
 
 interface SofaFormProps {
   onResult: (result: any) => void;
@@ -64,28 +66,64 @@ const getSeverity = (score: number) => {
   return 'danger';
 };
 
+const KPA_TO_MMHG = 7.50062;
+
 export function SofaForm({ onResult }: SofaFormProps) {
   const [ventilated, setVentilated] = useState(false);
+  // PaO2 in either unit. The mirrored box is rounded for display, so the P/F ratio is
+  // always computed from whichever box the user actually typed in.
+  const [pao2KpaStr,  setPao2KpaStr]  = useState('');
+  const [pao2MmhgStr, setPao2MmhgStr] = useState('');
+  const [lastPao2, setLastPao2] = useState<'kpa' | 'mmhg'>('kpa');
+  const [fio2Str, setFio2Str] = useState('');
+
+  const onPao2KpaChange = useCallback((v: string) => {
+    setLastPao2('kpa');
+    setPao2KpaStr(v);
+    const n = parseFloat(v);
+    setPao2MmhgStr(Number.isFinite(n) && n > 0 ? fmt(n * KPA_TO_MMHG, 1) : '');
+  }, []);
+
+  const onPao2MmhgChange = useCallback((v: string) => {
+    setLastPao2('mmhg');
+    setPao2MmhgStr(v);
+    const n = parseFloat(v);
+    setPao2KpaStr(Number.isFinite(n) && n > 0 ? fmt(n / KPA_TO_MMHG, 1) : '');
+  }, []);
+
+  const pao2MmHg = lastPao2 === 'kpa'
+    ? (parseFloat(pao2KpaStr) || 0) * KPA_TO_MMHG
+    : (parseFloat(pao2MmhgStr) || 0);
+  const fio2Pct = parseFloat(fio2Str) || 0;
+
+  // scorePulmonary takes FiO2 as a fraction, so a 100% entry becomes 1.0.
+  const respiration = pao2MmHg > 0 && fio2Pct > 0
+    ? scorePulmonary(pao2MmHg, fio2Pct / 100, undefined, ventilated)
+    : null;
   const [platelets, setPlatelets]   = useState<number | null>(null);
   const [gcs, setGcs]               = useState<number | null>(null);
   const [bilirubin, setBilirubin]   = useState<number | null>(null);
   const [cardio, setCardio]         = useState<number | null>(null);
   const [renal, setRenal]           = useState<number | null>(null);
 
-  const canSave = platelets !== null && gcs !== null &&
+  const canSave = respiration !== null && platelets !== null && gcs !== null &&
                   bilirubin !== null && cardio !== null && renal !== null;
 
   const liveResult = useMemo(() => {
     if (!canSave) return null;
-    const score = (platelets ?? 0) + (gcs ?? 0) + (bilirubin ?? 0) + (cardio ?? 0) + (renal ?? 0);
+    const score = (respiration ?? 0) + (platelets ?? 0) + (gcs ?? 0) +
+                  (bilirubin ?? 0) + (cardio ?? 0) + (renal ?? 0);
     return { score, severity: getSeverity(score) };
-  }, [canSave, platelets, gcs, bilirubin, cardio, renal]);
+  }, [canSave, respiration, platelets, gcs, bilirubin, cardio, renal]);
 
   const onResultRef = useRef(onResult);
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!liveResult) return;
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
     onResultRef.current({
       outputs: [{
         id: 'sofa',
@@ -94,14 +132,34 @@ export function SofaForm({ onResult }: SofaFormProps) {
         unit: '/20',
         interpretation: { text: '', severity: liveResult.severity },
       }],
-      inputs: { ventilated, platelets, gcs, bilirubin, cardio, renal },
-      formulaUsed: 'SOFA = Coagulation + CNS + Liver + Cardiovascular + Renal (each 0–4 pts)',
+      inputs: { pao2MmHg, fio2Pct, ventilated, platelets, gcs, bilirubin, cardio, renal },
+      formulaUsed: `SOFA = Respiration + Coagulation + Liver + Cardiovascular + CNS + Renal (each 0–4 pts)
+
+Respiration uses the PaO₂/FiO₂ ratio (mmHg):
+  ≥400: 0   |   300–399: +1   |   200–299: +2
+  100–199: +3 and <100: +4, but only if mechanically ventilated (otherwise +2)
+
+P/F ratio = ${pao2MmHg > 0 && fio2Pct > 0 ? Math.round(pao2MmHg / (fio2Pct / 100)) : '—'}  →  Respiration ${respiration ?? 0} pts`,
     });
-  }, [liveResult, bilirubin, cardio, gcs, platelets, renal, ventilated]);
+  }, [liveResult, respiration, pao2MmHg, fio2Pct, bilirubin, cardio, gcs, platelets, renal, ventilated]);
 
   return (
     <div>
-      {/* 1. Mechanical ventilation */}
+      {/* 1. PaO2 */}
+      <Field label="PaO₂">
+        <div className="grid grid-cols-[1fr_auto_1fr] items-center gap-2">
+          <NumInput value={pao2KpaStr} onChange={onPao2KpaChange} suffix="kPa" step="0.1" min={1} max={100} placeholder="Norm: 10 - 13.3" />
+          <OrDivider />
+          <NumInput value={pao2MmhgStr} onChange={onPao2MmhgChange} suffix="mmHg" step="1" min={10} max={700} />
+        </div>
+      </Field>
+
+      {/* 2. FiO2 */}
+      <Field label="FiO₂" hint="Room air is 21%">
+        <NumInput value={fio2Str} onChange={setFio2Str} suffix="%" step="1" min={21} max={100} />
+      </Field>
+
+      {/* 3. Mechanical ventilation */}
       <Field label="On mechanical ventilation" hint="Including CPAP">
         <div className="grid grid-cols-2 rounded-lg overflow-hidden border border-gray-200">
           {(['No', 'Yes'] as const).map((opt) => {

@@ -28,7 +28,10 @@ export function CorrectedReticulocyteForm({ onResult }: Props) {
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!liveResult) return;
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
     onResultRef.current({
       // Order and primary match MDCalc: its headline is the RPI, with corrected
       // retic % and absolute count listed beneath it.
@@ -77,7 +80,7 @@ export function CorrectedReticulocyteForm({ onResult }: Props) {
 
       <FieldRow label="Red blood cell count">
         <div className="flex items-stretch gap-2">
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <NumInput
               value={rbcStr} onChange={setRbcStr}
               suffix={rbcUnit === 'e12' ? '× 10¹² cells/L' : '× 10⁶ cells/µL'}

@@ -61,6 +61,14 @@
   }
   html {
     scroll-behavior: smooth;
+    /* The HOME / Refresh / EXIT bar is fixed on top of the page, so anything
+       scrolled flush to the bottom edge ends up underneath it. On a long form
+       (APACHE II) a field could sit exactly there, and the tap meant for it
+       landed on Refresh — which clears the entered values and leaves the page.
+       Browsers park a focused input at that same edge when the Android keyboard
+       opens, so it was reachable without the user scrolling there deliberately.
+       6rem matches the pb-24 the pages already reserve for the bar (73px tall). */
+    scroll-padding-bottom: 6rem;
   }
 }
 

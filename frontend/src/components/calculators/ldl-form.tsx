@@ -20,42 +20,55 @@ export function LdlForm({ onResult }: Props) {
   const [tgMmStr,  setTgMmStr]  = useState('');
   const [tgMgStr,  setTgMgStr]  = useState('');
 
+  const [lastTc,  setLastTc]  = useState<'mg' | 'mm'>('mg');
+  const [lastHdl, setLastHdl] = useState<'mg' | 'mm'>('mg');
+  const [lastTg,  setLastTg]  = useState<'mg' | 'mm'>('mg');
+
   const onTcMmChange = useCallback((v: string) => {
+    setLastTc('mm');
     setTcMmStr(v);
     const n = parseFloat(v);
     setTcMgStr(Number.isFinite(n) && n > 0 ? fmt(n * CHOL_FACTOR, 1) : '');
   }, []);
   const onTcMgChange = useCallback((v: string) => {
+    setLastTc('mg');
     setTcMgStr(v);
     const n = parseFloat(v);
     setTcMmStr(Number.isFinite(n) && n > 0 ? fmt(n / CHOL_FACTOR, 2) : '');
   }, []);
 
   const onHdlMmChange = useCallback((v: string) => {
+    setLastHdl('mm');
     setHdlMmStr(v);
     const n = parseFloat(v);
     setHdlMgStr(Number.isFinite(n) && n > 0 ? fmt(n * CHOL_FACTOR, 1) : '');
   }, []);
   const onHdlMgChange = useCallback((v: string) => {
+    setLastHdl('mg');
     setHdlMgStr(v);
     const n = parseFloat(v);
     setHdlMmStr(Number.isFinite(n) && n > 0 ? fmt(n / CHOL_FACTOR, 2) : '');
   }, []);
 
   const onTgMmChange = useCallback((v: string) => {
+    setLastTg('mm');
     setTgMmStr(v);
     const n = parseFloat(v);
     setTgMgStr(Number.isFinite(n) && n > 0 ? fmt(n * TG_FACTOR, 1) : '');
   }, []);
   const onTgMgChange = useCallback((v: string) => {
+    setLastTg('mg');
     setTgMgStr(v);
     const n = parseFloat(v);
     setTgMmStr(Number.isFinite(n) && n > 0 ? fmt(n / TG_FACTOR, 2) : '');
   }, []);
 
-  const tcMgDl  = parseFloat(tcMgStr)  || 0;
-  const hdlMgDl = parseFloat(hdlMgStr) || 0;
-  const tgMgDl  = parseFloat(tgMgStr)  || 0;
+  // Calculate from the box the user typed in. The mg/dL mirror is rounded to 1 dp for
+  // display, and computing from it shifts the result (TC 3.0, HDL 0.5, TG 0.6 mmol/L
+  // gave 86.1 mg/dL where MDCalc gives 86.0).
+  const tcMgDl  = lastTc  === 'mm' ? (parseFloat(tcMmStr)  || 0) * CHOL_FACTOR : (parseFloat(tcMgStr)  || 0);
+  const hdlMgDl = lastHdl === 'mm' ? (parseFloat(hdlMmStr) || 0) * CHOL_FACTOR : (parseFloat(hdlMgStr) || 0);
+  const tgMgDl  = lastTg  === 'mm' ? (parseFloat(tgMmStr)  || 0) * TG_FACTOR   : (parseFloat(tgMgStr)  || 0);
 
   const liveResult = useMemo(() => {
     if (tcMgDl <= 0 || hdlMgDl <= 0 || tgMgDl <= 0) return null;
@@ -67,7 +80,10 @@ export function LdlForm({ onResult }: Props) {
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!liveResult) return;
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
     onResultRef.current({
       outputs: [
         {
@@ -86,7 +102,7 @@ export function LdlForm({ onResult }: Props) {
         },
       ],
       inputs: { tcMgDl, hdlMgDl, tgMgDl },
-      warnings: liveResult.warning ? [liveResult.warning] : [],
+      warnings: liveResult.warnings,
       formulaUsed:
         'LDL (mg/dL) = Total Cholesterol (mg/dL) - HDL (mg/dL) - Triglycerides (mg/dL) / 5\n\n' +
         'Note: Not valid when Triglycerides > 400 mg/dL (Friedewald equation)',

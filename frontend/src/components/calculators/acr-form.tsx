@@ -18,7 +18,10 @@ export function AcrForm({ onResult }: Props) {
   const [crMgdlStr,  setCrMgdlStr]  = useState('');
   const [crUmolStr,  setCrUmolStr]  = useState('');
 
+  const [lastCr, setLastCr] = useState<'gdl' | 'mgdl' | 'umol'>('gdl');
+
   const onCrGdlChange = useCallback((v: string) => {
+    setLastCr('gdl');
     setCrGdlStr(v);
     const n = parseFloat(v);
     if (Number.isFinite(n) && n > 0) {
@@ -31,6 +34,7 @@ export function AcrForm({ onResult }: Props) {
   }, []);
 
   const onCrMgdlChange = useCallback((v: string) => {
+    setLastCr('mgdl');
     setCrMgdlStr(v);
     const n = parseFloat(v);
     if (Number.isFinite(n) && n > 0) {
@@ -43,6 +47,7 @@ export function AcrForm({ onResult }: Props) {
   }, []);
 
   const onCrUmolChange = useCallback((v: string) => {
+    setLastCr('umol');
     setCrUmolStr(v);
     const n = parseFloat(v);
     if (Number.isFinite(n) && n > 0) {
@@ -56,7 +61,12 @@ export function AcrForm({ onResult }: Props) {
   }, []);
 
   const albumin   = parseFloat(albuminStr) || 0;
-  const crGdl     = parseFloat(crGdlStr)   || 0;
+  // The two boxes the user did not type in are rounded mirrors, so convert from the one
+  // they did (albumin 20 mg/dL with creatinine 2000 umol/L gave ACR 884.2 vs 884.0).
+  const crGdl =
+    lastCr === 'mgdl' ? (parseFloat(crMgdlStr) || 0) / 1000 :
+    lastCr === 'umol' ? (parseFloat(crUmolStr) || 0) / 88.4 / 1000 :
+    (parseFloat(crGdlStr) || 0);
 
   const liveResult = useMemo(() => {
     if (albumin <= 0 || crGdl <= 0) return null;
@@ -68,7 +78,10 @@ export function AcrForm({ onResult }: Props) {
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!liveResult) return;
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
     onResultRef.current({
       outputs: [
         {

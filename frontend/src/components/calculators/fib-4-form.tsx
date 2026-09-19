@@ -1,10 +1,19 @@
 'use client';
 import React, { useEffect, useMemo, useRef, useState } from 'react';
 import { FIB4_FORMULA, calculateFIB4 } from '@/lib/calculators/fib-4';
+import { NumInput, isFilled } from './shared-ui';
 
 interface Fib4FormProps {
   onResult: (result: any) => void;
 }
+
+// Warn, never block. Transaminases run into the thousands in acute hepatitis and
+// a reactive thrombocytosis passes 1000, so the ceilings only catch a value that
+// went into the wrong box. Platelet bounds match cci-form for the same units.
+const TRANSAMINASE_MIN = 0;
+const TRANSAMINASE_MAX = 5000;
+const PLATELET_MIN = 0;
+const PLATELET_MAX = 1000;
 
 function NumberRow({
   title,
@@ -13,6 +22,9 @@ function NumberRow({
   placeholder,
   value,
   onChange,
+  min,
+  max,
+  step,
 }: {
   title: string;
   note?: string;
@@ -20,6 +32,9 @@ function NumberRow({
   placeholder?: string;
   value: string;
   onChange: (value: string) => void;
+  min: number;
+  max: number;
+  step?: string;
 }) {
   return (
     <div className="grid gap-4 border-t border-border py-4 md:grid-cols-[1fr_1fr] md:gap-8">
@@ -29,22 +44,16 @@ function NumberRow({
         </label>
         {note && <p className="text-sm leading-relaxed text-foreground">{note}</p>}
       </div>
-      <div className="flex overflow-hidden rounded-lg border border-border bg-background shadow-sm">
-        <input
-          id={title}
-          type="number"
-          min="0"
-          step="0.1"
-          inputMode="decimal"
-          placeholder={placeholder}
-          value={value}
-          onChange={(event) => onChange(event.target.value)}
-          className="min-h-[42px] flex-1 bg-transparent px-3 text-base font-semibold outline-none placeholder:text-muted-foreground"
-        />
-        <span className="flex min-w-[72px] items-center justify-center border-l border-border px-3 text-sm font-semibold text-foreground">
-          {unit}
-        </span>
-      </div>
+      <NumInput
+        id={title}
+        value={value}
+        onChange={onChange}
+        suffix={unit}
+        min={min}
+        max={max}
+        step={step}
+        placeholder={placeholder}
+      />
     </div>
   );
 }
@@ -66,39 +75,27 @@ function PlateletRow({
         Platelet count
       </label>
       <div className="grid items-center gap-3 sm:grid-cols-[1fr_auto_1fr]">
-        <div className="flex overflow-hidden rounded-lg border border-border bg-background shadow-sm">
-          <input
-            id="Platelet count 10^9/L"
-            type="number"
-            min="0"
-            step="0.1"
-            inputMode="decimal"
-            placeholder=""
-            value={platelets109L}
-            onChange={(event) => onPlatelets109LChange(event.target.value)}
-            className="min-h-[42px] flex-1 bg-transparent px-3 text-base font-semibold outline-none placeholder:text-muted-foreground"
-          />
-          <span className="flex min-w-[104px] items-center justify-center border-l border-border bg-muted px-3 text-sm font-bold text-foreground">
-            x 10^9/L
-          </span>
-        </div>
+        <NumInput
+          id="Platelet count 10^9/L"
+          value={platelets109L}
+          onChange={onPlatelets109LChange}
+          suffix="x 10^9/L"
+          min={PLATELET_MIN}
+          max={PLATELET_MAX}
+          step="1"
+          placeholder="Norm: 150 - 400"
+        />
         <span className="text-center text-sm font-semibold text-muted-foreground">OR</span>
-        <div className="flex overflow-hidden rounded-lg border border-border bg-background shadow-sm">
-          <input
-            id="Platelet count 10^3/uL"
-            type="number"
-            min="0"
-            step="0.1"
-            inputMode="decimal"
-            placeholder=""
-            value={platelets103Ul}
-            onChange={(event) => onPlatelets103UlChange(event.target.value)}
-            className="min-h-[42px] flex-1 bg-transparent px-3 text-base font-semibold outline-none placeholder:text-muted-foreground"
-          />
-          <span className="flex min-w-[104px] items-center justify-center border-l border-border bg-muted px-3 text-sm font-bold text-foreground">
-            x 10^3/uL
-          </span>
-        </div>
+        <NumInput
+          id="Platelet count 10^3/uL"
+          value={platelets103Ul}
+          onChange={onPlatelets103UlChange}
+          suffix="x 10^3/uL"
+          min={PLATELET_MIN}
+          max={PLATELET_MAX}
+          step="1"
+          placeholder="Norm: 150 - 400"
+        />
       </div>
     </div>
   );
@@ -133,6 +130,9 @@ export function Fib4Form({ onResult }: Fib4FormProps) {
   );
 
   const liveResult = useMemo(() => calculateFIB4(inputs), [inputs]);
+  const complete =
+    isFilled(age) && isFilled(ast) && isFilled(alt) && isFilled(platelets109L, platelets103Ul);
+
   const onResultRef = useRef(onResult);
 
   useEffect(() => {
@@ -140,6 +140,13 @@ export function Fib4Form({ onResult }: Fib4FormProps) {
   });
 
   useEffect(() => {
+    // A blank box is read as 0 (or 1, to keep a division safe), so without this
+    // an untouched form reports a real-looking score. Hold the result until the
+    // clinician has actually entered the values.
+    if (!complete) {
+      onResultRef.current(null);
+      return;
+    }
     const severity = liveResult.severity as any;
     onResultRef.current({
       outputs: [
@@ -154,19 +161,45 @@ export function Fib4Form({ onResult }: Fib4FormProps) {
       inputs: { ...inputs, platelets109L: Number(platelets109L || 0), platelets103Ul: Number(platelets103Ul || 0) },
       formulaUsed: FIB4_FORMULA,
     });
-  }, [inputs, liveResult, platelets103Ul, platelets109L]);
+  }, [complete, inputs, liveResult, platelets103Ul, platelets109L]);
 
   return (
     <div>
+      {/* FIB-4 was derived and validated in adults, so the floor is 18 rather
+          than the 1 that age-in-a-formula calculators such as eGFR use. */}
       <NumberRow
         title="Age"
         note="Use with caution in patients <35 or >65 years old, as the score has been shown to be less reliable in these patients"
         unit="years"
         value={age}
         onChange={setAge}
+        min={18}
+        max={110}
+        step="1"
       />
-      <NumberRow title="AST" note="Aspartate aminotransferase" unit="U/L" placeholder="" value={ast} onChange={setAst} />
-      <NumberRow title="ALT" note="Alanine aminotransferase" unit="U/L" placeholder="" value={alt} onChange={setAlt} />
+      <NumberRow
+        title="AST"
+        note="Aspartate aminotransferase"
+        unit="U/L"
+        placeholder="Norm: 10 - 40"
+        value={ast}
+        onChange={setAst}
+        min={TRANSAMINASE_MIN}
+        max={TRANSAMINASE_MAX}
+        step="1"
+      />
+      {/* ALT divides the score, so a zero would send it to infinity. */}
+      <NumberRow
+        title="ALT"
+        note="Alanine aminotransferase"
+        unit="U/L"
+        placeholder="Norm: 7 - 56"
+        value={alt}
+        onChange={setAlt}
+        min={1}
+        max={TRANSAMINASE_MAX}
+        step="1"
+      />
       <PlateletRow
         platelets109L={platelets109L}
         platelets103Ul={platelets103Ul}

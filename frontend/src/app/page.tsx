@@ -1,11 +1,11 @@
 'use client';
-import { useState, useEffect, useMemo } from 'react';
+import { useState, useEffect, useMemo, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { BottomBar } from '@/components/layout/bottom-bar';
 import { ExhortLogo } from '@/components/brand/exhort-logo';
 import { CALCULATORS } from '@/lib/calculators/calculator-registry';
+import { searchCalculators } from '@/lib/calculators/calculator-search';
 import { useUIStore } from '@/store/ui.store';
-import { X } from 'lucide-react';
 
 const SLOT_COUNT = 5;
 const STORAGE_KEY = 'home-slots';
@@ -20,7 +20,17 @@ export default function DashboardPage() {
   useEffect(() => {
     try {
       const saved = localStorage.getItem(STORAGE_KEY);
-      if (saved) setSlots(JSON.parse(saved));
+      if (!saved) return;
+      // Anything could be under this key: an older build's shape, a hand-edited
+      // value, or a calculator id that no longer exists. Normalise to exactly
+      // SLOT_COUNT entries so the dashboard renders instead of throwing.
+      const parsed: unknown = JSON.parse(saved);
+      if (!Array.isArray(parsed)) return;
+      setSlots(
+        Array.from({ length: SLOT_COUNT }, (_, i) =>
+          typeof parsed[i] === 'string' ? (parsed[i] as string) : null,
+        ),
+      );
     } catch {}
   }, []);
 
@@ -38,38 +48,38 @@ export default function DashboardPage() {
     setSearch('');
   };
 
-  const removeSlot = (i: number) => {
-    const next = [...slots];
-    next[i] = null;
-    saveSlots(next);
+  // Long-press a filled slot to swap the calculator in it. A tap still opens it.
+  const LONG_PRESS_MS = 500;
+  const pressTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const longPressed = useRef(false);
+
+  useEffect(() => () => { if (pressTimer.current) clearTimeout(pressTimer.current); }, []);
+
+  const startPress = (i: number) => {
+    longPressed.current = false;
+    pressTimer.current = setTimeout(() => {
+      longPressed.current = true;
+      setActiveSlot(i);
+      setSearch('');
+      navigator.vibrate?.(15);   // subtle confirmation where the device supports it
+    }, LONG_PRESS_MS);
   };
 
-  const normalizedSearch = search.trim().toLowerCase();
-  // Match title, shortTitle, description and tags. 67 of 72 titles are multi-word
-  // ("Corrected Reticulocyte Percentage"), so a prefix-only match on the title hid
-  // calculators behind their own name: "reticulocyte", "RPI", "FENa", "anion gap"
-  // and "sleep apnea" all returned nothing. Ranked so an exact title prefix still leads.
-  const filtered = useMemo(() => {
-    if (!normalizedSearch) return CALCULATORS;
-    const rank = (c: (typeof CALCULATORS)[number]) => {
-      const title = c.title.toLowerCase();
-      const short = (c.shortTitle ?? '').toLowerCase();
-      const desc = (c.description ?? '').toLowerCase();
-      const tags = (c.tags ?? []).map(t => t.toLowerCase());
-      if (title.startsWith(normalizedSearch)) return 0;
-      if (short.startsWith(normalizedSearch)) return 1;
-      if (tags.some(t => t.startsWith(normalizedSearch))) return 2;
-      if (title.includes(normalizedSearch)) return 3;
-      if (short.includes(normalizedSearch) || tags.some(t => t.includes(normalizedSearch))) return 4;
-      if (desc.includes(normalizedSearch)) return 5;
-      return -1;
-    };
-    return CALCULATORS
-      .map(c => ({ c, r: rank(c) }))
-      .filter(x => x.r >= 0)
-      .sort((a, b) => a.r - b.r || a.c.title.localeCompare(b.c.title))
-      .map(x => x.c);
-  }, [normalizedSearch]);
+  const cancelPress = () => {
+    if (pressTimer.current) { clearTimeout(pressTimer.current); pressTimer.current = null; }
+  };
+
+  // Suppress the tap that follows a long press, otherwise the picker opens and the
+  // calculator navigates at the same time.
+  const openCalc = (id: string) => {
+    if (longPressed.current) { longPressed.current = false; return; }
+    router.push(`/calculators/${id}`);
+  };
+
+  // Matching lives in calculator-search.ts: phrase ranks first, then per-word
+  // matching, so "corrected sodium in hyperglycemia" still finds "Sodium
+  // Correction for Hyperglycemia" instead of reading as a missing calculator.
+  const filtered = useMemo(() => searchCalculators(CALCULATORS, search), [search]);
 
   return (
     <div className="min-h-screen bg-white flex flex-col">
@@ -84,6 +94,9 @@ export default function DashboardPage() {
         <h1 className="text-[26px] sm:text-3xl font-extrabold tracking-tight text-gray-800 leading-tight">
           Pocket Medical Calculator
         </h1>
+        <p className="text-xs text-muted-foreground mt-1">
+          Tap to open · long-press to change
+        </p>
         <div className="flex justify-end mt-3">
           <ExhortLogo />
         </div>
@@ -97,10 +110,15 @@ export default function DashboardPage() {
             return (
               <div key={i} className="flex items-center gap-2">
                 {calc ? (
-                  /* Filled slot */
+                  /* Filled slot — tap to open, long-press to change */
                   <button
-                    onClick={() => router.push(`/calculators/${calc.id}`)}
-                    className="flex-1 text-left px-4 py-3 rounded-xl border-2 border-[#0E7490] bg-[#0E7490]/10 active:scale-[0.98] transition-all"
+                    onClick={() => openCalc(calc.id)}
+                    onPointerDown={() => startPress(i)}
+                    onPointerUp={cancelPress}
+                    onPointerLeave={cancelPress}
+                    onPointerCancel={cancelPress}
+                    onContextMenu={e => e.preventDefault()}
+                    className="flex-1 text-left px-4 py-3 rounded-xl border-2 border-[#0E7490] bg-[#0E7490]/10 active:scale-[0.98] transition-all select-none"
                   >
                     <p className="text-sm font-semibold text-[#0E7490]">{calc.title}</p>
                     {(() => {
@@ -117,14 +135,6 @@ export default function DashboardPage() {
                     className="flex-1 text-left px-4 py-4 rounded-xl border-2 border-dashed border-border text-sm text-muted-foreground hover:border-[#0E7490]/50 transition-all"
                   >
                     + Add Calculator
-                  </button>
-                )}
-                {calc && (
-                  <button
-                    onClick={() => removeSlot(i)}
-                    className="h-10 w-10 flex items-center justify-center rounded-lg text-muted-foreground hover:text-red-500 transition-colors"
-                  >
-                    <X className="h-4 w-4" />
                   </button>
                 )}
               </div>

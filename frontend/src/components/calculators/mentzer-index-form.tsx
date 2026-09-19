@@ -23,7 +23,10 @@ export function MentzerIndexForm({ onResult }: Props) {
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!liveResult) return;
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
     onResultRef.current({
       outputs: [{
         id: 'mentzer-index',
@@ -49,7 +52,7 @@ export function MentzerIndexForm({ onResult }: Props) {
 
       <FieldRow label="RBC count">
         <div className="flex items-stretch gap-2">
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <NumInput
               value={rbcStr} onChange={setRbcStr}
               suffix={rbcUnit === 'e12' ? '× 10¹² cells/L' : '× 10⁶ cells/µL'}

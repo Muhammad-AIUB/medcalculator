@@ -15,7 +15,7 @@ interface LdlInput {
 export function calculateLDL(input: LdlInput): {
   ldlMgDl:  number;
   ldlMmol:  number;
-  warning?: string;
+  warnings: string[];
   interpretation: string;
   severity: 'success' | 'warning' | 'danger';
   references: string[];
@@ -25,14 +25,32 @@ export function calculateLDL(input: LdlInput): {
   const ldlMgDl = Math.round((tcMgDl - hdlMgDl - tgMgDl / 5) * 10) / 10;
   const ldlMmol = Math.round((ldlMgDl / 38.67) * 100) / 100;
 
-  const warning = tgMgDl > 400
-    ? 'Friedewald equation is not reliable when triglycerides > 400 mg/dL'
-    : undefined;
+  const warnings: string[] = [];
+
+  // An LDL at or below zero means HDL + TG/5 came out larger than total
+  // cholesterol, which no real lipid panel does — in practice a value typed into
+  // the wrong box, or mg/dL and mmol/L mixed up. It used to fall through to the
+  // "< 70" arm and was reported in green as "Optimal LDL — target for very
+  // high-risk patients", which is the most reassuring line on the screen.
+  const impossible = ldlMgDl <= 0;
+  if (impossible) {
+    warnings.push(
+      'LDL came out at or below zero — HDL + TG/5 exceeds total cholesterol. ' +
+      'Check that each value is in the right box and in mg/dL.',
+    );
+  }
+
+  if (tgMgDl > 400) {
+    warnings.push('Friedewald equation is not reliable when triglycerides > 400 mg/dL');
+  }
 
   let severity: 'success' | 'warning' | 'danger';
   let interpretation: string;
 
-  if (ldlMgDl < 100) {
+  if (impossible) {
+    severity = 'danger';
+    interpretation = 'Not a usable result — check the entered values';
+  } else if (ldlMgDl < 100) {
     severity = 'success';
     interpretation = ldlMgDl < 70
       ? 'Optimal LDL (< 70 mg/dL) — target for very high-risk patients'
@@ -54,7 +72,7 @@ export function calculateLDL(input: LdlInput): {
   return {
     ldlMgDl,
     ldlMmol,
-    warning,
+    warnings,
     interpretation,
     severity,
     references: [

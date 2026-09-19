@@ -7,16 +7,20 @@
 const CACHE_VERSION = 'v1.2.0';
 const CACHE_NAME = `medcalc-${CACHE_VERSION}`;
 
+// Trailing slashes are not cosmetic here: next.config.js sets trailingSlash,
+// so the export writes calculators/egfr/index.html and every navigation asks
+// for '/calculators/egfr/'. Pre-caching '/calculators/egfr' stored a key no
+// request ever matched, so these pages were silently absent offline.
 const SHELL_URLS = [
   '/',
-  '/calculators/egfr',
-  '/calculators/child-pugh',
-  '/calculators/meld-na',
-  '/calculators/bmi',
-  '/calculators/edd',
-  '/calculators/sofa',
-  '/calculators/vasopressor',
-  '/calculators/tsat',
+  '/calculators/egfr/',
+  '/calculators/child-pugh/',
+  '/calculators/meld-na/',
+  '/calculators/bmi/',
+  '/calculators/edd/',
+  '/calculators/sofa/',
+  '/calculators/vasopressor/',
+  '/calculators/tsat/',
   '/manifest.json',
 ];
 

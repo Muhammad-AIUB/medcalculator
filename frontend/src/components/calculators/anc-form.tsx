@@ -26,7 +26,10 @@ export function AncForm({ onResult }: Props) {
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!liveResult) return;
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
     onResultRef.current({
       outputs: [{
         id: 'anc',
@@ -59,7 +62,7 @@ export function AncForm({ onResult }: Props) {
 
       <FieldRow label="WBC count" hint="Per 1000. Enter as 8.4, not 8400">
         <div className="flex items-stretch gap-2">
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <NumInput
               value={wbcStr} onChange={setWbcStr}
               suffix={wbcUnit === 'e9' ? '× 10⁹ cells/L' : '× 10³ cells/µL'}

@@ -20,6 +20,20 @@ const DRUGS: { name: string; defaultUnit: string; units: string[] }[] = [
   { name: 'Phenylephrine', defaultUnit: 'mcg/kg/min', units: ['mcg/kg/min', 'mcg/min', 'mg/hr'] },
 ];
 
+// The unit sits in its own <select>, so the plausible ceiling moves with it.
+// These are deliberately far above any real infusion — dopamine tops out near
+// 20 mcg/kg/min and vasopressin near 0.06 units/min — because the job is to
+// catch a decimal slip or a dose typed under the wrong unit, not to second-guess
+// a rescue dose. mcg/min and mg/hr are the same ceiling carried across
+// (5000 mcg/min = 300 mg/hr), as are units/min and units/hr.
+const DOSE_MAX: Record<string, number> = {
+  'mcg/kg/min': 50,
+  'mcg/min': 5000,
+  'mg/hr': 300,
+  'units/min': 1,
+  'units/hr': 60,
+};
+
 const VIS_MULTIPLIERS: Record<string, number> = {
   dopamine: 1, dobutamine: 1, epinephrine: 100, norepinephrine: 100,
   vasopressin: 2.5, milrinone: 10, phenylephrine: 1,
@@ -92,7 +106,10 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!liveResult) return;
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
     const severity = liveResult.severity as any;
     onResultRef.current({
       outputs: [
@@ -162,15 +179,17 @@ export function VasopressorForm({ onResult }: VasopressorFormProps) {
                 </div>
                 {drug.enabled && (
                   <div className="px-4 pb-3 flex gap-2">
-                    <input
-                      type="number"
-                      min={0}
-                      step="0.01"
-                      placeholder="Dose"
-                      value={drug.dose}
-                      onChange={e => updateDrug(i, 'dose', e.target.value)}
-                      className="flex-1 h-11 rounded-lg border-2 border-[#0E7490]/50 bg-background px-3 text-sm font-medium outline-none focus:border-[#0E7490] [appearance:textfield] [&::-webkit-outer-spin-button]:appearance-none [&::-webkit-inner-spin-button]:appearance-none"
-                    />
+                    <div className="min-w-0 flex-1">
+                      <NumInput
+                        value={drug.dose}
+                        onChange={v => updateDrug(i, 'dose', v)}
+                        suffix=""
+                        min={0}
+                        max={DOSE_MAX[drug.unit]}
+                        step="0.01"
+                        placeholder="Dose"
+                      />
+                    </div>
                     <select
                       value={drug.unit}
                       onChange={e => updateDrug(i, 'unit', e.target.value)}

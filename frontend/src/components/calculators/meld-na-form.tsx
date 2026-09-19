@@ -17,11 +17,22 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
   const [sodiumMmolStr, setSodiumMmolStr] = useState('');
   const [sodiumMeqStr, setSodiumMeqStr] = useState('');
 
-  const bilMg = parseFloat(bilMgStr) || 0;
+  // Which box the user typed in. The mirrored box is rounded to 2 dp for display, so
+  // calculating from it feeds a rounded lab value into the score. MELD-Na is reported
+  // as an integer, so that can shift the whole score: Cr 50 umol/L, bilirubin 325 umol/L,
+  // INR 1.3, Na 125 gave 29 where MDCalc gives 28.
+  const [lastBil, setLastBil]     = useState<'mg' | 'umol'>('mg');
+  const [lastCreat, setLastCreat] = useState<'mg' | 'umol'>('mg');
+
+  const bilMg = lastBil === 'umol'
+    ? (parseFloat(bilUmolStr) || 0) / 17.1
+    : (parseFloat(bilMgStr) || 0);
   const inr = parseFloat(inrStr) || 0;
   // Pass the entered value straight through. calculateMELDNa() substitutes 4.0 mg/dL
   // when onDialysis, so the field stays editable the way MDCalc leaves it.
-  const creatMg = parseFloat(creatMgStr) || 0;
+  const creatMg = lastCreat === 'umol'
+    ? (parseFloat(creatUmolStr) || 0) / 88.4
+    : (parseFloat(creatMgStr) || 0);
   const sodium = parseFloat(sodiumMeqStr || sodiumMmolStr) || 0;
 
   const liveResult = useMemo(() => {
@@ -90,6 +101,7 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
   }, [liveResult, bilMg, inr, creatMg, sodium, onDialysis]);
 
   const onBilUmolChange = useCallback((v: string) => {
+    setLastBil('umol');
     setBilUmolStr(v);
     const n = parseFloat(v);
     const mg = Number.isFinite(n) && v !== '' ? fmt(n / 17.1, 2) : '';
@@ -97,6 +109,7 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
   }, []);
 
   const onBilMgChange = useCallback((v: string) => {
+    setLastBil('mg');
     setBilMgStr(v);
     const n = parseFloat(v);
     const umol = Number.isFinite(n) && v !== '' ? fmt(n * 17.1, 1) : '';
@@ -104,6 +117,7 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
   }, []);
 
   const onCreatUmolChange = useCallback((v: string) => {
+    setLastCreat('umol');
     setCreatUmolStr(v);
     const n = parseFloat(v);
     const mg = Number.isFinite(n) && v !== '' ? fmt(n / 88.4, 2) : '';
@@ -111,6 +125,7 @@ export function MeldNaForm({ onResult }: MeldNaFormProps) {
   }, []);
 
   const onCreatMgChange = useCallback((v: string) => {
+    setLastCreat('mg');
     setCreatMgStr(v);
     const n = parseFloat(v);
     const umol = Number.isFinite(n) && v !== '' ? fmt(n * 88.4, 1) : '';

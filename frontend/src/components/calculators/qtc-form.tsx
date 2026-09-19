@@ -66,7 +66,10 @@ export function QtcForm({ onResult }: Props) {
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!liveResult) return;
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
     const r = liveResult.results;
     const primary = r[formula];
     const interp  = liveResult.interpretation(primary);
@@ -147,7 +150,7 @@ export function QtcForm({ onResult }: Props) {
         hint={`1 small box = ${msPerBox} msec (paper speed ${paperSpeed} mm/sec)`}
       >
         <div className="flex items-stretch gap-2">
-          <div className="flex-1">
+          <div className="min-w-0 flex-1">
             <NumInput
               value={qtStr}
               onChange={setQtStr}

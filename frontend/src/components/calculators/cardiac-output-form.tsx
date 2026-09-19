@@ -88,7 +88,10 @@ export function CardiacOutputForm({ onResult }: Props) {
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!liveResult) return;
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
 
     const coSeverity = liveResult.co >= 4 && liveResult.co <= 8   ? 'success' as const : liveResult.co < 4 ? 'danger' as const : 'warning' as const;
     const ciSeverity = liveResult.ci >= 2.5 && liveResult.ci <= 4 ? 'success' as const : liveResult.ci < 2.5 ? 'danger' as const : 'warning' as const;

@@ -14,10 +14,25 @@ export function BmiForm({ onResult }: BmiFormProps) {
   const [kgStr, setKgStr] = useState('');
   const [lbStr, setLbStr] = useState('');
 
-  const heightCm = useMemo(() => parseFloat(cmStr) || 0, [cmStr]);
-  const weightKg = useMemo(() => parseFloat(kgStr) || 0, [kgStr]);
+  // Which unit the user typed in. The cm and kg boxes are rounded to 1 dp when mirrored
+  // from ft/in and lb, so calculating from them shifts the BMI (80 lb at 4 ft 8 in gave
+  // 18.0 where 17.9 is correct).
+  const [lastH, setLastH] = useState<'cm' | 'ftin'>('cm');
+  const [lastW, setLastW] = useState<'kg' | 'lb'>('kg');
+
+  const heightCm = useMemo(
+    () => (lastH === 'ftin'
+      ? (parseFloat(ftStr) || 0) * 30.48 + (parseFloat(inStr) || 0) * 2.54
+      : parseFloat(cmStr) || 0),
+    [lastH, ftStr, inStr, cmStr],
+  );
+  const weightKg = useMemo(
+    () => (lastW === 'lb' ? (parseFloat(lbStr) || 0) / 2.20462 : parseFloat(kgStr) || 0),
+    [lastW, lbStr, kgStr],
+  );
 
   const onCmChange = useCallback((v: string) => {
+    setLastH('cm');
     setCmStr(v);
     const cm = parseFloat(v);
     if (Number.isFinite(cm) && cm > 0) {
@@ -40,16 +55,19 @@ export function BmiForm({ onResult }: BmiFormProps) {
   }, []);
 
   const onFtChange = useCallback((v: string) => {
+    setLastH('ftin');
     setFtStr(v);
     syncFtIn(v, inStr);
   }, [inStr, syncFtIn]);
 
   const onInChange = useCallback((v: string) => {
+    setLastH('ftin');
     setInStr(v);
     syncFtIn(ftStr, v);
   }, [ftStr, syncFtIn]);
 
   const onKgChange = useCallback((v: string) => {
+    setLastW('kg');
     setKgStr(v);
     const kg = parseFloat(v);
     const lb = Number.isFinite(kg) && kg > 0 ? fmt(kg * 2.20462, 1) : '';
@@ -57,6 +75,7 @@ export function BmiForm({ onResult }: BmiFormProps) {
   }, []);
 
   const onLbChange = useCallback((v: string) => {
+    setLastW('lb');
     setLbStr(v);
     const lb = parseFloat(v);
     const kg = Number.isFinite(lb) && lb > 0 ? fmt(lb / 2.20462, 1) : '';
@@ -71,7 +90,10 @@ export function BmiForm({ onResult }: BmiFormProps) {
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!canSave) return;
+    if (!canSave) {
+      onResultRef.current(null);
+      return;
+    }
     const raw = calculateBMI({ heightCm, weightKg });
     const severity = raw.severity as any;
     onResultRef.current({
@@ -88,6 +110,10 @@ export function BmiForm({ onResult }: BmiFormProps) {
           label: sr.label,
           value: sr.value,
           unit: sr.unit,
+          // The result panel shows 1 dp unless told otherwise, which rendered the
+          // Mosteller BSA as 1.9 where the BSA calculator alongside it shows 1.87.
+          // BSA drives chemotherapy and cardiac-index dosing, so keep both digits.
+          ...(sr.unit === 'm2' ? { decimals: 2 } : {}),
           interpretation: { text: String(sr.value), severity: (sr.severity ?? 'neutral') as any },
         })) ?? []),
       ],

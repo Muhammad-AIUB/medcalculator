@@ -64,10 +64,15 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <meta name="msapplication-TileColor" content="#0891b2" />
       </head>
       <body className="antialiased min-h-screen bg-background">
+        {/* The UI is light-only by design: the result card, the option buttons and
+            the home screen all paint fixed light backgrounds, and no theme switch is
+            mounted anywhere. enableSystem used to let a system-dark user land on a
+            half-dark page (dark body behind a white result card, unreadable help
+            text), so the theme is pinned until those surfaces get real dark tokens. */}
         <ThemeProvider
           attribute="class"
           defaultTheme="light"
-          enableSystem
+          forcedTheme="light"
           disableTransitionOnChange={false}
         >
           {children}

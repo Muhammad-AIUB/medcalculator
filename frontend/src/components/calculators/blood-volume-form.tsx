@@ -57,7 +57,10 @@ export function BloodVolumeForm({ onResult }: Props) {
   useEffect(() => { onResultRef.current = onResult; });
 
   useEffect(() => {
-    if (!liveResult) return;
+    if (!liveResult) {
+      onResultRef.current(null);
+      return;
+    }
     let formula = '';
     if (isAdult) {
       formula = sex === 'male'

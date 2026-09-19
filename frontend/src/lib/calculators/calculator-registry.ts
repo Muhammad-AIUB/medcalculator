@@ -60,6 +60,8 @@ import { calculateNEWS } from './news'
 import { calculateNEWS2 } from './news2'
 import { calculateIPIDlbcl } from './ipi-dlbcl'
 import { calculateCnsIpi } from './cns-ipi'
+import { calculateMeldCombined } from './meld-combined'
+import { calculatePreciseDapt } from './precise-dapt'
 import { calculateICH } from './ich'
 import { calculateMRS } from './mrs'
 import { calculateHuntHess } from './hunt-hess'
@@ -81,16 +83,16 @@ import { calculateSCAIShock } from './scai-shock'
 export const CALCULATORS: Calculator[] = [
   {
     id: 'egfr',
-    title: 'eGFR Calculator',
-    shortTitle: 'eGFR',
+    title: 'MDRD eGFR',
+    shortTitle: 'MDRD eGFR',
     emoji: '🫘',
     description:
-      'Estimate glomerular filtration rate using CKD-EPI 2021 or MDRD formula with automatic mg/dL ↔ µmol/L unit conversion',
+      'Estimates glomerular filtration rate with the 4-variable MDRD equation (sex, age, creatinine, Black race), with automatic mg/dL ↔ µmol/L conversion',
     category: 'renal',
     icon: 'Droplets',
     color: 'text-blue-600',
     bgColor: 'bg-blue-50 dark:bg-blue-950',
-    tags: ['kidney', 'creatinine', 'CKD', 'renal function', 'nephrology'],
+    tags: ['MDRD', 'eGFR', 'GFR', 'kidney', 'creatinine', 'CKD', 'renal function', 'nephrology'],
     inputs: [
       {
         id: 'creatinine',
@@ -615,7 +617,9 @@ export const CALCULATORS: Calculator[] = [
     icon: 'HeartPulse',
     color: 'text-red-600',
     bgColor: 'bg-red-50 dark:bg-red-950',
-    tags: ['ICU', 'sepsis', 'organ failure', 'critical care', 'mortality', 'ventilator'],
+    // The respiration component is the PaO₂/FiO₂ ratio; "oxygen" appears
+    // nowhere else in this entry, so without it the word finds nothing.
+    tags: ['ICU', 'sepsis', 'organ failure', 'critical care', 'mortality', 'ventilator', 'oxygenation', 'hypoxemia'],
     inputs: [
       { id: 'pao2', label: 'PaO₂', type: 'number', required: false, min: 20, max: 600, helpText: 'mmHg' },
       { id: 'fio2', label: 'FiO₂', type: 'number', required: false, min: 0.21, max: 1.0, helpText: '0.21–1.0' },
@@ -830,7 +834,13 @@ export const CALCULATORS: Calculator[] = [
     bgColor: 'bg-blue-50',
     tags: ['creatinine clearance', 'CrCl', 'Cockcroft-Gault', 'renal function', 'IBW', 'ABW'],
     inputs: [
-      { id: 'sex',        label: 'Sex',         type: 'radio',  required: true  },
+      {
+        id: 'sex',
+        label: 'Sex',
+        type: 'radio',
+        required: true,
+        options: [{ value: 'male', label: 'Male' }, { value: 'female', label: 'Female' }],
+      },
       { id: 'age',        label: 'Age',         type: 'number', required: true,  min: 1, max: 120 },
       { id: 'weight',     label: 'Weight (kg)', type: 'number', required: true,  min: 1, max: 300 },
       { id: 'creatinine', label: 'Creatinine',  type: 'number', required: true,  min: 0.1, max: 30 },
@@ -981,7 +991,8 @@ export const CALCULATORS: Calculator[] = [
     icon: 'Wind',
     color: 'text-sky-600',
     bgColor: 'bg-sky-50',
-    tags: ["Wells", 'pulmonary embolism', 'PE', 'DVT', 'D-dimer', 'CTPA', 'thrombosis'],
+    // "Wells score" is what people say; the title only ever says "Criteria".
+    tags: ["Wells", 'Wells score', 'pulmonary embolism', 'PE', 'DVT', 'D-dimer', 'CTPA', 'thrombosis'],
     inputs: [],
     calculate: (inputs) => {
       const result = calculateWellsPE({
@@ -1503,7 +1514,8 @@ export const CALCULATORS: Calculator[] = [
     icon: 'HeartPulse',
     color: 'text-red-600',
     bgColor: 'bg-red-50',
-    tags: ["Wells", 'DVT', 'deep vein thrombosis', 'thrombosis', 'D-dimer', 'ultrasound', 'hematology'],
+    // "Wells score" is what people say; the title only ever says "Criteria".
+    tags: ["Wells", 'Wells score', 'DVT', 'deep vein thrombosis', 'thrombosis', 'D-dimer', 'ultrasound', 'hematology'],
     inputs: [],
     calculate: (inputs) => {
       const result = calculateWellsDvt({
@@ -1866,6 +1878,55 @@ export const CALCULATORS: Calculator[] = [
         kidneyOrAdrenal: Boolean(inputs.kidneyOrAdrenal),
       });
       return { calculatorId: 'cns-ipi', score: result.score, unit: 'points', severity: result.severity, label: 'CNS-IPI', interpretation: result.interpretation };
+    },
+  },
+  {
+    id: 'meld-combined',
+    title: 'Model for End-Stage Liver Disease (Combined MELD)',
+    shortTitle: 'Combined MELD',
+    emoji: '🫀',
+    description: 'Offers all three MELD versions for liver transplant planning: the original pre-2016 score, MELD Na, and MELD 3.0 (currently recommended by OPTN)',
+    category: 'liver',
+    icon: 'Activity',
+    color: 'text-amber-600',
+    bgColor: 'bg-amber-50',
+    tags: ['MELD', 'Combined MELD', 'MELD 3.0', 'MELD Na', 'MELD-Na', 'liver', 'cirrhosis', 'transplant', 'end-stage liver disease', 'hepatology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculateMeldCombined({
+        version:        (inputs.version as any) ?? 'meld-3',
+        bilirubinMgDl:  Number(inputs.bilirubinMgDl ?? 0),
+        inr:            Number(inputs.inr ?? 0),
+        creatinineMgDl: Number(inputs.creatinineMgDl ?? 0),
+        sodium:         inputs.sodium === undefined ? undefined : Number(inputs.sodium),
+        albuminGdl:     inputs.albuminGdl === undefined ? undefined : Number(inputs.albuminGdl),
+        female:         Boolean(inputs.female),
+        onDialysis:     Boolean(inputs.onDialysis),
+      });
+      return { calculatorId: 'meld-combined', score: result.score, unit: 'points', severity: result.severity, label: 'MELD', interpretation: result.interpretation };
+    },
+  },
+  {
+    id: 'precise-dapt',
+    title: 'PRECISE-DAPT Score',
+    shortTitle: 'PRECISE-DAPT',
+    emoji: '🩸',
+    description: 'Estimates out-of-hospital bleeding risk on dual antiplatelet therapy after PCI, to help decide DAPT duration',
+    category: 'cardiovascular',
+    icon: 'Activity',
+    color: 'text-rose-600',
+    bgColor: 'bg-rose-50',
+    tags: ['PRECISE-DAPT', 'PRECISE DAPT', 'DAPT', 'dual antiplatelet', 'bleeding', 'PCI', 'stent', 'cardiology'],
+    inputs: [],
+    calculate: (inputs) => {
+      const result = calculatePreciseDapt({
+        age:          Number(inputs.age ?? 0),
+        hemoglobinGL: Number(inputs.hemoglobinGL ?? 0),
+        wbc:          Number(inputs.wbc ?? 0),
+        crclMlMin:    Number(inputs.crclMlMin ?? 0),
+        priorBleed:   Boolean(inputs.priorBleed),
+      });
+      return { calculatorId: 'precise-dapt', score: result.score, unit: 'points', severity: result.severity, label: 'PRECISE-DAPT', interpretation: result.interpretation };
     },
   },
   {
@@ -2442,5 +2503,6 @@ export const CALCULATOR_CATEGORIES = [
   'liver',
   'nutrition',
   'obstetric',
+  'cardiovascular',
   'hematology',
 ] as const

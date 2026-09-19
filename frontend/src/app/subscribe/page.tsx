@@ -53,6 +53,10 @@ export default function SubscribePage() {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    // Marking the device subscribed cannot be undone from the UI, so never do it
+    // for a submission that carries nothing. required= on the fields covers the
+    // normal path; this covers a whitespace-only name or a bypassed form.
+    if (!form.name.trim() || !form.email.trim()) return;
     try {
       localStorage.setItem('subscription', JSON.stringify({ ...form, at: Date.now() }));
     } catch {}
@@ -134,6 +138,7 @@ export default function SubscribePage() {
                   <User className={iconClass} />
                   <input
                     type="text"
+                    required
                     value={form.name}
                     onChange={update('name')}
                     className={inputClass}
@@ -177,6 +182,7 @@ export default function SubscribePage() {
                   <Mail className={iconClass} />
                   <input
                     type="email"
+                    required
                     value={form.email}
                     onChange={update('email')}
                     className={inputClass}

@@ -18,7 +18,11 @@ interface SOFAInput {
   urineOutput?: number
 }
 
-function scorePulmonary(pao2?: number, fio2?: number, spo2?: number, ventilated?: boolean): number {
+// Exported so sofa-form.tsx scores respiration from the same table rather than
+// duplicating the thresholds. Verified against mdcalc.com/calc/691: P/F >=400 -> 0,
+// 300-399 -> 1, 200-299 -> 2, 100-199 -> 3 only if ventilated (else 2),
+// <100 -> 4 only if ventilated (else 2).
+export function scorePulmonary(pao2?: number, fio2?: number, spo2?: number, ventilated?: boolean): number {
   // PaO2/FiO2 preferred; use SpO2/FiO2 if PaO2 unavailable
   let ratio: number | undefined
 

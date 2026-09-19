@@ -1,10 +1,11 @@
-﻿'use client';
+'use client';
 import { useRouter } from 'next/navigation';
 import { useMemo, useState, useCallback } from 'react';
 import { AppShell } from '@/components/layout/app-shell';
 import { Button } from '@/components/ui/button';
 import { getCalculator } from '@/lib/calculators/calculator-registry';
 import { useUIStore } from '@/store/ui.store';
+import { cn } from '@/lib/utils';
 import dynamic from 'next/dynamic';
 
 const EgfrForm        = dynamic(() => import('@/components/calculators/egfr-form').then(m => ({ default: m.EgfrForm })), { ssr: false });
@@ -68,6 +69,8 @@ const NewsForm                     = dynamic(() => import('@/components/calculat
 const News2Form                    = dynamic(() => import('@/components/calculators/news2-form').then(m => ({ default: m.News2Form })), { ssr: false });
 const IpiDlbclForm                 = dynamic(() => import('@/components/calculators/ipi-dlbcl-form').then(m => ({ default: m.IpiDlbclForm })), { ssr: false });
 const CnsIpiForm                   = dynamic(() => import('@/components/calculators/cns-ipi-form').then(m => ({ default: m.CnsIpiForm })), { ssr: false });
+const MeldCombinedForm             = dynamic(() => import('@/components/calculators/meld-combined-form').then(m => ({ default: m.MeldCombinedForm })), { ssr: false });
+const PreciseDaptForm              = dynamic(() => import('@/components/calculators/precise-dapt-form').then(m => ({ default: m.PreciseDaptForm })), { ssr: false });
 const IchForm                      = dynamic(() => import('@/components/calculators/ich-form').then(m => ({ default: m.IchForm })), { ssr: false });
 const MrsForm                      = dynamic(() => import('@/components/calculators/mrs-form').then(m => ({ default: m.MrsForm })), { ssr: false });
 const HuntHessForm                 = dynamic(() => import('@/components/calculators/hunt-hess-form').then(m => ({ default: m.HuntHessForm })), { ssr: false });
@@ -148,6 +151,8 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
   news2:                      News2Form,
   'ipi-dlbcl':                IpiDlbclForm,
   'cns-ipi':                  CnsIpiForm,
+  'meld-combined':            MeldCombinedForm,
+  'precise-dapt':             PreciseDaptForm,
   ich:                        IchForm,
   mrs:                        MrsForm,
   'hunt-hess':                HuntHessForm,
@@ -168,7 +173,7 @@ const FORM_MAP: Record<string, React.ComponentType<any>> = {
 };
 
 const FORMULA_MAP: Record<string, string> = {
-  egfr:         'GFR = 175 x Scr^-1.154 x Age^-0.203 x 1.212 (if Black) x 0.742 (if Female)',
+  egfr:         'eGFR = 175 × Scr^−1.154 × Age^−0.203 × (0.742 if female) × (1.212 if Black)   [MDRD 4-variable]',
   bmi:          'BMI = Weight (kg) / Height^2 (m^2)',
   bsa:          'BSA (m²) = √[(Height in cm × Weight in kg) / 3600]   (Mosteller)',
   'bsa-costeff': 'BSA (m²) = (4 × W + 7) / (90 + W)   (Costeff, W in kg)',
@@ -243,6 +248,11 @@ const FORMULA_MAP: Record<string, string> = {
   curb65: 'CURB-65 = C + U + R + B + 65 (each criterion = 1 point)\n\nC — Confusion (new-onset disorientation to person, place, or time)\nU — Urea >7 mmol/L (BUN >19 mg/dL)\nR — Respiratory rate ≥30 breaths/min\nB — Blood pressure: SBP <90 mmHg or DBP ≤60 mmHg\n65 — Age ≥65 years\n\nMax score: 5\n\nScore | 30-day Mortality | Recommendation\n0–1   | ~1–3%           | Low risk — outpatient treatment\n2     | ~6.8%           | Moderate risk — consider short hospitalization\n3     | ~14%            | High risk — hospitalize\n4–5   | ~27.8%          | Very high risk — hospitalize, consider ICU',
   moca: 'Addition of assigned points across all domains:\n\nVisuospatial/Executive (5 pts): Trail making (1), Cube copy (1), Clock drawing (0–3)\nNaming (3 pts): Lion (1), Rhinoceros (1), Camel (1)\nAttention (6 pts): Digit span forward (1), Digit span backward (1), Vigilance (1), Serial 7s (0–3)\nLanguage (3 pts): Sentence repetition ×2 (1 each), Letter fluency ≥11 words (1)\nAbstraction (2 pts): Two similarity items (1 each)\nDelayed Recall (5 pts): Recall of 5 words (0–5)\nOrientation (6 pts): Date, month, year, day, place, city (0–6)\nEducation correction: +1 if ≤12 years of formal education (max total = 30)\n\n≥ 26:    Normal cognition\n18–25:  Mild cognitive impairment\n10–17:  Moderate cognitive impairment\n< 10:   Severe cognitive impairment',
   edss: 'EDSS: Points assigned based on level of disability.\nFSS: Addition of selected points within each body system.\n\nAmbulation score (4.0–10.0) takes precedence when ambulatory function is impaired.\nWhen fully ambulatory, EDSS is derived from FSS subscores (0–3.5):\n\n0:   Normal\n1.0: One FS grade 1\n1.5: >1 FS grade 1\n2.0: One FS grade 2\n2.5: Two FS grade 2\n3.0: One FS grade 3\n3.5: ≥2 FS grade 3, or more complex impairment\n\nFunctional Systems (FSS): Pyramidal (0-6), Cerebellar (0-5), Brainstem (0-5),\nSensory (0-6), Bowel/Bladder (0-6), Visual (0-6), Cerebral (0-5), Other (0-1)',
+  news2: 'NEWS2 = Respiratory rate + SpO₂ + Air/O₂ + Temperature + Systolic BP + Pulse + Consciousness (ACVPU)\n\nSpO₂ uses Scale 1 (usual target) or Scale 2 (hypercapnic respiratory failure, target 88–92%)\nConsciousness: Alert 0 | new-onset Confusion / Voice / Pain / Unresponsive +3\nAny supplemental oxygen: +2\n\nMax score: 20\n\n0–4: Low risk\n0–4 with any single parameter scoring 3: Low-medium risk — urgent clinician review\n5–6: Medium risk — urgent clinician review, minimum hourly monitoring\n≥7: High risk — emergency assessment, continuous monitoring',
+  'ipi-dlbcl': 'IPI = Age >60 + Stage III–IV + ECOG ≥2 + LDH >1× normal + >1 extranodal site\n(each risk factor = 1 point, max 5)\n\nR-IPI (Sehn 2007, R-CHOP era)\n0:   Very good prognosis (94% 4-yr OS)\n1–2: Good prognosis (79% 4-yr OS)\n3–5: Poor prognosis (55% 4-yr OS)\n\nIPI (Shipp 1993, pre-rituximab)\n0–1: Low (82% 4-yr OS)\n2:   Low-intermediate (81% 4-yr OS)\n3:   High-intermediate (49% 4-yr OS)\n4–5: High (59% 4-yr OS)',
+  'cns-ipi': 'CNS-IPI = Age >60 + LDH > normal + ECOG >1 + Stage III/IV + >1 extranodal site\n          + kidney and/or adrenal involvement\n(each risk factor = 1 point, max 6)\n\n0–1: Low — 0.6% 2-year CNS relapse\n2–3: Intermediate — 3.4% 2-year CNS relapse\n4–6: High — 10.2% 2-year CNS relapse; consider CNS-directed prophylaxis',
+  'meld-combined': 'Three versions on one page — pick one:\n\nMELD (original, pre-2016)\n  = 3.78 ln(bilirubin) + 11.2 ln(INR) + 9.57 ln(creatinine) + 6.43\n\nMELD Na (prior UNOS/OPTN standard)\n  = MELD, then if MELD > 11:  + 1.32 (137 − Na) − 0.033 × MELD × (137 − Na)\n\nMELD 3.0 (currently recommended by OPTN)\n  = 1.33 (if female) + 4.56 ln(bilirubin) + 0.82 (137 − Na) − 0.24 (137 − Na) ln(bilirubin)\n  + 9.09 ln(INR) + 11.14 ln(creatinine) + 1.85 (3.5 − albumin) − 1.83 (3.5 − albumin) ln(creatinine) + 6',
+  'precise-dapt': 'PRECISE-DAPT = age + haemoglobin + white cell count + creatinine clearance + prior bleeding\n\nPublished as a nomogram rather than an equation; each axis contributes linearly up to a ceiling.\n\n≤10:   Very low bleeding risk\n11–17: Low\n18–24: Moderate\n≥25:   High — consider short DAPT (3–6 months), then single antiplatelet therapy',
 };
 
 const severityColors: Record<string, string> = {
@@ -276,8 +286,8 @@ export function CalculatorPageClient({ id }: Props) {
   // to be declared before any early return below.
   const handleResult = useCallback((res: any) => {
     setResult(res);
-    addToRecent(id);
     if (res) {
+      addToRecent(id);
       const primaryOutput = res.outputs?.[0];
       addHistoryEntry({
         calculatorId: id,
@@ -313,6 +323,34 @@ export function CalculatorPageClient({ id }: Props) {
   // pads trailing zeros the way MDCalc does for continuous values: FENa 0.0, DAS28 4.0,
   // anion gap 25.0. Only set it where MDCalc has actually been observed padding.
   const secondary: any[] = result?.outputs?.slice(1) ?? [];
+  // The clinical band the calculator worked out. Ten of them (APRI, FIB-4, SOFA-2,
+  // FRAX, SLEDAI, the AIH pair, the RA trio) put the band in `classification` and
+  // leave `text` as the bare score, so reading only `text` showed "0.8333" or
+  // "9 points" where "Indeterminate / possible fibrosis" belonged. Skip the band
+  // when the note already spells it out, which is how most calculators phrase it.
+  const primaryShown = primary
+    ? (typeof primary.value === 'number'
+        ? primary.value.toLocaleString(undefined, {
+            maximumFractionDigits: primary.decimals ?? 1,
+            minimumFractionDigits: primary.minDecimals ?? 0,
+          })
+        : String(primary.value ?? ''))
+    : '';
+  // Anything that only restates the headline adds nothing: TSAT's note is the same
+  // "35%", EDD's classification is the due date already shown above.
+  const squash = (v: string) => v.replace(/\s+/g, '').toLowerCase();
+  const echoesHeadline = (v: string) =>
+    squash(v) === squash(primaryShown) ||
+    squash(v) === squash(primaryShown + (primary?.unit ?? ''));
+
+  const rawBand = primary?.interpretation?.classification?.toString().trim() ?? '';
+  const rawNote = primary?.interpretation?.text?.toString().trim() ?? '';
+  // A note that is only the score repeats the headline above it, so drop it.
+  const noteIsJustTheValue = !!rawNote && /^[-+]?[\d.,]+\s*(points?|pts?)?$/i.test(rawNote);
+  const primaryNote = !rawNote || noteIsJustTheValue || echoesHeadline(rawNote) ? '' : rawNote;
+  const primaryBand =
+    rawBand && !primaryNote.includes(rawBand) && !echoesHeadline(rawBand) ? rawBand : '';
+
   const sev   = primary?.interpretation?.severity ?? 'neutral';
   const color = severityColors[sev] ?? severityColors.neutral;
   const bg    = primary ? (severityBg[sev] ?? severityBg.neutral) : '#f8fafc';
@@ -336,12 +374,7 @@ export function CalculatorPageClient({ id }: Props) {
             <>
               <div className="flex items-baseline gap-2">
                 <span className="text-5xl font-bold" style={{ color }}>
-                  {typeof primary.value === 'number'
-                    ? primary.value.toLocaleString(undefined, {
-                        maximumFractionDigits: primary.decimals ?? 1,
-                        minimumFractionDigits: primary.minDecimals ?? 0,
-                      })
-                    : primary.value}
+                  {primaryShown}
                 </span>
                 {primary.unit && (
                   <span className="text-base font-medium text-gray-500">{primary.unit}</span>
@@ -368,8 +401,17 @@ export function CalculatorPageClient({ id }: Props) {
                     return (
                       <div key={o.id ?? o.label ?? i}>
                         <div className="flex items-baseline justify-between gap-3">
-                          <span className="text-sm font-medium text-gray-600">{o.label}</span>
-                          <span className="text-lg font-bold whitespace-nowrap" style={{ color: oColor }}>
+                          <span className="min-w-0 text-sm font-medium text-gray-600">{o.label}</span>
+                          {/* nowrap keeps a number glued to its unit; a text value
+                              ("High - consider transplant listing") has to be allowed
+                              to wrap, or it pushes the whole page wider than the phone. */}
+                          <span
+                            className={cn(
+                              'min-w-0 text-right text-lg font-bold',
+                              typeof o.value === 'number' && 'whitespace-nowrap',
+                            )}
+                            style={{ color: oColor }}
+                          >
                             {shown}
                             {o.unit && (
                               <span className="ml-1 text-xs font-medium text-gray-500">{o.unit}</span>
@@ -398,14 +440,19 @@ export function CalculatorPageClient({ id }: Props) {
         </div>
 
         {/* Interpretation */}
-        {primary?.interpretation?.text ? (
+        {(primaryBand || primaryNote) ? (
           <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
             <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
               Interpretation
             </p>
-            <p className="text-sm font-medium text-foreground">
-              {primary.interpretation.text}
-            </p>
+            {primaryBand && (
+              <p className="text-sm font-semibold text-foreground">{primaryBand}</p>
+            )}
+            {primaryNote && (
+              <p className={cn('text-sm font-medium text-foreground', primaryBand && 'mt-0.5')}>
+                {primaryNote}
+              </p>
+            )}
           </div>
         ) : null}
 
