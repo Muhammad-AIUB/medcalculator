@@ -8,6 +8,9 @@ dist/
 .next/
 build/
 out/
+# tsc --noEmit rewrites this on every type-check, so a tracked copy shows up
+# dirty in every diff and conflicts on every merge.
+*.tsbuildinfo
 
 # Capacitor Android (generated at build time by GitHub Actions)
 frontend/android/
