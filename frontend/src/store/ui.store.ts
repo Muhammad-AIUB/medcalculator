@@ -42,12 +42,33 @@ export const useUIStore = create<UIState>()(
         return { recentCalculators: [calcId, ...filtered].slice(0, 5) };
       }),
 
-      addHistoryEntry: (entry) => set((state) => ({
-        history: [
-          { ...entry, id: generateSessionId() },
-          ...state.history,
-        ].slice(0, 100),
-      })),
+      /**
+       * Records a calculation, collapsing a run of edits into one entry.
+       *
+       * The calculator page calls this for every result a form emits, and forms
+       * emit on each keystroke: typing a creatinine of "1.25" filed three entries
+       * ("1", "1.2", "1.25"). Two of those were never a patient's value, and the
+       * 100-entry cap then evicted other calculators' results about three times
+       * faster than intended, so the summary under a home-screen slot vanished
+       * early.
+       *
+       * Consecutive entries for the same calculator are the same calculation being
+       * refined, so the newest replaces it in place, keeping its id. Only the most
+       * recent entry per calculator is read today (the home screen looks it up with
+       * history.find), so nothing observable is lost. Revisit this if a history
+       * list is ever shown and two back-to-back runs of one calculator both matter.
+       */
+      addHistoryEntry: (entry) => set((state) => {
+        const [newest, ...older] = state.history;
+        const refinesNewest = newest?.calculatorId === entry.calculatorId;
+        const next: HistoryEntry = {
+          ...entry,
+          id: refinesNewest ? newest.id : generateSessionId(),
+        };
+        return {
+          history: [next, ...(refinesNewest ? older : state.history)].slice(0, 100),
+        };
+      }),
 
       removeHistoryEntry: (id) => set((state) => ({
         history: state.history.filter((e) => e.id !== id),
