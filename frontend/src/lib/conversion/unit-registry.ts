@@ -1,5 +1,8 @@
 import type { UnitDefinition, UnitCategory } from '@/types/conversion'
 
+// Grams per mole, used to convert a mass concentration to a molar one
+// (µmol/L = mg/dL × 10000 / M). Two entries below need a clinical decision before
+// anything is wired up to them — see the notes inline.
 export const MOLAR_MASSES: Record<string, number> = {
   creatinine: 113.12,
   bilirubin: 584.66,
@@ -9,6 +12,10 @@ export const MOLAR_MASSES: Record<string, number> = {
   cholesterol: 386.65,
   triglycerides: 885.43,
   calcium: 40.08,
+  // NEEDS A DECISION before use: 94.97 is the mass of the phosphate ion (PO4).
+  // Laboratories report serum *phosphorus*, and the standard conversion for that
+  // is mg/dL × 0.3229 = mmol/L, i.e. M = 30.97. Converting a reported phosphorus
+  // with 94.97 understates it roughly threefold.
   phosphate: 94.97,
   magnesium: 24.31,
   iron: 55.85,
@@ -29,6 +36,10 @@ export const UNIT_REGISTRY: Record<string, UnitDefinition> = {
   'µmol/L': { symbol: 'µmol/L', name: 'micromoles per liter', category: 'concentration-molar', toCanonical: 1, precision: 1, aliases: ['umol/L', 'umol/l', 'µmol/l'] },
   'mmol/L': { symbol: 'mmol/L', name: 'millimoles per liter', category: 'concentration-molar', toCanonical: 1000, precision: 2, aliases: ['mmol/l', 'mM'] },
   'nmol/L': { symbol: 'nmol/L', name: 'nanomoles per liter', category: 'concentration-molar', toCanonical: 0.001, precision: 1, aliases: ['nmol/l'] },
+  // NEEDS A DECISION before use: this sits in the molar category with the same
+  // canonical factor as µmol/L, so 140 mEq/L of sodium reads as 140 µmol/L. mEq/L
+  // is mmol/L × valence, so the honest factor is 1000 for a monovalent ion and 500
+  // for a divalent one — the registry has nowhere to record valence yet.
   'mEq/L': { symbol: 'mEq/L', name: 'milliequivalents per liter', category: 'concentration-molar', toCanonical: 1, precision: 1, aliases: ['meq/L', 'meq/l', 'mEq/l'] },
   'kg': { symbol: 'kg', name: 'kilograms', category: 'weight', toCanonical: 1, precision: 1, aliases: ['kgs', 'kilogram', 'kilograms'] },
   'lb': { symbol: 'lb', name: 'pounds', category: 'weight', toCanonical: 0.453592, precision: 1, aliases: ['lbs', 'pound', 'pounds'] },

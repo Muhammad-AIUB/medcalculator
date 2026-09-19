@@ -153,42 +153,35 @@ export class MedicalUnitConverter {
       inFromCanonical = value * from.toCanonical
     }
 
-    // Cross-category conversion via mg/dL ↔ µmol/L
-    // mg/dL → µmol/L: (mg/dL * 10 / molarMass * 1000) = mg/dL * 10000 / molarMass / 1000
-    // Actually: µmol/L = mg/dL * 1000/molarMass * 10 (for mg/dL to µmol/L)
-    // mg/dL * (10 / molarMass) * 1000 = mg/dL * 10000/molarMass
-    // Simplified: µmol/L = mg/dL * 88.42 (for creatinine, molarMass=113.12)
-    // General formula: µmol/L = mg/dL * 10000 / molarMass
+    // Cross-category conversion runs through the two canonical units: mg/dL for
+    // concentration-mass, µmol/L for concentration-molar.
+    //
+    //   mg/dL → g/dL (÷1000) → g/L (×10) → mol/L (÷M) → µmol/L (×1e6)
+    //     = mg/dL × 10000 / M
+    //
+    // For creatinine (M = 113.12) that is ×88.40, and for bilirubin (M = 584.66)
+    // ×17.10 — the factors creatinineConvert and bilirubinConvert already use, which
+    // is what pins this down. An earlier derivation here converted litres to
+    // decilitres by multiplying by 10 instead of 0.1 and came out 100× wrong in both
+    // directions (88.4 µmol/L of creatinine read back as 100 mg/dL rather than 1.0).
+    const UMOL_PER_L_PER_MG_PER_DL = 10000
 
     let mgPerDL: number
-    // Convert from unit to mg/dL equivalent
     if (from.category === 'concentration-mass') {
-      // Already in mass concentration, convert to mg/dL
-      mgPerDL = inFromCanonical // toCanonical=1 means canonical=mg/dL for concentration-mass
+      // Canonical for concentration-mass is already mg/dL.
+      mgPerDL = inFromCanonical
     } else if (from.category === 'concentration-molar') {
-      // µmol/L → mg/dL
-      // µmol/L / (10000/molarMass) = mg/dL
-      const umolPerL = inFromCanonical // toCanonical=1 means µmol/L for molar
-      mgPerDL = umolPerL * molarMass / 10000 * 1 // µmol/L * g/mol / 1000 / 10 * 1000 / 1
-      // Correction: µmol/L → mmol/L (*0.001) → g/L (*molarMass) → g/dL (/10) → mg/dL (*1000)
-      // = µmol/L * 0.001 * molarMass / 10 * 1000 = µmol/L * molarMass / 100 / 1000 * 1000
-      // Let's be precise: µmol/L * (molarMass g/mol) * (1 mol/1e6 µmol) * (1000 mg/g) * (1 dL / 0.1 L)
-      // = µmol/L * molarMass * 1e-6 * 1000 * 10
-      // = µmol/L * molarMass * 0.01
-      mgPerDL = umolPerL * molarMass * 0.01
+      // Canonical for concentration-molar is µmol/L.
+      mgPerDL = (inFromCanonical * molarMass) / UMOL_PER_L_PER_MG_PER_DL
     } else {
       return value
     }
 
-    // Now convert mg/dL to target
     if (to.category === 'concentration-mass') {
-      // mg/dL → target mass concentration
       const result = mgPerDL / (to.toCanonical as number)
       return this.round(result, to.precision)
     } else if (to.category === 'concentration-molar') {
-      // mg/dL → µmol/L: value / (molarMass * 0.01)
-      const umolPerL = mgPerDL / (molarMass * 0.01)
-      // Now convert µmol/L to target molar unit
+      const umolPerL = (mgPerDL * UMOL_PER_L_PER_MG_PER_DL) / molarMass
       const result = umolPerL / (to.toCanonical as number)
       return this.round(result, to.precision)
     }
