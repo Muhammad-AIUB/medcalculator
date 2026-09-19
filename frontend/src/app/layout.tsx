@@ -49,6 +49,12 @@ export const viewport: Viewport = {
   maximumScale: 5,
   userScalable: true,
   themeColor: '#0F2744',
+  // Android 15 draws every app targeting API 35+ edge to edge and, from API 36,
+  // will not let it opt out. Without viewport-fit=cover the WebView reports every
+  // env(safe-area-inset-*) as 0, so the bottom bar would sit under the gesture
+  // bar and the teal band under the status bar. Capacitor's SystemBars plugin
+  // looks for exactly this string before it starts publishing real insets.
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {

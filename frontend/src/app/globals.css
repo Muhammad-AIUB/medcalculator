@@ -67,8 +67,10 @@
        landed on Refresh — which clears the entered values and leaves the page.
        Browsers park a focused input at that same edge when the Android keyboard
        opens, so it was reachable without the user scrolling there deliberately.
-       6rem matches the pb-24 the pages already reserve for the bar (73px tall). */
-    scroll-padding-bottom: 6rem;
+       6rem matches the pb-24 the pages already reserve for the bar (73px tall),
+       plus the gesture-bar inset the bar sits behind once the app is edge to
+       edge, which every build targeting API 36 is. */
+    scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
   }
 }
 

@@ -86,7 +86,11 @@ export default function DashboardPage() {
       {/* Teal gradient header band */}
       <div
         className="w-full h-14 shrink-0"
-        style={{ background: 'linear-gradient(180deg, #0a5d57 0%, #0e7d74 50%, #16a99c 100%)' }}
+        style={{
+          background: 'linear-gradient(180deg, #0a5d57 0%, #0e7d74 50%, #16a99c 100%)',
+          // Edge to edge from API 36: let the band grow up behind the status bar.
+          height: 'calc(3.5rem + env(safe-area-inset-top, 0px))',
+        }}
       />
 
       {/* Title + brand */}
@@ -103,7 +107,10 @@ export default function DashboardPage() {
       </div>
 
       {/* Calculator slots */}
-      <main className="flex-1 w-full max-w-2xl mx-auto px-4 pt-4 pb-24">
+      <main
+        className="flex-1 w-full max-w-2xl mx-auto px-4 pt-4 pb-24"
+        style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}
+      >
         <div className="space-y-3">
           {slots.map((calcId, i) => {
             const calc = calcId ? CALCULATORS.find(c => c.id === calcId) : null;

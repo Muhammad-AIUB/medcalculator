@@ -10,5 +10,8 @@ export default defineConfig({
   test: {
     environment: 'node',
     include: ['src/**/*.test.ts'],
+    // ui.store persists through localStorage, which Node either does not define
+    // or defines without setItem depending on the version. See the setup file.
+    setupFiles: ['./vitest.setup.ts'],
   },
 })
