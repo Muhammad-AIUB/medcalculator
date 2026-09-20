@@ -1,15 +1,34 @@
-name: Build Android APK
+name: Android CI
+
+# Two things happen here, in this order, and the order is the point.
+#
+# First the gate: type-check, lint, the 933 unit tests, the static export, and
+# then a *release* bundle. That last one matters because the release variant is
+# the only one that runs R8 and the resource shrinker, and it is the variant
+# that reaches patients through Play. It used to be built nowhere but on one
+# laptop, so a minify rule that stripped something Capacitor loads reflectively
+# would have been discovered by a user, not by CI.
+#
+# Then distribution: the debug APK that testers sideload. It is produced only
+# after the gate has passed and only on a push, never on a pull request.
 
 on:
   push:
     branches: [main]
-  workflow_dispatch:   # Allows manual trigger from GitHub UI
+  pull_request:
+  workflow_dispatch:
 
 permissions:
   contents: write
 
+# A second push while the first is still building only wastes a runner; the
+# older run can go.
+concurrency:
+  group: android-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  build-android:
+  build:
     runs-on: ubuntu-latest
 
     steps:
@@ -24,9 +43,26 @@ jobs:
           cache: 'npm'
           cache-dependency-path: frontend/package-lock.json
 
+      # `npm ci` rather than `npm install`: it installs exactly what the
+      # lockfile pins and fails if the lockfile and package.json disagree,
+      # instead of quietly resolving something newer than what was tested.
       - name: Install dependencies
         working-directory: frontend
-        run: npm install
+        run: npm ci
+
+      - name: Type-check
+        working-directory: frontend
+        run: npx tsc --noEmit
+
+      - name: Lint
+        working-directory: frontend
+        run: npx next lint
+
+      # These cover the formulas, the registry wiring, the conversion factors
+      # and the form guards. A red suite must not reach an installable file.
+      - name: Unit tests
+        working-directory: frontend
+        run: npm test
 
       - name: Build Next.js static export
         working-directory: frontend
@@ -39,6 +75,9 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
 
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+
       # `cap add` is gone on purpose: the android project is committed, and
       # adding it fresh would reset the versionCode and the release config.
       # sync copies the web build in and refreshes the plugin list.
@@ -50,6 +89,24 @@ jobs:
         working-directory: frontend/android
         run: chmod +x gradlew
 
+      # The shipping code path. Unsigned here - the upload key stays on the
+      # developer's machine - but R8, the resource shrinker and the manifest
+      # merge all run exactly as they do for the build that goes to Play, so a
+      # break in any of them fails this workflow rather than a patient's phone.
+      - name: Build release bundle (unsigned, verification only)
+        working-directory: frontend/android
+        run: ./gradlew bundleRelease --no-daemon
+
+      # Kept so the release build can be compared against whatever was signed
+      # locally, and so a broken shrinker can be inspected rather than guessed at.
+      - name: Upload release bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: app-release-unsigned-aab
+          path: frontend/android/app/build/outputs/bundle/release/app-release.aab
+          retention-days: 14
+          if-no-files-found: error
+
       - name: Build Debug APK
         working-directory: frontend/android
         run: ./gradlew assembleDebug --no-daemon
@@ -57,12 +114,19 @@ jobs:
       - name: Rename APK
         run: cp frontend/android/app/build/outputs/apk/debug/app-debug.apk MedCalcPro.apk
 
+      # Push only. A pull request gets the whole gate above and no publish.
       - name: Create GitHub Release with APK
+        if: github.event_name == 'push'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
           name: "MedCalc Pro — Build ${{ github.run_number }}"
-          body: "✅ Offline-first Android APK. Install করুন — internet ছাড়াই কাজ করবে।"
+          body: |
+            ✅ Offline-first Android APK. Install করুন — internet ছাড়াই কাজ করবে।
+
+            ⚠️ This is a **debug** build: it is debuggable and signed with
+            Android's shared debug key, so treat it as an internal test build
+            rather than the one on Play.
           files: MedCalcPro.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
