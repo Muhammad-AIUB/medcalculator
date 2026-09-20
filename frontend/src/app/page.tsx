@@ -89,7 +89,7 @@ export default function DashboardPage() {
         style={{
           background: 'linear-gradient(180deg, #0a5d57 0%, #0e7d74 50%, #16a99c 100%)',
           // Edge to edge from API 36: let the band grow up behind the status bar.
-          height: 'calc(3.5rem + env(safe-area-inset-top, 0px))',
+          height: 'calc(3.5rem + var(--sa-top))',
         }}
       />
 
@@ -109,7 +109,7 @@ export default function DashboardPage() {
       {/* Calculator slots */}
       <main
         className="flex-1 w-full max-w-2xl mx-auto px-4 pt-4 pb-24"
-        style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}
+        style={{ paddingBottom: 'calc(6rem + var(--sa-bottom))' }}
       >
         <div className="space-y-3">
           {slots.map((calcId, i) => {

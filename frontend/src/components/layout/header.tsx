@@ -19,7 +19,7 @@ export function Header({ title, showBack, backHref = '/', className }: HeaderPro
         borderBottom: '1px solid rgba(255,255,255,0.08)',
         // Edge to edge from API 36: the gradient runs up behind the status bar,
         // the title row starts below it.
-        paddingTop: 'env(safe-area-inset-top, 0px)',
+        paddingTop: 'var(--sa-top)',
       }}
     >
       <div className="flex h-14 items-center gap-3 px-4 max-w-2xl mx-auto">

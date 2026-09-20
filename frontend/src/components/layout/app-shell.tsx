@@ -16,7 +16,7 @@ export function AppShell({ children, title, showBack, backHref }: AppShellProps)
           bar now sits behind, so the last field stays reachable edge to edge. */}
       <main
         className="flex-1 w-full max-w-2xl mx-auto px-4 pt-4 pb-24"
-        style={{ paddingBottom: 'calc(6rem + env(safe-area-inset-bottom, 0px))' }}
+        style={{ paddingBottom: 'calc(6rem + var(--sa-bottom))' }}
       >
         {children}
       </main>

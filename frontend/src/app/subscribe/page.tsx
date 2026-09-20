@@ -80,7 +80,7 @@ export default function SubscribePage() {
         style={{
           background: 'linear-gradient(180deg, #0a5d57 0%, #0e7d74 50%, #16a99c 100%)',
           // Edge to edge from API 36: let the band grow up behind the status bar.
-          height: 'calc(3.5rem + env(safe-area-inset-top, 0px))',
+          height: 'calc(3.5rem + var(--sa-top))',
         }}
       />
 

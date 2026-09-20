@@ -59,6 +59,18 @@
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
+  :root {
+    /* Two mechanisms publish the safe-area insets and only one of them is live
+       at a time. Capacitor 8 zeroes the WebView's native insets on purpose -
+       a Chromium bug makes env() unreliable there - and injects
+       --safe-area-inset-* instead, so inside the APK env() is always 0. In a
+       plain browser or the PWA nothing injects the variable and env() is the
+       only source. Chaining them means the same CSS is right in both, which
+       the emulator proved the hard way: the first version used env() alone and
+       every inset resolved to zero on Android 16. */
+    --sa-top: var(--safe-area-inset-top, env(safe-area-inset-top, 0px));
+    --sa-bottom: var(--safe-area-inset-bottom, env(safe-area-inset-bottom, 0px));
+  }
   html {
     scroll-behavior: smooth;
     /* The HOME / Refresh / EXIT bar is fixed on top of the page, so anything
@@ -70,7 +82,7 @@
        6rem matches the pb-24 the pages already reserve for the bar (73px tall),
        plus the gesture-bar inset the bar sits behind once the app is edge to
        edge, which every build targeting API 36 is. */
-    scroll-padding-bottom: calc(6rem + env(safe-area-inset-bottom, 0px));
+    scroll-padding-bottom: calc(6rem + var(--sa-bottom));
   }
 }
 

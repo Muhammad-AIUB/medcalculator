@@ -44,7 +44,7 @@ export function BottomBar() {
     // it, so edge-to-edge looks deliberate rather than clipped.
     <nav
       className="fixed bottom-0 left-0 right-0 z-40 bg-gray-100 border-t border-gray-200"
-      style={{ paddingBottom: 'env(safe-area-inset-bottom, 0px)' }}
+      style={{ paddingBottom: 'var(--sa-bottom)' }}
     >
       <div className="grid grid-cols-3 gap-3 px-4 py-3 max-w-2xl mx-auto">
         <button onClick={() => router.push(navTarget)} className={btnClass}>
