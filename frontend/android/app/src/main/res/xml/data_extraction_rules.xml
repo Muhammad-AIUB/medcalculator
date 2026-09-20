@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  Android 12 and up read these rules instead of android:allowBackup.
+
+  Both paths are refused outright: cloud-backup would copy the stored
+  calculations and the submitted subscription details into the user's Google
+  Drive, and device-transfer would carry them to a new phone. Neither is
+  something a clinical calculator should do quietly on the user's behalf.
+-->
+<data-extraction-rules>
+    <cloud-backup>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </cloud-backup>
+    <device-transfer>
+        <exclude domain="root" />
+        <exclude domain="file" />
+        <exclude domain="database" />
+        <exclude domain="sharedpref" />
+        <exclude domain="external" />
+    </device-transfer>
+</data-extraction-rules>
