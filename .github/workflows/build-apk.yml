@@ -73,31 +73,33 @@ jobs:
         working-directory: frontend
         run: npm test
 
-      # On a tag the tag is the authority. version.properties has to agree with
-      # it, because that file is what a local Android Studio build reads when it
-      # signs the AAB that actually goes to Play - if the two drift, the store
-      # listing and the release notes stop describing the same binary.
-      - name: Resolve version
+      # version.properties is the single source: Gradle reads it here and in
+      # Android Studio, so the AAB signed by hand for Play and anything CI
+      # builds carry identical numbers. A tag does not override it - it is
+      # checked against it, which is the only arrangement where the two cannot
+      # drift apart. Deriving the code in CI alone would have left a local
+      # build on the file's number and the release notes on the tag's.
+      - name: Check the tag against version.properties
         id: version
         run: |
           set -euo pipefail
-          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
-            VER="${GITHUB_REF_NAME#v}"
-            IFS=. read -r MAJ MIN PAT <<< "$VER"
-            CODE=$(( MAJ * 1000000 + MIN * 1000 + PAT ))
-            FILE_NAME=$(grep -E '^versionName=' frontend/android/version.properties | cut -d= -f2)
-            if [ "$FILE_NAME" != "$VER" ]; then
-              echo "::error::Tag ${GITHUB_REF_NAME} does not match version.properties (versionName=$FILE_NAME). Update the file, commit, then re-tag."
-              exit 1
-            fi
-            echo "name=$VER" >> "$GITHUB_OUTPUT"
-            echo "code=$CODE" >> "$GITHUB_OUTPUT"
-            echo "Tagged build: $VER (versionCode $CODE)"
-          else
-            echo "name=" >> "$GITHUB_OUTPUT"
-            echo "code=" >> "$GITHUB_OUTPUT"
-            echo "Untagged build: taking the version from version.properties"
+          FILE=frontend/android/version.properties
+          FILE_NAME=$(grep -E '^versionName=' "$FILE" | cut -d= -f2)
+          FILE_CODE=$(grep -E '^versionCode=' "$FILE" | cut -d= -f2)
+          echo "name=$FILE_NAME" >> "$GITHUB_OUTPUT"
+          echo "code=$FILE_CODE" >> "$GITHUB_OUTPUT"
+          if [ "${GITHUB_REF_TYPE}" != "tag" ]; then
+            echo "Untagged build: $FILE_NAME (versionCode $FILE_CODE)"
+            exit 0
           fi
+          VER="${GITHUB_REF_NAME#v}"
+          IFS=. read -r MAJ MIN PAT <<< "$VER"
+          WANT_CODE=$(( MAJ * 1000000 + MIN * 1000 + PAT ))
+          if [ "$FILE_NAME" != "$VER" ] || [ "$FILE_CODE" != "$WANT_CODE" ]; then
+            echo "::error::Tag ${GITHUB_REF_NAME} wants versionName=$VER and versionCode=$WANT_CODE, but $FILE has versionName=$FILE_NAME and versionCode=$FILE_CODE. Fix the file, commit, delete the tag and re-tag."
+            exit 1
+          fi
+          echo "Tagged build: $VER (versionCode $WANT_CODE)"
 
       - name: Build Next.js static export
         working-directory: frontend
@@ -136,8 +138,6 @@ jobs:
       - name: Build release bundle
         working-directory: frontend/android
         env:
-          APP_VERSION_NAME: ${{ steps.version.outputs.name }}
-          APP_VERSION_CODE: ${{ steps.version.outputs.code }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
@@ -157,8 +157,6 @@ jobs:
         if: env.HAS_KEYSTORE == 'true'
         working-directory: frontend/android
         env:
-          APP_VERSION_NAME: ${{ steps.version.outputs.name }}
-          APP_VERSION_CODE: ${{ steps.version.outputs.code }}
           ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
           ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
