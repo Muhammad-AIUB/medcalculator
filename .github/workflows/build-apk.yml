@@ -1,28 +1,32 @@
 name: Android CI
 
-# Two things happen here, in this order, and the order is the point.
+# One pipeline, three things, in this order.
 #
-# First the gate: type-check, lint, the 933 unit tests, the static export, and
-# then a *release* bundle. That last one matters because the release variant is
-# the only one that runs R8 and the resource shrinker, and it is the variant
-# that reaches patients through Play. It used to be built nowhere but on one
-# laptop, so a minify rule that stripped something Capacitor loads reflectively
-# would have been discovered by a user, not by CI.
+# 1. The gate - type-check, lint, the unit tests, the static export - runs for
+#    every push and every pull request.
+# 2. The release bundle. This is the variant that reaches Play, and the only one
+#    that runs R8 and the resource shrinker. Building it here means a keep-rule
+#    that strips something Capacitor loads reflectively fails a workflow instead
+#    of a patient's phone.
+# 3. The sideloadable APK. It is the *release* variant signed with a throwaway
+#    test key held in Actions secrets - never the Play upload key, which stays in
+#    Android Studio on the maintainer's machine. The APK published before this
+#    was the debug variant, debuggable=true, which Capacitor reads directly to
+#    switch on WebView inspection and logging.
 #
-# Then distribution: the debug APK that testers sideload. It is produced only
-# after the gate has passed and only on a push, never on a pull request.
+# Without the ANDROID_KEYSTORE_BASE64 secret the first two still run and nothing
+# is published, which is the safe way round.
 
 on:
   push:
     branches: [main]
+    tags: ['v*']
   pull_request:
   workflow_dispatch:
 
 permissions:
   contents: write
 
-# A second push while the first is still building only wastes a runner; the
-# older run can go.
 concurrency:
   group: android-${{ github.ref }}
   cancel-in-progress: true
@@ -30,6 +34,11 @@ concurrency:
 jobs:
   build:
     runs-on: ubuntu-latest
+
+    env:
+      # Secrets cannot be read in an `if:`, so presence is hoisted into a plain
+      # boolean here and tested as env.HAS_KEYSTORE below.
+      HAS_KEYSTORE: ${{ secrets.ANDROID_KEYSTORE_BASE64 != '' }}
 
     steps:
       - name: Checkout code
@@ -64,6 +73,32 @@ jobs:
         working-directory: frontend
         run: npm test
 
+      # On a tag the tag is the authority. version.properties has to agree with
+      # it, because that file is what a local Android Studio build reads when it
+      # signs the AAB that actually goes to Play - if the two drift, the store
+      # listing and the release notes stop describing the same binary.
+      - name: Resolve version
+        id: version
+        run: |
+          set -euo pipefail
+          if [ "${GITHUB_REF_TYPE}" = "tag" ]; then
+            VER="${GITHUB_REF_NAME#v}"
+            IFS=. read -r MAJ MIN PAT <<< "$VER"
+            CODE=$(( MAJ * 1000000 + MIN * 1000 + PAT ))
+            FILE_NAME=$(grep -E '^versionName=' frontend/android/version.properties | cut -d= -f2)
+            if [ "$FILE_NAME" != "$VER" ]; then
+              echo "::error::Tag ${GITHUB_REF_NAME} does not match version.properties (versionName=$FILE_NAME). Update the file, commit, then re-tag."
+              exit 1
+            fi
+            echo "name=$VER" >> "$GITHUB_OUTPUT"
+            echo "code=$CODE" >> "$GITHUB_OUTPUT"
+            echo "Tagged build: $VER (versionCode $CODE)"
+          else
+            echo "name=" >> "$GITHUB_OUTPUT"
+            echo "code=" >> "$GITHUB_OUTPUT"
+            echo "Untagged build: taking the version from version.properties"
+          fi
+
       - name: Build Next.js static export
         working-directory: frontend
         run: npm run build
@@ -89,44 +124,96 @@ jobs:
         working-directory: frontend/android
         run: chmod +x gradlew
 
-      # The shipping code path. Unsigned here - the upload key stays on the
-      # developer's machine - but R8, the resource shrinker and the manifest
-      # merge all run exactly as they do for the build that goes to Play, so a
-      # break in any of them fails this workflow rather than a patient's phone.
-      - name: Build release bundle (unsigned, verification only)
+      # Written outside the workspace so it cannot be committed by a later step
+      # or swept into an artifact.
+      - name: Decode test keystore
+        if: env.HAS_KEYSTORE == 'true'
+        run: |
+          set -euo pipefail
+          echo "${{ secrets.ANDROID_KEYSTORE_BASE64 }}" | base64 -d > "$RUNNER_TEMP/ci-test.jks"
+          echo "ANDROID_KEYSTORE_PATH=$RUNNER_TEMP/ci-test.jks" >> "$GITHUB_ENV"
+
+      - name: Build release bundle
         working-directory: frontend/android
+        env:
+          APP_VERSION_NAME: ${{ steps.version.outputs.name }}
+          APP_VERSION_CODE: ${{ steps.version.outputs.code }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
         run: ./gradlew bundleRelease --no-daemon
 
-      # Kept so the release build can be compared against whatever was signed
-      # locally, and so a broken shrinker can be inspected rather than guessed at.
+      # Kept so a shrinker problem can be inspected rather than guessed at, and
+      # so the CI build can be diffed against whatever was signed locally.
       - name: Upload release bundle
         uses: actions/upload-artifact@v4
         with:
-          name: app-release-unsigned-aab
+          name: app-release-aab
           path: frontend/android/app/build/outputs/bundle/release/app-release.aab
           retention-days: 14
           if-no-files-found: error
 
-      - name: Build Debug APK
+      - name: Build release APK for sideloading
+        if: env.HAS_KEYSTORE == 'true'
         working-directory: frontend/android
-        run: ./gradlew assembleDebug --no-daemon
+        env:
+          APP_VERSION_NAME: ${{ steps.version.outputs.name }}
+          APP_VERSION_CODE: ${{ steps.version.outputs.code }}
+          ANDROID_KEYSTORE_PASSWORD: ${{ secrets.ANDROID_KEYSTORE_PASSWORD }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+          ANDROID_KEY_PASSWORD: ${{ secrets.ANDROID_KEY_PASSWORD }}
+        run: ./gradlew assembleRelease --no-daemon
 
-      - name: Rename APK
-        run: cp frontend/android/app/build/outputs/apk/debug/app-debug.apk MedCalcPro.apk
+      # Proves what is about to be published rather than trusting the build
+      # type: not debuggable, and not signed by Android's debug certificate.
+      - name: Verify the APK before publishing
+        if: env.HAS_KEYSTORE == 'true'
+        run: |
+          set -euo pipefail
+          APK=frontend/android/app/build/outputs/apk/release/app-release.apk
+          BUILD_TOOLS=$(ls -d "$ANDROID_HOME"/build-tools/* | sort -V | tail -1)
+          "$BUILD_TOOLS/apksigner" verify --print-certs "$APK" | tee certs.txt
+          if grep -q "CN=Android Debug" certs.txt; then
+            echo "::error::APK is signed with the Android debug certificate"
+            exit 1
+          fi
+          if "$BUILD_TOOLS/aapt2" dump badging "$APK" | grep -q "application-debuggable"; then
+            echo "::error::APK is debuggable"
+            exit 1
+          fi
+          cp "$APK" MedCalcPro.apk
+          echo "Signed, not debuggable: $(du -h MedCalcPro.apk | cut -f1)"
 
-      # Push only. A pull request gets the whole gate above and no publish.
-      - name: Create GitHub Release with APK
-        if: github.event_name == 'push'
+      - name: Say why nothing was published
+        if: env.HAS_KEYSTORE != 'true'
+        run: echo "::notice::No ANDROID_KEYSTORE_BASE64 secret, so no APK was published. The gate and the release bundle still ran."
+
+      - name: Publish tagged release
+        if: github.ref_type == 'tag' && env.HAS_KEYSTORE == 'true'
+        uses: softprops/action-gh-release@v2
+        with:
+          name: "Pocket Medical Calculator ${{ github.ref_name }}"
+          body: |
+            Release APK for sideloading — version ${{ steps.version.outputs.name }} (versionCode ${{ steps.version.outputs.code }}).
+
+            Offline-first: install করুন, internet ছাড়াই কাজ করবে।
+
+            Signed with the project's test key rather than the Play upload key,
+            so uninstall the Play build first if you have it.
+          files: MedCalcPro.apk
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Publish main-branch build
+        if: github.ref_type == 'branch' && github.event_name == 'push' && env.HAS_KEYSTORE == 'true'
         uses: softprops/action-gh-release@v2
         with:
           tag_name: build-${{ github.run_number }}
           name: "MedCalc Pro — Build ${{ github.run_number }}"
+          prerelease: true
           body: |
-            ✅ Offline-first Android APK. Install করুন — internet ছাড়াই কাজ করবে।
-
-            ⚠️ This is a **debug** build: it is debuggable and signed with
-            Android's shared debug key, so treat it as an internal test build
-            rather than the one on Play.
+            Development build from main. Release variant, signed with the
+            project's test key — not a Play release.
           files: MedCalcPro.apk
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

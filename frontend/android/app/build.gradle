@@ -1,14 +1,46 @@
 apply plugin: 'com.android.application'
 
+// The version lives in version.properties, one directory up, so that a build
+// signed by hand in Android Studio and a build produced by CI cannot report
+// different numbers. A tagged CI run overrides both from the tag.
+def versionProps = new Properties()
+def versionPropsFile = file('../version.properties')
+if (versionPropsFile.exists()) {
+    versionPropsFile.withInputStream { versionProps.load(it) }
+}
+def resolvedVersionCode = (System.getenv('APP_VERSION_CODE')
+        ?: versionProps.getProperty('versionCode', '1')).toInteger()
+def resolvedVersionName = System.getenv('APP_VERSION_NAME')
+        ?: versionProps.getProperty('versionName', '1.0')
+
+// Signing for the sideloadable test build, and only that. The Play upload key
+// never appears here - it stays in Android Studio's own dialog on the
+// maintainer's machine. With no environment set, which is every local build,
+// no signingConfig is attached at all and nothing changes.
+def ciKeystorePath = System.getenv('ANDROID_KEYSTORE_PATH')
+def hasCiKeystore = ciKeystorePath != null && !ciKeystorePath.isEmpty() && file(ciKeystorePath).exists()
+
 android {
     namespace = "com.exhort.pocketcalculator"
     compileSdk = rootProject.ext.compileSdkVersion
+
+    signingConfigs {
+        if (hasCiKeystore) {
+            ciTest {
+                storeFile file(ciKeystorePath)
+                storePassword System.getenv('ANDROID_KEYSTORE_PASSWORD')
+                keyAlias System.getenv('ANDROID_KEY_ALIAS')
+                keyPassword System.getenv('ANDROID_KEY_PASSWORD')
+            }
+        }
+    }
+
     defaultConfig {
         applicationId "com.exhort.pocketcalculator"
         minSdkVersion rootProject.ext.minSdkVersion
         targetSdkVersion rootProject.ext.targetSdkVersion
-        versionCode 5
-        versionName "1.0.4"
+        versionCode resolvedVersionCode
+        versionName resolvedVersionName
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
         aaptOptions {
              // Files and dirs to omit from the packaged assets dir, modified to accommodate modern web apps.
@@ -24,6 +56,9 @@ android {
             minifyEnabled true
             shrinkResources true
             proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+            if (hasCiKeystore) {
+                signingConfig signingConfigs.ciTest
+            }
         }
     }
 }
