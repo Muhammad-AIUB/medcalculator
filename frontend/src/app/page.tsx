@@ -148,6 +148,14 @@ export default function DashboardPage() {
             );
           })}
         </div>
+
+        {/* Said on the first screen, not buried in the privacy policy. A tool
+            that returns MELD and SOFA scores has to state what it is before
+            anyone acts on one. */}
+        <p className="mt-6 text-xs leading-relaxed text-muted-foreground">
+          For qualified healthcare professionals. A reference aid — it does not
+          replace clinical judgement, diagnosis, or treatment decisions.
+        </p>
       </main>
 
       <BottomBar />

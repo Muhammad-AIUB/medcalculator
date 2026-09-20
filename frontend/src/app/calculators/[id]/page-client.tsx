@@ -466,6 +466,33 @@ export function CalculatorPageClient({ id }: Props) {
           </p>
         </div>
 
+        {/* Sources. Sixty-seven calculation modules already return the papers
+            and guidelines they implement, and every form passes them up here,
+            but nothing rendered them - so the one thing that lets a clinician
+            check a score against its origin was collected and thrown away. */}
+        {result?.references?.length > 0 && (
+          <div className="rounded-xl border border-border bg-muted/40 px-4 py-3">
+            <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-1">
+              References
+            </p>
+            <ul className="space-y-1">
+              {result.references.map((ref: string, i: number) => (
+                <li key={i} className="text-xs leading-relaxed text-muted-foreground">
+                  {ref}
+                </li>
+              ))}
+            </ul>
+          </div>
+        )}
+
+        {/* The privacy policy has carried this line since launch; the app never
+            showed it. A clinical calculator has to say on screen what it is. */}
+        <p className="pb-2 text-xs leading-relaxed text-muted-foreground">
+          For qualified healthcare professionals. This is a reference aid and does
+          not replace clinical judgement, diagnosis, or treatment decisions.
+          Always verify against the source before acting on a result.
+        </p>
+
       </div>
     </AppShell>
   );
